@@ -55,7 +55,7 @@ export interface Stream<Props> extends RxObservable<GeneratorOutput<Props>> {}
 
 /** */
 export interface Question<Props> extends InquirerQuestion {
-  name?: keyof Props;
+  name?: Extract<keyof Props, string>;
 }
 
 // Data types ------------------------------------------------------------------
