@@ -3,7 +3,14 @@
 // Node modules
 import chalk from 'chalk';
 import { Data as EjsData, renderFile } from 'ejs';
-import { existsSync, outputFile, outputJson, readJson } from 'fs-extra';
+import {
+  existsSync,
+  outputFile,
+  outputJson,
+  readdirSync,
+  readJson,
+  statSync,
+} from 'fs-extra';
 import { prompt } from 'inquirer';
 import { merge } from 'lodash';
 import { isAbsolute } from 'path';
@@ -52,6 +59,9 @@ const prettyPath: {
   to: ctx => ctx.to.replace(process.cwd(), '.'),
   from: ctx => ctx.from.replace(process.cwd(), '.'),
 };
+
+const isFile = (path: string) => statSync(path).isFile;
+const isDirectory = (path: string) => statSync(path).isDirectory;
 
 let conflictCount = 0;
 
@@ -121,6 +131,42 @@ const output: {
     await outputJson(ctx.to, data, { spaces: 2 });
     log.fileExtend(prettyPath.to(ctx));
   },
+};
+
+export const copy: SideEffectFunc = generator => async (
+  from: string,
+  to: string,
+  data: EjsData,
+  options?: FSOptions,
+) => {
+  try {
+    if (isFile(from)) await copyFile(generator)(from, to, data, options);
+    else if (isDirectory(from)) {
+      await copyDirectory(generator)(from, to, data, options);
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const copyDirectory: SideEffectFunc = generator => async (
+  from: string,
+  to: string,
+  data: EjsData,
+  options?: FSOptions,
+) => {
+  try {
+    const listing = await readdirSync(from);
+
+    for (const item of listing) {
+      if (isFile(item)) await copyFile(generator)(from, to, data, options);
+      else if (isDirectory(item)) {
+        await copyDirectory(generator)(from, to, data, options);
+      }
+    }
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const copyFile: SideEffectFunc = generator => async (

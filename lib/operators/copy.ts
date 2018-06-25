@@ -6,7 +6,7 @@ import { merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 
 // Local modules
-import { copyFile, FSOptions } from '../util/fs';
+import { copy as _copy, FSOptions } from '../util/fs';
 import { task } from './task';
 
 // Types
@@ -55,7 +55,7 @@ export const copy = <T>(
           ? fromData
           : join(templateDir as string, fromData);
 
-        await copyFile(generator)(fromPath, toPath, ejsData, opts);
+        await _copy(generator)(fromPath, toPath, ejsData, opts);
       } catch (err) {
         throw err;
       }
