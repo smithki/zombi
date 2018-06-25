@@ -13,7 +13,7 @@ import {
 } from 'fs-extra';
 import { prompt } from 'inquirer';
 import { merge } from 'lodash';
-import { isAbsolute } from 'path';
+import { isAbsolute, join } from 'path';
 
 // Local modules
 import { log } from './log';
@@ -36,8 +36,9 @@ export interface FSOptions {
 
 const { red } = chalk;
 
-// Logic -----------------------------------------------------------------------
+// Helpers ---------------------------------------------------------------------
 
+/** Extract the current generator context. */
 const getCtx = (generator, options?: FSOptions) => (
   to: string,
   from?: string,
@@ -53,6 +54,7 @@ const getCtx = (generator, options?: FSOptions) => (
   );
 };
 
+// Prettify paths for logging.
 const prettyPath: {
   [key: string]: (ctx) => string;
 } = {
@@ -60,11 +62,14 @@ const prettyPath: {
   from: ctx => ctx.from.replace(process.cwd(), '.'),
 };
 
-const isFile = (path: string) => statSync(path).isFile;
-const isDirectory = (path: string) => statSync(path).isDirectory;
+/** Returns true if path leads to a file. */
+const isFile = (path: string) => statSync(path).isFile();
+/** Returns true if path leads to a directory. */
+const isDirectory = (path: string) => statSync(path).isDirectory();
 
+// Count the number of conflicting files.
 let conflictCount = 0;
-
+/** Checks for existing files at the destinationRoot and prompts to overwrite. */
 const checkForConflict = ctx => data => async write => {
   const prettyTo = prettyPath.to(ctx);
   const exists = existsSync(ctx.to);
@@ -114,69 +119,73 @@ const checkForConflict = ctx => data => async write => {
 const output: {
   [key: string]: (ctx) => (data) => Promise<void>;
 } = {
-  /** */
+  /** Outputs a file to the destination. */
   file: ctx => async data =>
     await checkForConflict(ctx)(data)(
       async () => await outputFile(ctx.to, data),
     ),
 
-  /** */
+  /** Outputs a JSON file to the destination. */
   json: ctx => async data =>
     await checkForConflict(ctx)(data)(
       async () => await outputJson(ctx.to, data, { spaces: 2 }),
     ),
 
-  /** */
+  /** Outputs a modified/extended JSON file to the destination. */
   extendJson: ctx => async data => {
     await outputJson(ctx.to, data, { spaces: 2 });
     log.fileExtend(prettyPath.to(ctx));
   },
 };
 
-export const copy: SideEffectFunc = generator => async (
+// FS Operations ---------------------------------------------------------------
+
+/** Copies a file or directory. */
+const copy: SideEffectFunc = generator => async (
   from: string,
   to: string,
   data: EjsData,
   options?: FSOptions,
 ) => {
   try {
-    if (isFile(from)) await copyFile(generator)(from, to, data, options);
-    else if (isDirectory(from)) {
-      await copyDirectory(generator)(from, to, data, options);
+    const ctx = getCtx(generator, options)(to, from);
+
+    if (isFile(from)) {
+      await copyFile(generator)(ctx.from, ctx.to, data, options);
+    } else if (isDirectory(from)) {
+      await copyDirectory(generator)(ctx.from, ctx.to, data, options);
     }
   } catch (err) {
     throw err;
   }
 };
 
-export const copyDirectory: SideEffectFunc = generator => async (
+/** Copies a directory. */
+const copyDirectory: SideEffectFunc = generator => async (
   from: string,
   to: string,
   data: EjsData,
   options?: FSOptions,
 ) => {
   try {
-    const listing = await readdirSync(from);
-
+    const listing = readdirSync(from);
     for (const item of listing) {
-      if (isFile(item)) await copyFile(generator)(from, to, data, options);
-      else if (isDirectory(item)) {
-        await copyDirectory(generator)(from, to, data, options);
-      }
+      await copy(generator)(join(from, item), join(to, item), data, options);
     }
   } catch (err) {
     throw err;
   }
 };
 
-export const copyFile: SideEffectFunc = generator => async (
+/** Copies a file. */
+const copyFile: SideEffectFunc = generator => async (
   from: string,
   to: string,
   data: EjsData,
   options?: FSOptions,
 ) => {
   try {
-    const ctx = await getCtx(generator, options)(to, from);
+    const ctx = getCtx(generator, options)(to, from);
 
     await new Promise(resolve => {
       renderFile(ctx.from, data || {}, async (err, string) => {
@@ -190,7 +199,8 @@ export const copyFile: SideEffectFunc = generator => async (
   }
 };
 
-export const createFile: SideEffectFunc = generator => async (
+/** Creates a new file. */
+const createFile: SideEffectFunc = generator => async (
   filePath: string,
   content?: any,
   options?: FSOptions,
@@ -204,7 +214,8 @@ export const createFile: SideEffectFunc = generator => async (
   }
 };
 
-export const createJson: SideEffectFunc = generator => async (
+/** Creates a new, JSON-formatted file. */
+const createJson: SideEffectFunc = generator => async (
   filePath: string,
   data?: JsonData,
   options?: FSOptions,
@@ -216,13 +227,14 @@ export const createJson: SideEffectFunc = generator => async (
   } catch (err) {}
 };
 
-export const extendJson: SideEffectFunc = generator => async (
+/** Extends an existing JSON-formatted file. */
+const extendJson: SideEffectFunc = generator => async (
   filePath: string,
   extensions: JsonData,
 ) => {
   try {
     // Get context and JSON data
-    const ctx = await getCtx(generator)(filePath);
+    const ctx = getCtx(generator)(filePath);
     const json = await readJson(ctx.to);
 
     merge(json, extensions || {});
@@ -233,3 +245,7 @@ export const extendJson: SideEffectFunc = generator => async (
     throw err;
   }
 };
+
+// EXPORTS ---------------------------------------------------------------------
+
+export { copy, copyDirectory, copyFile, createFile, createJson, extendJson };
