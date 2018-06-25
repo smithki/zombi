@@ -23,10 +23,6 @@ const { cyan, green, yellow } = chalk;
 
 /**
  * Creates a new generator.
- *
- * @export
- * @class Zombi
- * @template Props An interface describing the shape of props for this generator.
  */
 export class Generator<Props> {
   name: string;
@@ -38,8 +34,7 @@ export class Generator<Props> {
   /**
    * Creates an instance of Zombi generator.
    *
-   * @param {Z.Options<Props>} [options={}]
-   * @memberof Zombi
+   * @param options
    */
   constructor(options: Options<Props> = {}) {
     const { name, templateRoot, destinationRoot, force, silent } = options;
@@ -76,10 +71,7 @@ export class Generator<Props> {
   /**
    * Create a sequence of tasks by chaining Zombi operators together.
    *
-   * @param {...Z.Operator<Props>[]} operators Zombi operators that will run in
-   * sequence.
-   * @returns {Generator<Props>}
-   * @memberof Zombi
+   * @param operators Zombi operators that will run in sequence.
    */
   sequence(...operators: Operator<Props>[]): Generator<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
@@ -105,7 +97,7 @@ export class Generator<Props> {
    *
    * @param {...Generator<any>[]} zombis The other generators to compose.
    * @returns {Generator<any>}
-   * @memberof Zombi
+   * @memberof Generator
    */
   compose(...zombis: Generator<any>[]): Generator<any> {
     if (!zombis.length) return this;
