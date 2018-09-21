@@ -1,18 +1,13 @@
-// Imports ---------------------------------------------------------------------
-
-// Node modules
-import { Data as EjsData } from 'ejs';
-import { isAbsolute } from 'path';
+// --- Imports -------------------------------------------------------------- //
 
 // Local modules
-import { extendJson as _extendJson } from '../util/fs';
 import { task } from './task';
 
 // Types
 import { Data, JsonData, Operator } from '../types';
-import { extractData } from '../util/extract-data';
+import { extractData } from '../utils/extract-data';
 
-// Logic -----------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 /**
  * Extend a JSON file.
@@ -31,7 +26,7 @@ export const extendJson = <T>(
       const filePath = await extract(file);
       const data = await extract(extensions);
 
-      await _extendJson(generator)(filePath, data);
+      await generator.fs.extendJson(filePath, data);
     } catch (err) {
       throw err;
     }

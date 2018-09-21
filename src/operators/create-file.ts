@@ -1,17 +1,13 @@
-// Imports ---------------------------------------------------------------------
-
-// Node modules
-import { Data as EjsData } from 'ejs';
+// --- Imports -------------------------------------------------------------- //
 
 // Local modules
-import { extractData } from '../util/extract-data';
-import { createFile as _createFile, FSOptions } from '../util/fs';
+import { extractData } from '../utils/extract-data';
 import { task } from './task';
 
 // Types
-import { Data, Operator } from '../types';
+import { Data, FSOptions, Operator } from '../types';
 
-// Logic -----------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 /**
  * Create a new file.
@@ -32,7 +28,7 @@ export const createFile = <T>(
       const data = await extract(content);
       const opts = await extract(options);
 
-      await _createFile(generator)(filePath, data, opts);
+      await generator.fs.createFile(filePath, data, opts);
     } catch (err) {
       throw err;
     }

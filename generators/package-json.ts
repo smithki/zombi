@@ -4,13 +4,12 @@
 import { basename } from 'path';
 
 // Local modules
-import { zombi } from '../lib/';
-import { Generator } from '../lib/core';
-import { copy, createJson, prompt, task } from '../lib/operators';
-import { getNpmConfig } from '../lib/util/get-npm-config';
-import { refineDeep } from '../lib/util/refine';
-import { LicenseProps, promptLicense } from './license-file';
-import { AuthorshipProps, promptAuthor } from './prompt-author';
+import { zombi } from '../src';
+import { createJson, prompt } from '../src/operators';
+import { getNpmConfig } from '../src/utils/get-npm-config';
+import { refineDeep } from '../src/utils/refine';
+import { promptLicense } from './license-file';
+import { promptAuthor } from './prompt-author';
 
 // Interfaces ------------------------------------------------------------------
 

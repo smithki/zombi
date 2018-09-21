@@ -1,30 +1,41 @@
-// Imports ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
+// Node modules
 import { Question as InquirerQuestion } from 'inquirer';
 import { UnaryFunction as RxUnaryFunction } from 'rxjs/interfaces';
 import { Observable as RxObservable } from 'rxjs/Observable';
-import { Generator } from '../core/generator';
 
-// Core types ------------------------------------------------------------------
+// Local modules
+import { FileSystem } from './fs';
+import { Generator } from './generator';
 
-/** */
-export interface GeneratorOutput<Props> {
-  context: Pick<
-    Generator<Props>,
-    | 'name'
-    | 'templateRoot'
-    | 'destinationRoot'
-    | 'template'
-    | 'destination'
-    | 'force'
-  >;
-  props: Props;
-  prompts: Task<Props>[];
-  sequence: Task<Props>[];
+// --- Core types ----------------------------------------------------------- //
+
+export interface GeneratorContext<Props>
+  extends Pick<
+      Generator<Props>,
+      | 'name'
+      | 'templateRoot'
+      | 'destinationRoot'
+      | 'template'
+      | 'destination'
+      | 'force'
+    > {
+  to?: string;
+  from?: string;
 }
 
 /** */
-export interface Options<Props>
+export interface GeneratorOutput<Props> {
+  context: GeneratorContext<Props>;
+  props: Props;
+  prompts: Task<Props>[];
+  sequence: Task<Props>[];
+  fs: FileSystem<Props>;
+}
+
+/** */
+export interface GeneratorConfig<Props>
   extends Partial<
       Pick<Generator<Props>, 'name' | 'templateRoot' | 'destinationRoot'>
     > {
@@ -33,9 +44,12 @@ export interface Options<Props>
   silent?: boolean;
 }
 
+export interface FSOptions {
+  force?: boolean;
+}
+
 /** */
-export interface Operator<T, R = T>
-  extends RxUnaryFunction<Stream<T>, Stream<T>> {}
+export interface Operator<T> extends RxUnaryFunction<Stream<T>, Stream<T>> {}
 
 /** */
 export interface Task<Props> extends Callback<Props>, TaskOptions {}
@@ -58,7 +72,7 @@ export interface Question<Props> extends InquirerQuestion {
   name?: Extract<keyof Props, string>;
 }
 
-// Data types ------------------------------------------------------------------
+// --- Data-types ----------------------------------------------------------- //
 
 /** */
 export type Data<R, Props> = R | Callback<Props, R>;

@@ -1,4 +1,4 @@
-// Imports ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
 // Node modules
 import * as caller from 'caller';
@@ -10,25 +10,30 @@ import { dirname, isAbsolute, join } from 'path';
 // Local modules
 import { log } from './log';
 
-// Constants -------------------------------------------------------------------
+// --- Constants/enums ------------------------------------------------------ //
 
 const { cyan, gray, green } = chalk;
 
 // Prettify `templateRoot` string (we'll need it for error messages soon).
 const templRoot = cyan('templateRoot');
 
-// Logic -----------------------------------------------------------------------
+export enum ResolveTemplateRootDepth {
+  FromGenerator = 3,
+  FromOperator = 2,
+}
+
+// --- Logic ---------------------------------------------------------------- //
 
 /**
  * Automatically resolves a valid `template/` path next to the executing
  * generator.
  *
- * @param depth The depth at which to search the Error stack.
+ * @param depth The depth at which to start searching the Error stack.
  * @param current The current `templateRoot` value to resolve against. If false,
  * templates are ignored.
  */
 export const resolveTemplateRoot = (
-  depth: number,
+  startingDepth: ResolveTemplateRootDepth | number,
   current: string | boolean = true,
 ) => {
   // First, we check the `current` value to determine whether we should proceed
@@ -51,12 +56,12 @@ export const resolveTemplateRoot = (
   // path and check for a `template/` directory next to it.
 
   // Resolve to `depth` of the stack trace using `caller(...)`.
-  const callerPath = caller(depth);
+  const callerPath = caller(startingDepth);
 
   // Collect relavent parent modules.
   const parent = module.parent;
   let deepParent = parent;
-  for (let i = 0; i < depth; i++) deepParent = deepParent.parent;
+  for (let i = 0; i < startingDepth; i++) deepParent = deepParent.parent;
 
   const path =
     // If `callerPath` is NOT the same as `dist/core/generator.ts`, then we can

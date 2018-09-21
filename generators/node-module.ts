@@ -1,16 +1,11 @@
-// Imports ---------------------------------------------------------------------
-
-// Node modules
-import { basename } from 'path';
+// --- Imports -------------------------------------------------------------- //
 
 // Local modules
-import { zombi } from '../lib';
-import { Generator } from '../lib/core';
-import { licenseFile, LicenseProps } from './license-file';
-import { packageJson, PackageJsonProps } from './package-json';
-import { AuthorshipProps } from './prompt-author';
+import { zombi } from '../src';
+import { licenseFile } from './license-file';
+import { packageJson } from './package-json';
 
-// Logic -----------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 /**
  * Generates a minimal node module including the following files:

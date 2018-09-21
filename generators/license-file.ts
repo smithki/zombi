@@ -1,22 +1,21 @@
-// Imports ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
 // Node modules
 import { kebabCase } from 'lodash';
 import { resolve } from 'path';
 
 // Local modules
-import { zombi } from '../lib';
-import { Generator } from '../lib/core';
-import { copy, extendJson, prompt } from '../lib/operators';
-import { getNpmConfig } from '../lib/util/get-npm-config';
+import { zombi } from '../src';
+import { copy, prompt } from '../src/operators';
+import { getNpmConfig } from '../src/utils/get-npm-config';
 import { PackageJsonProps } from './package-json';
-import { AuthorshipProps, promptAuthor } from './prompt-author';
+import { promptAuthor } from './prompt-author';
 
-// Interfaces ------------------------------------------------------------------
+// --- Types ---------------------------------------------------------------- //
 
 export interface LicenseProps extends Pick<PackageJsonProps, 'pkgLicense'> {}
 
-// Logic -----------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 const generator = zombi<LicenseProps>({
   name: 'zombi-license-file',

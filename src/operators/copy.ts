@@ -1,4 +1,4 @@
-// Imports ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
 // Node modules
 import { Data as EjsData } from 'ejs';
@@ -6,15 +6,17 @@ import { merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 
 // Local modules
-import { copy as _copy, FSOptions } from '../util/fs';
+import { extractData, extractEjsData } from '../utils/extract-data';
+import {
+  resolveTemplateRoot,
+  ResolveTemplateRootDepth,
+} from '../utils/resolve-template-root';
 import { task } from './task';
 
 // Types
-import { Data, Operator } from '../types';
-import { extractData, extractEjsData } from '../util/extract-data';
-import { resolveTemplateRoot } from '../util/resolve-template-root';
+import { Data, FSOptions, Operator } from '../types';
 
-// Logic -----------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 /**
  * Copies files from the template directory to the destination directory.
@@ -39,8 +41,11 @@ export const copy = <T>(
   const source = merge({}, stream); // Use a copy of the current stream.
   let templateRoot;
   stream.subscribe(g => (templateRoot = g.context.templateRoot));
-  // Depth === 2 because we should be 2 modules away from the generator.
-  const templateDir = resolveTemplateRoot(2, templateRoot);
+  // depth === 2 because we should be 2 modules away from the generator.
+  const templateDir = resolveTemplateRoot(
+    ResolveTemplateRootDepth.FromOperator,
+    templateRoot,
+  );
 
   return stream.pipe(
     task(async generator => {
@@ -55,7 +60,7 @@ export const copy = <T>(
           ? fromData
           : join(templateDir as string, fromData);
 
-        await _copy(generator)(fromPath, toPath, ejsData, opts);
+        await generator.fs.copy(fromPath, toPath, ejsData, opts);
       } catch (err) {
         throw err;
       }

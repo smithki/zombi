@@ -1,11 +1,10 @@
 // Imports ---------------------------------------------------------------------
 
-import { zombi } from '../lib/';
-import { Generator } from '../lib/core';
-import { prompt } from '../lib/operators';
-import { getNpmConfig } from '../lib/util/get-npm-config';
+import { zombi } from '../src';
+import { prompt } from '../src/operators';
+import { getNpmConfig } from '../src/utils/get-npm-config';
 
-// Interfaces ------------------------------------------------------------------
+// --- Types ---------------------------------------------------------------- //
 
 export interface AuthorshipProps {
   authorName: string;

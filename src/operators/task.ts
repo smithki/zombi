@@ -1,4 +1,4 @@
-// IMPORTS ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
 // Node modules
 import { merge } from 'lodash';
@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
 // Types
 import { Callback, Operator, TaskOptions } from '../types';
 
-// LOGIC -----------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 /**
  * Add generator tasks to perform side-effects during the run process. Similar

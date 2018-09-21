@@ -1,10 +1,10 @@
-// Imports ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
 import { Data as EjsData } from 'ejs';
 import { merge } from 'lodash';
 import { Data, GeneratorOutput } from '../types';
 
-// Logic -----------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 export const extractEjsData = (generator: GeneratorOutput<any>) => async (
   data: Data<EjsData, any>,

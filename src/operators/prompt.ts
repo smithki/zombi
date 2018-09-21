@@ -1,18 +1,18 @@
-// IMPORTS ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
 // Node modules
-import { prompt as ask, Questions } from 'inquirer';
+import { prompt as ask } from 'inquirer';
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
 // Local modules
-import { ensureArray } from '../util/ensure-array';
-import { extractData } from '../util/extract-data';
+import { ensureArray } from '../utils/ensure-array';
+import { extractData } from '../utils/extract-data';
 
 // Types
 import { Data, Operator, Question } from '../types';
 
-// LOGIC -----------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 /**
  * A wrapper for [Inquirer's prompt

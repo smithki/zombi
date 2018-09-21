@@ -1,20 +1,13 @@
-// -----------------------------------------------------------------------------
-// Imports
-
-// Node modules
-import { Data as EjsData } from 'ejs';
-import { isAbsolute } from 'path';
+// --- Imports -------------------------------------------------------------- //
 
 // Local modules
-import { extractData } from '../util/extract-data';
-import { createJson as _createJson, FSOptions } from '../util/fs';
+import { extractData } from '../utils/extract-data';
 import { task } from './task';
 
 // Types
-import { Data, JsonData, Operator } from '../types';
+import { Data, FSOptions, JsonData, Operator } from '../types';
 
-// -----------------------------------------------------------------------------
-// Logic
+// --- Logic ---------------------------------------------------------------- //
 
 /**
  * Create a JSON-formatted file.
@@ -35,7 +28,7 @@ export const createJson = <T>(
       const json = await extract(data);
       const opts = await extract(options);
 
-      await _createJson(generator)(filePath, json, opts);
+      await generator.fs.createJson(filePath, json, opts);
     } catch (err) {
       throw err;
     }

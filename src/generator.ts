@@ -1,48 +1,58 @@
-// Imports ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
 // Node modules
-import * as caller from 'caller';
 import chalk from 'chalk';
 import { merge, uniq } from 'lodash';
 import { resolve } from 'path';
 import { of } from 'rxjs/observable/of';
 
 // Local modules
-import { createGeneratorName } from '../util/create-generator-name';
-import { log, setSilent } from '../util/log';
-import { resolveTemplateRoot } from '../util/resolve-template-root';
+import { FileSystem } from './fs';
+import { log, setSilent } from './utils/log';
+import { normalizeGeneratorName } from './utils/normalize-generator-name';
+import {
+  resolveTemplateRoot,
+  ResolveTemplateRootDepth,
+} from './utils/resolve-template-root';
 
 // Types
-import { Callback, GeneratorOutput, Operator, Options, Stream } from '../types';
+import { GeneratorConfig, GeneratorOutput, Operator, Stream } from './types';
 
-// Constants -------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 const { cyan, green, yellow } = chalk;
-
-// Logic -----------------------------------------------------------------------
 
 /**
  * Creates a new generator.
  */
 export class Generator<Props> {
-  name: string;
-  templateRoot: string | boolean;
-  destinationRoot: string;
-  zombi$: Stream<Props>;
-  force: boolean;
+  // --- Properties --- //
+
+  // Config properties
+  public name: string;
+  public templateRoot: string | boolean;
+  public destinationRoot: string;
+  public force: boolean;
+
+  private zombi$: Stream<Props>;
+
+  // --- Constructor --- //
 
   /**
-   * Creates an instance of Zombi generator.
+   * Instantiate a Generator.
    *
-   * @param options
+   * @param config
    */
-  constructor(options: Options<Props> = {}) {
-    const { name, templateRoot, destinationRoot, force, silent } = options;
+  constructor(config: GeneratorConfig<Props> = {}) {
+    const { name, templateRoot, destinationRoot, force, silent } = config;
 
     // Assign attributes
-    this.name = createGeneratorName(name);
+    this.name = normalizeGeneratorName(name);
     this.destinationRoot = destinationRoot || process.cwd();
-    this.templateRoot = resolveTemplateRoot(3, templateRoot);
+    this.templateRoot = resolveTemplateRoot(
+      ResolveTemplateRootDepth.FromGenerator,
+      templateRoot,
+    );
     this.force = force;
 
     // Silence logs if so desired.
@@ -59,37 +69,42 @@ export class Generator<Props> {
         force: this.force,
       },
 
-      props: options.initialProps || {},
+      props: config.initialProps || {},
       prompts: [],
       sequence: [],
+      fs: undefined,
     };
+
+    generator.fs = new FileSystem(generator);
 
     // Create observable from generator
     this.zombi$ = of(generator as any);
   }
+
+  // --- Public methods --- //
 
   /**
    * Create a sequence of tasks by chaining Zombi operators together.
    *
    * @param operators Zombi operators that will run in sequence.
    */
-  sequence(...operators: Operator<Props>[]): Generator<Props> {
+  public sequence(...operators: Operator<Props>[]): Generator<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
     return merge({}, this, { zombi$: result });
   }
 
   // tslint:disable:prettier
-  compose(): Generator<Props>
-  compose<Z1>(z1: Generator<Z1>): Generator<Props & Z1>;
-  compose<Z1, Z2>(z1: Generator<Z1>, z2: Generator<Z2>): Generator<Props & Z1 & Z2>;
-  compose<Z1, Z2, Z3>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>): Generator<Props & Z1 & Z2 & Z3>;
-  compose<Z1, Z2, Z3, Z4>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>): Generator<Props & Z1 & Z2 & Z3 & Z4>;
-  compose<Z1, Z2, Z3, Z4, Z5>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z5>, z5: Generator<Z5>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5>;
-  compose<Z1, Z2, Z3, Z4, Z5, Z6>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6>;
-  compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
-  compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
-  compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
-  compose(...zombis: Generator<any>[]): Generator<any>;
+  public compose(): Generator<Props>
+  public compose<Z1>(z1: Generator<Z1>): Generator<Props & Z1>;
+  public compose<Z1, Z2>(z1: Generator<Z1>, z2: Generator<Z2>): Generator<Props & Z1 & Z2>;
+  public compose<Z1, Z2, Z3>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>): Generator<Props & Z1 & Z2 & Z3>;
+  public compose<Z1, Z2, Z3, Z4>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>): Generator<Props & Z1 & Z2 & Z3 & Z4>;
+  public compose<Z1, Z2, Z3, Z4, Z5>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z5>, z5: Generator<Z5>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
+  public compose(...zombis: Generator<any>[]): Generator<any>
   // tslint:enable:prettier
 
   /**
@@ -99,7 +114,7 @@ export class Generator<Props> {
    * @returns {Generator<any>}
    * @memberof Generator
    */
-  compose(...zombis: Generator<any>[]): Generator<any> {
+  public compose(...zombis: Generator<any>[]): Generator<any> {
     if (!zombis.length) return this;
 
     let result;
@@ -131,12 +146,12 @@ export class Generator<Props> {
   }
 
   /**
-   * Runs a generator.
+   * Execute this generator's sequence.
    *
    * @returns
    * @memberof Zombi
    */
-  async run() {
+  public async run() {
     log();
     log(green.bold('🧟‍  Zombi is running ') + cyan.bold(this.name));
     log();
@@ -169,9 +184,9 @@ export class Generator<Props> {
   }
 
   /**
-   * Clones a generator
+   * Clone this generator.
    */
-  clone() {
+  public clone() {
     return merge({}, this);
   }
 
@@ -182,7 +197,7 @@ export class Generator<Props> {
    * @returns
    * @memberof Zombi
    */
-  template(...pathSegments: string[]) {
+  public template(...pathSegments: string[]) {
     if (this.templateRoot) {
       return resolve(this.templateRoot as string, ...pathSegments);
     }
@@ -195,7 +210,7 @@ export class Generator<Props> {
    * @returns
    * @memberof Zombi
    */
-  destination(...pathSegments: string[]) {
+  public destination(...pathSegments: string[]) {
     return resolve(this.destinationRoot, ...pathSegments);
   }
 }

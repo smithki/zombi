@@ -1,4 +1,4 @@
-// INTERFACES ------------------------------------------------------------------
+// --- Types ---------------------------------------------------------------- //
 
 export interface RefineOptions {
   ignoreNil?: boolean;
@@ -10,7 +10,7 @@ export interface RefineOptions {
   ignoreEmptyStrings?: boolean;
 }
 
-// LOGIC -----------------------------------------------------------------------
+// --- Logic ---------------------------------------------------------------- //
 
 const filterObj = (obj, predicate) =>
   Object.keys(obj)
