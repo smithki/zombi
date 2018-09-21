@@ -38,5 +38,5 @@ export const log = merge(doLog, {
   fileOverwrite,
   fileForcedOverwrite,
   fileSkip,
-  ...omit(console, 'log'),
+  ...console,
 });

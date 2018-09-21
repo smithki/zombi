@@ -4,9 +4,9 @@
 import chalk from 'chalk';
 import { Data as EjsData, renderFile } from 'ejs';
 import {
-  exists,
   outputFile,
   outputJson,
+  pathExists,
   readdir,
   readJson,
   stat,
@@ -16,6 +16,9 @@ import { merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 import { promisify } from 'util';
 
+// Internal
+import { log } from './utils/log';
+
 // Types
 import {
   FSOptions,
@@ -23,7 +26,6 @@ import {
   GeneratorOutput,
   JsonData,
 } from './types';
-import { log } from './utils/log';
 
 // --- Constants ------------------------------------------------------------ //
 
@@ -199,7 +201,7 @@ export class FileSystem<Props> {
     write: () => Promise<void>,
   ) {
     const prettyTo = this.prettifyPath(ctx).to;
-    const doesExist = await promisify(exists)(ctx.to);
+    const doesExist = await pathExists(ctx.to);
 
     if (!ctx.force) {
       if (doesExist) {
@@ -233,7 +235,7 @@ export class FileSystem<Props> {
 
     // Write file to destination.
     await write();
-    if (exists) {
+    if (doesExist) {
       // Print overwrite message. If we reach this code, we know `ctx.force` is
       // true.
       log.fileForcedOverwrite(prettyTo);

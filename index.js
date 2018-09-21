@@ -1,2 +1,2 @@
 // Expose modules for core library
-module.exports = require('./dist/lib');
+module.exports = require('./dist/src');

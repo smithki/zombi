@@ -1,2 +1,2 @@
 // Expose types for core library
-export * from './dist/lib';
+export * from './dist/src';
