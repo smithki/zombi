@@ -14,7 +14,6 @@ import {
 import { prompt } from 'inquirer';
 import { merge } from 'lodash';
 import { isAbsolute, join } from 'path';
-import { promisify } from 'util';
 
 // Internal
 import { log } from './utils/log';
