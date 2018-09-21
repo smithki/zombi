@@ -4,6 +4,7 @@
 import chalk from 'chalk';
 import { merge, uniq } from 'lodash';
 import { resolve } from 'path';
+import * as prettyTime from 'pretty-time';
 import { of } from 'rxjs/observable/of';
 
 // Local modules
@@ -20,7 +21,7 @@ import { GeneratorConfig, GeneratorOutput, Operator, Stream } from './types';
 
 // --- Logic ---------------------------------------------------------------- //
 
-const { cyan, green, yellow } = chalk;
+const { cyan, green, yellow, gray } = chalk;
 
 /**
  * Creates a new generator.
@@ -156,6 +157,9 @@ export class Generator<Props> {
     log(green.bold('🧟‍  Zombi is running ') + cyan.bold(this.name));
     log();
 
+    let startTime;
+    let timeElapsed;
+
     await new Promise(resolve => {
       this.zombi$.subscribe(async g => {
         const { prompts, sequence } = g;
@@ -172,14 +176,25 @@ export class Generator<Props> {
         log(green.bold('🧠  Generating...'));
         log();
 
+        startTime = process.hrtime();
+
         // Execute sequence
         for (const task of sequence) await task(g);
+
+        timeElapsed = process.hrtime(startTime);
+
         resolve();
       });
     });
 
+    const prettyTimeElapsed = prettyTime(timeElapsed);
+
     log();
-    log(green.bold(`⚡  It's aliiive!`));
+    log(
+      green.bold(
+        `⚡  It's aliiive! ${gray(`Generated in ${cyan(prettyTimeElapsed)}`)}`,
+      ),
+    );
     return;
   }
 

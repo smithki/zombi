@@ -44,7 +44,7 @@ export const resolveTemplateRoot = (
   if (isString(current)) {
     // If `templateRoot` is already set to an absolute path, keep it that way...
     if (isAbsolute(current)) return current;
-    // ...Otherwise, introduce an error.
+    // ...Otherwise, raise an error.
     const e = new Error(
       `Failed to resolve ${templRoot} because it is not an absolute path.`,
     );
@@ -87,7 +87,7 @@ export const resolveTemplateRoot = (
   const boolExample = green('false');
 
   if (!exists) {
-    // Introduce error if path is not found.
+    // Raise error if path is not found.
     const e = new Error(
       `Failed to resolve ${templRoot} at ${templPath}. Ensure there is a ${templDir} directory next to your generator's entry point or set ${templRoot} explicitly like so:\n\n  ${example}\n\nIf your generator does not use or require templates, set ${templRoot} to ${boolExample}\n`,
     );
@@ -100,7 +100,7 @@ export const resolveTemplateRoot = (
       // If path is found and IS a directory, then we have our mark!
       return path;
     }
-    // If the path is found but IS NOT a directory, then introduce an error...
+    // If the path is found but IS NOT a directory, then raise an error...
     const e = new Error(
       `Failed to resolve ${templRoot} because it is not a directory.`,
     );
