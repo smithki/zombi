@@ -24,7 +24,7 @@ import { GeneratorConfig, GeneratorOutput, Operator, Stream } from './types';
 const { cyan, green, yellow, gray } = chalk;
 
 /**
- * A Class representing the generator interface.
+ * A class representing the `zombi` generator interface.
  */
 export class Generator<Props> {
   // --- Properties --- //
@@ -35,12 +35,13 @@ export class Generator<Props> {
   public destinationRoot: string;
   public force: boolean;
 
+  // Stores the underlying RxJS Observable.
   private zombi$: Stream<Props>;
 
   // --- Constructor --- //
 
   /**
-   * Instantiate a Generator.
+   * Instantiates a Generator.
    *
    * @param config
    */
@@ -120,7 +121,6 @@ export class Generator<Props> {
   public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>, z15: Generator<Z15>, z16: Generator<Z16>, z17: Generator<Z17>, z18: Generator<Z18>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14 & Z15 & Z16 & Z17 & Z18>;
   public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>, z15: Generator<Z15>, z16: Generator<Z16>, z17: Generator<Z17>, z18: Generator<Z18>, z19: Generator<Z19>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14 & Z15 & Z16 & Z17 & Z18 & Z19>;
   public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19, Z20>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>, z15: Generator<Z15>, z16: Generator<Z16>, z17: Generator<Z17>, z18: Generator<Z18>, z19: Generator<Z19>, z20: Generator<Z20>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14 & Z15 & Z16 & Z17 & Z18 & Z20>;
-  public compose(...zombis: Generator<any>[]): Generator<any>
   // tslint:enable:prettier
 
   /**
@@ -141,9 +141,9 @@ export class Generator<Props> {
       result = g;
     });
 
-    const doCompose = z => {
+    const doCompose = (z: Generator<any>) => {
       const source = merge({}, z.zombi$);
-      const s = source.subscribe(g => {
+      const s = source.subscribe((g: GeneratorOutput<any>) => {
         result.prompts.push(...g.prompts);
         result.sequence.push(...g.sequence);
       });
@@ -162,7 +162,7 @@ export class Generator<Props> {
   }
 
   /**
-   * Execute this generator's sequence.
+   * Execute the generator's task sequence and output side-effects.
    *
    * @returns
    * @memberof Zombi
@@ -214,14 +214,14 @@ export class Generator<Props> {
   }
 
   /**
-   * Clone this generator.
+   * Create a copy of the generator.
    */
   public clone() {
     return merge({}, this);
   }
 
   /**
-   * Resolves a path to this generator's `templateRoot`.
+   * Resolves a path to the generator's `templateRoot`.
    *
    * @param {...string[]} pathSegments Strings from which to resolve a path.
    * @returns
@@ -234,7 +234,7 @@ export class Generator<Props> {
   }
 
   /**
-   * Resolves a path to this generator's `destinationRoot`.
+   * Resolves a path to the generator's `destinationRoot`.
    *
    * @param {...string[]} pathSegments Strings from which to resolve a path.
    * @returns

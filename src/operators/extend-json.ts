@@ -1,7 +1,7 @@
 // --- Imports -------------------------------------------------------------- //
 
 // Local modules
-import { sideEffect } from './task';
+import { sideEffect } from './side-effect';
 
 // Types
 import { GeneratorData, JsonData, Operator } from '../types';

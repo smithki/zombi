@@ -2,7 +2,7 @@
 
 // Local modules
 import { resolveDataBuilder } from '../utils/resolve-data';
-import { sideEffect } from './task';
+import { sideEffect } from './side-effect';
 
 // Types
 import { FSOptions, GeneratorData, Operator } from '../types';

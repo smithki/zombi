@@ -14,7 +14,7 @@ import {
   resolveTemplateRoot,
   ResolveTemplateRootDepth,
 } from '../utils/resolve-template-root';
-import { sideEffect } from './task';
+import { sideEffect } from './side-effect';
 
 // Types
 import { FSOptions, GeneratorData, Operator } from '../types';
