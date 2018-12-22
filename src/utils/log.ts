@@ -2,13 +2,13 @@
 
 // Node modules
 import chalk from 'chalk';
-import { merge, omit } from 'lodash';
+import { merge } from 'lodash';
 
 // --- Constants ------------------------------------------------------------ //
 
 const { green, magenta, gray, red, yellow } = chalk;
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 let silent = false;
 export const setSilent = (value: boolean) => (silent = value);

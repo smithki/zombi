@@ -1,8 +1,8 @@
 // Imports ---------------------------------------------------------------------
 
-import { zombi } from '../src';
-import { prompt } from '../src/operators';
-import { getNpmConfig } from '../src/utils/get-npm-config';
+import { zombi } from '../index';
+import { prompt } from '../operators/index';
+import { getNpmConfig } from '../utils/get-npm-config';
 
 // --- Types ---------------------------------------------------------------- //
 

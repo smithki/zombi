@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { merge, uniq } from 'lodash';
 import { resolve } from 'path';
 import * as prettyTime from 'pretty-time';
-import { of } from 'rxjs/observable/of';
+import { of } from 'rxjs';
 
 // Local modules
 import { FileSystem } from './fs';
@@ -19,12 +19,12 @@ import {
 // Types
 import { GeneratorConfig, GeneratorOutput, Operator, Stream } from './types';
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 const { cyan, green, yellow, gray } = chalk;
 
 /**
- * Creates a new generator.
+ * A Class representing the generator interface.
  */
 export class Generator<Props> {
   // --- Properties --- //
@@ -45,6 +45,8 @@ export class Generator<Props> {
    * @param config
    */
   constructor(config: GeneratorConfig<Props> = {}) {
+    // --- Configuration & setup --- //
+
     const { name, templateRoot, destinationRoot, force, silent } = config;
 
     // Assign attributes
@@ -59,8 +61,9 @@ export class Generator<Props> {
     // Silence logs if so desired.
     if (silent) setSilent(silent);
 
-    // Create the generator
-    const generator: GeneratorOutput<Partial<Props>> = {
+    // --- Build the initial generator output --- //
+
+    const g: GeneratorOutput<Partial<Props>> = {
       context: {
         name: this.name,
         templateRoot: this.templateRoot,
@@ -76,10 +79,11 @@ export class Generator<Props> {
       fs: undefined,
     };
 
-    generator.fs = new FileSystem(generator);
+    g.fs = new FileSystem(g);
 
-    // Create observable from generator
-    this.zombi$ = of(generator as any);
+    // --- Make an observable of the generator output --- //
+
+    this.zombi$ = of(g as any);
   }
 
   // --- Public methods --- //
@@ -105,6 +109,17 @@ export class Generator<Props> {
   public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
   public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
   public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>, z15: Generator<Z15>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14 & Z15>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>, z15: Generator<Z15>, z16: Generator<Z16>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14 & Z15 & Z16>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>, z15: Generator<Z15>, z16: Generator<Z16>, z17: Generator<Z17>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14 & Z15 & Z16 & Z17>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>, z15: Generator<Z15>, z16: Generator<Z16>, z17: Generator<Z17>, z18: Generator<Z18>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14 & Z15 & Z16 & Z17 & Z18>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>, z15: Generator<Z15>, z16: Generator<Z16>, z17: Generator<Z17>, z18: Generator<Z18>, z19: Generator<Z19>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14 & Z15 & Z16 & Z17 & Z18 & Z19>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19, Z20>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>, z10: Generator<Z10>, z11: Generator<Z11>, z12: Generator<Z12>, z13: Generator<Z13>, z14: Generator<Z14>, z15: Generator<Z15>, z16: Generator<Z16>, z17: Generator<Z17>, z18: Generator<Z18>, z19: Generator<Z19>, z20: Generator<Z20>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9 & Z10 & Z11 & Z12 & Z13 & Z14 & Z15 & Z16 & Z17 & Z18 & Z20>;
   public compose(...zombis: Generator<any>[]): Generator<any>
   // tslint:enable:prettier
 
@@ -166,7 +181,7 @@ export class Generator<Props> {
 
         if (!prompts.length && !sequence.length) {
           log(yellow.bold(`🤷  There's nothing to Generate.`));
-          return;
+          resolve();
         }
 
         // Execute prompts

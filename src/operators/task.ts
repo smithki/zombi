@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
 // Types
 import { Callback, Operator, TaskOptions } from '../types';
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 /**
  * Add generator tasks to perform side-effects during the run process. Similar

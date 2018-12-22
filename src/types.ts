@@ -2,8 +2,8 @@
 
 // Node modules
 import { Question as InquirerQuestion } from 'inquirer';
-import { UnaryFunction as RxUnaryFunction } from 'rxjs/interfaces';
-import { Observable as RxObservable } from 'rxjs/Observable';
+import { UnaryFunction as RxUnaryFunction } from 'rxjs';
+import { Observable as RxObservable } from 'rxjs';
 
 // Local modules
 import { FileSystem } from './fs';
@@ -75,7 +75,7 @@ export interface Question<Props> extends InquirerQuestion {
 // --- Data-types ----------------------------------------------------------- //
 
 /** */
-export type Data<R, Props> = R | Callback<Props, R>;
+export type GeneratorData<R, Props> = R | Callback<Props, R>;
 
 /** */
 export interface JsonData {

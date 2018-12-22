@@ -4,10 +4,10 @@
 import { basename } from 'path';
 
 // Local modules
-import { zombi } from '../src';
-import { createJson, prompt } from '../src/operators';
-import { getNpmConfig } from '../src/utils/get-npm-config';
-import { refineDeep } from '../src/utils/refine';
+import { zombi } from '../index';
+import { createJson, prompt } from '../operators/index';
+import { getNpmConfig } from '../utils/get-npm-config';
+import { refineDeep } from '../utils/refine';
 import { promptLicense } from './license-file';
 import { promptAuthor } from './prompt-author';
 

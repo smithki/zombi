@@ -1,11 +1,11 @@
 // --- Imports -------------------------------------------------------------- //
 
 // Local modules
-import { zombi } from '../src';
+import { zombi } from '../index';
 import { licenseFile } from './license-file';
 import { packageJson } from './package-json';
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 /**
  * Generates a minimal node module including the following files:
@@ -14,4 +14,7 @@ import { packageJson } from './package-json';
 export const nodeModule = zombi({
   name: 'zombi-node-module',
   templateRoot: false,
-}).compose(packageJson, licenseFile);
+}).compose(
+  packageJson,
+  licenseFile,
+);

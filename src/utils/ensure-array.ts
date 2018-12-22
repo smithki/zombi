@@ -2,7 +2,7 @@
 
 import { isArray } from 'lodash';
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 function isArrayType<T>(value: T | T[]): value is T[] {
   return isArray(value);

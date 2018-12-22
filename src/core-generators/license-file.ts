@@ -5,9 +5,9 @@ import { kebabCase } from 'lodash';
 import { resolve } from 'path';
 
 // Local modules
-import { zombi } from '../src';
-import { copy, prompt } from '../src/operators';
-import { getNpmConfig } from '../src/utils/get-npm-config';
+import { zombi } from '../index';
+import { copy, prompt } from '../operators/index';
+import { getNpmConfig } from '../utils/get-npm-config';
 import { PackageJsonProps } from './package-json';
 import { promptAuthor } from './prompt-author';
 
@@ -15,7 +15,7 @@ import { promptAuthor } from './prompt-author';
 
 export interface LicenseProps extends Pick<PackageJsonProps, 'pkgLicense'> {}
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 const generator = zombi<LicenseProps>({
   name: 'zombi-license-file',
@@ -41,7 +41,7 @@ export const licenseFile = generator
   .compose(promptAuthor)
   .sequence(
     copy(
-      async ({ props }) => kebabCase(props.pkgLicense + '-license') + '.txt',
+      async ({ props }) => `${kebabCase(`${props.pkgLicense}-license`)}.txt`,
       'LICENSE',
     ),
   );

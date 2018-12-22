@@ -3,7 +3,7 @@
 import { execSync } from 'child_process';
 import { parse } from 'ini';
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 /**
  * Retrieve a specific config value from `.npmrc` or an object containing all
@@ -14,7 +14,7 @@ import { parse } from 'ini';
  * docs](https://docs.npmjs.com/misc/config) for available keys. If left
  * `undefined`, all config values will be returned in a plain object.
  */
-export const getNpmConfig = (key?: string) => {
+export function getNpmConfig(key?: string) {
   const result = execSync(`npm config get ${key}`, {
     stdio: ['ignore', 'pipe', 'pipe'], // Prevent writing output to the console
   })
@@ -27,4 +27,4 @@ export const getNpmConfig = (key?: string) => {
 
   // If our search results in e
   return !result ? undefined : result;
-};
+}

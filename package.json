@@ -4,8 +4,7 @@
   "description": "Dead simple, streaming scaffolding for people with braaains.",
   "author": {
     "name": "Ian K Smith",
-    "email": "smithki707@gmail.com",
-    "url": ""
+    "email": "smithki707@gmail.com"
   },
   "license": "MIT",
   "repository": "github:o3-studio/zombi",
@@ -19,32 +18,18 @@
   ],
   "main": "./index.js",
   "types": "./index.d.ts",
-  "scripts-info": {
-    "info": "Show all scripts.",
-    "clean": "Clean up existing build output.",
-    "watch": "Compile all and watch for changes.",
-    "compile:ts": "Compile TypeScripts.",
-    "dev": "Bundle and watch for changes.",
-    "build": "Bundle for optimized use.",
-    "lint": "Lint using TSLint and format using Prettier.",
-    "docs": "Builds documentation as markdown files.",
-    "release_patch": "Release a patch version.",
-    "release_minor": "Release a minor version.",
-    "release_major": "Release a major version."
-  },
   "scripts": {
-    "info": "npm-scripts-info",
-    "clean": "del ./dist",
-    "watch": "run-p \"compile:* -- -w\"",
-    "compile:ts": "tsc",
-    "dev": "npm run clean && npm run watch",
-    "build": "npm run clean && run-p compile:*",
-    "docs": "typedoc --out ./docs --theme markdown ./lib",
+    "clean": "npm-run-all clean:*",
+    "clean:dist": "rimraf ./dist",
+    "clean:cache": "rimraf .rts2_cache_*",
+    "dev": "npm-run-all -s clean:dist -p compile_watch:*",
+    "build": "npm-run-all -s clean:dist -p compile:*",
+    "compile:zombi": "microbundle build src/index.ts --format cjs",
+    "compile_watch:zombi": "microbundle watch src/index.ts --format cjs",
+    "compile:generators": "microbundle build src/generators/index.ts --format cjs --output generators",
+    "compile_watch:generators": "microbundle watch src/generators/index.ts --format cjs --output generators",
     "lint": "tslint --project ./tsconfig.json",
-    "precommit": "lint-staged && npm run docs",
-    "release_patch": "npm version patch && npm run lint && npm run build && npm publish",
-    "release_minor": "npm version minor && npm run lint && npm run build && npm publish",
-    "release_major": "npm version major && npm run lint && npm run build && npm publish"
+    "precommit": "lint-staged && npm run docs"
   },
   "lint-staged": {
     "*.ts": [
@@ -54,32 +39,30 @@
   },
   "dependencies": {
     "caller": "~1.0.1",
-    "chalk": "^2.3.2",
+    "chalk": "^2.4.1",
     "ejs": "^2.5.7",
     "fs-extra": "^5.0.0",
     "ini": "~1.3.5",
     "inquirer": "^5.1.0",
     "lodash": "^4.17.5",
     "pretty-time": "~1.1.0",
-    "rxjs": "^5.5.6"
+    "rxjs": "^6.3.3"
   },
   "devDependencies": {
-    "@smithkistyle/tslint-config": "^5.0.8",
+    "@ikscodes/tslint-config": "^5.3.1",
     "@types/chalk": "^2.2.0",
     "@types/ejs": "^2.5.0",
     "@types/fs-extra": "^5.0.1",
     "@types/inquirer": "0.0.36",
     "@types/lodash": "^4.14.104",
     "@types/node": "^9.4.6",
-    "del-cli": "^1.1.0",
     "husky": "^0.14.3",
     "lint-staged": "~7.3.0",
+    "microbundle": "^0.9.0",
     "npm-run-all": "~4.1.2",
-    "npm-scripts-info": "^0.3.7",
-    "prettier": "^1.11.1",
-    "tslint": "~5.9.1",
-    "typedoc": "~0.11.1",
-    "typedoc-plugin-markdown": "~1.0.15",
-    "typescript": "~3.0.3"
+    "prettier": "^1.15.3",
+    "rimraf": "^2.6.2",
+    "tslint": "^5.12.0",
+    "typescript": "^3.2.2"
   }
 }

@@ -6,7 +6,7 @@ import { merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 
 // Local modules
-import { extractData, extractEjsData } from '../utils/extract-data';
+import { resolveData, resolveEjsData } from '../utils/resolve-data';
 import {
   resolveTemplateRoot,
   ResolveTemplateRootDepth,
@@ -14,9 +14,9 @@ import {
 import { task } from './task';
 
 // Types
-import { Data, FSOptions, Operator } from '../types';
+import { FSOptions, GeneratorData, Operator } from '../types';
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 /**
  * Copies files from the template directory to the destination directory.
@@ -30,10 +30,10 @@ import { Data, FSOptions, Operator } from '../types';
  * into the template file. Props are automatically injected.
  */
 export const copy = <T>(
-  from: Data<string, T>,
-  to: Data<string, T>,
-  data?: Data<EjsData, T>,
-  options?: Data<FSOptions, T>,
+  from: GeneratorData<string, T>,
+  to: GeneratorData<string, T>,
+  data?: GeneratorData<EjsData, T>,
+  options?: GeneratorData<FSOptions, T>,
 ): Operator<T> => stream => {
   // Find the `templateRoot` nearest to the calling generator (and not the
   // current context). This enables us to use relative paths in the `from`
@@ -50,9 +50,9 @@ export const copy = <T>(
   return stream.pipe(
     task(async generator => {
       try {
-        const extract = extractData(generator);
+        const extract = resolveData(generator);
         const toPath = await extract(to);
-        const ejsData = await extractEjsData(generator)(data);
+        const ejsData = await resolveEjsData(generator)(data);
         const opts = await extract(options);
 
         const fromData = await extract(from);

@@ -1,13 +1,13 @@
 // --- Imports -------------------------------------------------------------- //
 
 // Local modules
-import { extractData } from '../utils/extract-data';
+import { resolveData } from '../utils/resolve-data';
 import { task } from './task';
 
 // Types
-import { Data, FSOptions, JsonData, Operator } from '../types';
+import { FSOptions, GeneratorData, JsonData, Operator } from '../types';
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 /**
  * Create a JSON-formatted file.
@@ -17,13 +17,13 @@ import { Data, FSOptions, JsonData, Operator } from '../types';
  * @param data JSON data with which to fill the new file.
  */
 export const createJson = <T>(
-  file: Data<string, T>,
-  data?: Data<JsonData, T>,
-  options?: Data<FSOptions, T>,
+  file: GeneratorData<string, T>,
+  data?: GeneratorData<JsonData, T>,
+  options?: GeneratorData<FSOptions, T>,
 ): Operator<T> =>
   task(async generator => {
     try {
-      const extract = extractData(generator);
+      const extract = resolveData(generator);
       const filePath = await extract(file);
       const json = await extract(data);
       const opts = await extract(options);

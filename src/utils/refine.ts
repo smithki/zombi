@@ -10,7 +10,7 @@ export interface RefineOptions {
   ignoreEmptyStrings?: boolean;
 }
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 const filterObj = (obj, predicate) =>
   Object.keys(obj)

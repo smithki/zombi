@@ -22,7 +22,7 @@ export enum ResolveTemplateRootDepth {
   FromOperator = 2,
 }
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 /**
  * Automatically resolves a valid `template/` path next to the executing

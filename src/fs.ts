@@ -30,7 +30,7 @@ import {
 
 const { red } = chalk;
 
-// --- Logic ---------------------------------------------------------------- //
+// --- Business logic ------------------------------------------------------- //
 
 export class FileSystem<Props> {
   // --- Properties --- //
@@ -210,7 +210,7 @@ export class FileSystem<Props> {
         const { overwrite } = await prompt({
           type: 'confirm',
           name: 'overwrite',
-          message: `Conflict on ` + `\`${prettyTo}\`` + red('\n  Overwrite?'),
+          message: `Conflict on \`${prettyTo}\` ${red('\n  Overwrite?')}`,
           default: false,
         });
 
