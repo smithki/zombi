@@ -1,4 +1,4 @@
-export { task } from './task';
+export { sideEffect as task } from './task';
 export { prompt } from './prompt';
 export { copy } from './copy';
 export { createFile } from './create-file';

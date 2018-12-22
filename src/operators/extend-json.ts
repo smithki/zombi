@@ -1,11 +1,11 @@
 // --- Imports -------------------------------------------------------------- //
 
 // Local modules
-import { task } from './task';
+import { sideEffect } from './task';
 
 // Types
 import { GeneratorData, JsonData, Operator } from '../types';
-import { resolveData } from '../utils/resolve-data';
+import { resolveDataBuilder } from '../utils/resolve-data';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -16,18 +16,19 @@ import { resolveData } from '../utils/resolve-data';
  * resolved to the contextual `destinationRoot`.
  * @param extensions JSON data with which to extend the existing file.
  */
-export const extendJson = <T>(
+export function extendJson<T>(
   file: GeneratorData<string, T>,
   extensions?: GeneratorData<JsonData, T>,
-): Operator<T> =>
-  task(async generator => {
+): Operator<T> {
+  return sideEffect(async generator => {
     try {
-      const extract = await resolveData(generator);
-      const filePath = await extract(file);
-      const data = await extract(extensions);
+      const resolveData = await resolveDataBuilder(generator);
+      const filePath = await resolveData(file);
+      const data = await resolveData(extensions);
 
       await generator.fs.extendJson(filePath, data);
     } catch (err) {
       throw err;
     }
   });
+}

@@ -6,13 +6,13 @@ import { GeneratorData, GeneratorOutput } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
-export function resolveEjsData(generator: GeneratorOutput<any>) {
+export function resolveEjsDataBuilder(generator: GeneratorOutput<any>) {
   return async (data: GeneratorData<EjsData, any>) => {
     try {
       return merge(
         {},
         generator.props,
-        (await resolveData(generator)(data)) || {},
+        (await resolveDataBuilder(generator)(data)) || {},
       );
     } catch (err) {
       throw err;
@@ -20,7 +20,7 @@ export function resolveEjsData(generator: GeneratorOutput<any>) {
   };
 }
 
-export function resolveData(generator: GeneratorOutput<any>) {
+export function resolveDataBuilder(generator: GeneratorOutput<any>) {
   return async <T>(value: T | ((...args) => Promise<T>)) => {
     return typeof value === 'function'
       ? await (value as any)(generator)

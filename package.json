@@ -7,29 +7,29 @@
     "email": "smithki707@gmail.com"
   },
   "license": "MIT",
-  "repository": "github:o3-studio/zombi",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/smithki/zombi"
+  },
   "files": [
     "dist",
     "template",
     "generators.js",
     "generators.d.ts",
-    "index.js",
-    "index.d.ts"
+    "zombi.js",
+    "zombi.d.ts"
   ],
-  "main": "./index.js",
-  "types": "./index.d.ts",
+  "main": "./zombi.js",
+  "types": "./zombi.d.ts",
   "scripts": {
-    "clean": "npm-run-all clean:*",
-    "clean:dist": "rimraf ./dist",
-    "clean:cache": "rimraf .rts2_cache_*",
-    "dev": "npm-run-all -s clean:dist -p compile_watch:*",
-    "build": "npm-run-all -s clean:dist -p compile:*",
-    "compile:zombi": "microbundle build src/index.ts --format cjs",
-    "compile_watch:zombi": "microbundle watch src/index.ts --format cjs",
-    "compile:generators": "microbundle build src/generators/index.ts --format cjs --output generators",
-    "compile_watch:generators": "microbundle watch src/generators/index.ts --format cjs --output generators",
+    "clean": "rimraf ./dist",
+    "dev": "npm-run-all -s clean compile_watch",
+    "build": "npm-run-all -s clean compile",
+    "compile": "tsc",
+    "compile_watch": "tsc --watch",
     "lint": "tslint --project ./tsconfig.json",
-    "precommit": "lint-staged && npm run docs"
+    "precommit": "lint-staged",
+    "prepublish": "npm run build"
   },
   "lint-staged": {
     "*.ts": [
@@ -46,6 +46,7 @@
     "inquirer": "^5.1.0",
     "lodash": "^4.17.5",
     "pretty-time": "~1.1.0",
+    "refine-deep": "^1.0.1",
     "rxjs": "^6.3.3"
   },
   "devDependencies": {

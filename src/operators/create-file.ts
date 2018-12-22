@@ -1,8 +1,8 @@
 // --- Imports -------------------------------------------------------------- //
 
 // Local modules
-import { resolveData } from '../utils/resolve-data';
-import { task } from './task';
+import { resolveDataBuilder } from '../utils/resolve-data';
+import { sideEffect } from './task';
 
 // Types
 import { FSOptions, GeneratorData, Operator } from '../types';
@@ -16,20 +16,21 @@ import { FSOptions, GeneratorData, Operator } from '../types';
  * resolved to the contextual `destinationRoot`.
  * @param content Data with which to fill the new file.
  */
-export const createFile = <T>(
+export function createFile<T>(
   file: GeneratorData<string, T>,
   content?: GeneratorData<any, T>,
   options?: GeneratorData<FSOptions, T>,
-): Operator<T> =>
-  task(async generator => {
+): Operator<T> {
+  return sideEffect(async generator => {
     try {
-      const extract = resolveData(generator);
-      const filePath = await extract(file);
-      const data = await extract(content);
-      const opts = await extract(options);
+      const resolveData = resolveDataBuilder(generator);
+      const filePath = await resolveData(file);
+      const data = await resolveData(content);
+      const opts = await resolveData(options);
 
       await generator.fs.createFile(filePath, data, opts);
     } catch (err) {
       throw err;
     }
   });
+}

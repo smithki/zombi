@@ -3920,6 +3920,11 @@ reduce-function-call@^1.0.1:
   dependencies:
     balanced-match "^0.4.2"
 
+refine-deep@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/refine-deep/-/refine-deep-1.0.1.tgz#99811f54931a9006f48c4d190ea136f4a31238a5"
+  integrity sha512-1iiuyH0ZSzOOBKyJkQSZwFSXHaOYiQeLD+qoxIB+HkqCK6NPTqY39w+sxcrCinXdrv5rSYVXRAoZ/3MIFEw0+g==
+
 reflect-metadata@^0.1.12:
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.12.tgz#311bf0c6b63cd782f228a81abe146a2bfa9c56f2"
