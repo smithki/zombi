@@ -5,12 +5,6 @@ import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
 // Types
-import {
-  Generator,
-  isParallel,
-  parallelismId,
-  parallelOperatorCache,
-} from '../generator';
 import { Callback, Operator, SideEffectOperatorOptions } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
