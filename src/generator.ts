@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 
 // Local modules
 import { FileSystem } from './fs';
+import { endParallelism, startParallelism } from './operators/parallelism';
 import { log, setSilent } from './utils/log';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
 import {
@@ -17,7 +18,6 @@ import {
 } from './utils/resolve-template-root';
 
 // Types
-import { endParallelism, startParallelism } from './operators/parallelism';
 import {
   GeneratorConfig,
   GeneratorOutput,
