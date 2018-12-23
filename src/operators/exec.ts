@@ -1,7 +1,8 @@
 // --- Imports -------------------------------------------------------------- //
 
 // Node modules
-import { exec as execProcess } from 'child_process';
+import { SpawnOptions } from 'child_process';
+import * as spawn from 'cross-spawn';
 
 // Local modules
 import { sideEffect } from './side-effect';
@@ -16,8 +17,12 @@ import { Operator } from '../types';
  *
  * @param command A string representation of the shell command to execute.
  */
-export function exec<T>(command: string): Operator<T> {
+export function exec<T>(command: string, options?: SpawnOptions): Operator<T> {
+  spawn;
   return sideEffect(async () => {
-    await execProcess(command);
+    const parts = command.split(' ');
+    const cmd = parts.shift();
+    const resolvedOptions = { stdio: 'inherit', ...options };
+    await spawn.sync(cmd, parts, resolvedOptions);
   });
 }

@@ -187,7 +187,6 @@ export class Generator<Props> {
 
     await new Promise(resolve => {
       this.zombi$.subscribe(async g => {
-        console.log(g);
         const { prompts, sequence } = g;
 
         if (!prompts.length && !sequence.length) {
