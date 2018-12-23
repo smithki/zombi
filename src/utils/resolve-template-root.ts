@@ -14,7 +14,7 @@ import { log } from './log';
 
 const { cyan, gray, green } = chalk;
 
-// Prettify `templateRoot` string (we'll need it for error messages soon).
+// Prettify `templateRoot` string (we may need it for error messages soon).
 const templRoot = cyan('templateRoot');
 
 export enum ResolveTemplateRootDepth {
@@ -32,10 +32,10 @@ export enum ResolveTemplateRootDepth {
  * @param current The current `templateRoot` value to resolve against. If false,
  * templates are ignored.
  */
-export const resolveTemplateRoot = (
+export function resolveTemplateRoot(
   startingDepth: ResolveTemplateRootDepth | number,
   current: string | boolean = true,
-) => {
+) {
   // First, we check the `current` value to determine whether we should proceed
   // with stack trace calculations.
 
@@ -80,10 +80,9 @@ export const resolveTemplateRoot = (
   // Prettify some more strings in case of error messages.
   const templDir = green('template/');
   const templPath = green(path.replace(process.cwd(), '.'));
-  const example =
-    gray('zombi(') +
-    `{ templateRoot: ${green("'/absolute/path/to/template'")} }` +
-    gray(');');
+  const example = `${gray('zombi(')} { templateRoot: ${green(
+    "'/absolute/path/to/template'",
+  )} } ${gray(');')}`;
   const boolExample = green('false');
 
   if (!exists) {
@@ -107,4 +106,4 @@ export const resolveTemplateRoot = (
     log.error(e);
     process.exit(1);
   }
-};
+}

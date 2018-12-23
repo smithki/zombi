@@ -33,8 +33,8 @@ export interface GeneratorContext<Props>
 export interface GeneratorOutput<Props> {
   context: GeneratorContext<Props>;
   props: Props;
-  prompts: Task<Props>[];
-  sequence: Task<Props>[];
+  prompts: SideEffect<Props>[];
+  sequence: (SideEffect<Props> | SideEffect<Props>[])[];
   fs: FileSystem<Props>;
 }
 
@@ -53,10 +53,11 @@ export interface FSOptions {
 }
 
 /** */
-export interface Operator<T> extends RxUnaryFunction<Stream<T>, Stream<T>> {}
+export interface Operator<T>
+  extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {}
 
 /** */
-export interface Task<Props>
+export interface SideEffect<Props>
   extends Callback<Props>,
     SideEffectOperatorOptions {}
 
@@ -71,7 +72,8 @@ export interface Callback<Props, R = void> {
 }
 
 /** */
-export interface Stream<Props> extends RxObservable<GeneratorOutput<Props>> {}
+export interface GeneratorStream<Props>
+  extends RxObservable<GeneratorOutput<Props>> {}
 
 /** */
 export interface Question<Props> extends InquirerQuestion {

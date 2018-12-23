@@ -6,7 +6,7 @@ import { basename } from 'path';
 // Local modules
 import { refineDeep } from 'refine-deep';
 import { zombi } from '../index';
-import { createJson, prompt } from '../operators/index';
+import { createJson, prompt } from '../operators';
 import { getNpmConfig } from '../utils/get-npm-config';
 import { promptLicense } from './license-file';
 import { promptAuthor } from './prompt-author';

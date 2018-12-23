@@ -2,7 +2,7 @@
 
 // Node modules
 import chalk from 'chalk';
-import { merge, uniq } from 'lodash';
+import { isArray, merge, uniq } from 'lodash';
 import { resolve } from 'path';
 import * as prettyTime from 'pretty-time';
 import { of } from 'rxjs';
@@ -17,7 +17,15 @@ import {
 } from './utils/resolve-template-root';
 
 // Types
-import { GeneratorConfig, GeneratorOutput, Operator, Stream } from './types';
+import { map } from 'rxjs/operators';
+import { endParallelism, startParallelism } from './operators/parallelism';
+import {
+  GeneratorConfig,
+  GeneratorOutput,
+  GeneratorStream,
+  Operator,
+  SideEffect,
+} from './types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -36,7 +44,7 @@ export class Generator<Props> {
   public force: boolean;
 
   // Stores the underlying RxJS Observable.
-  private zombi$: Stream<Props>;
+  private zombi$: GeneratorStream<Props>;
 
   // --- Constructor --- //
 
@@ -96,6 +104,21 @@ export class Generator<Props> {
    */
   public sequence(...operators: Operator<Props>[]): Generator<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
+    return merge({}, this, { zombi$: result });
+  }
+
+  /**
+   * Create a parallel sequence of tasks by chaining Zombi operators together.
+   *
+   * @param operators Zombi operators that will run in parallel.
+   */
+  public parallel(...operators: Operator<Props>[]): Generator<Props> {
+    const result = (this.zombi$.pipe as any)(
+      startParallelism(),
+      ...operators,
+      endParallelism(),
+    );
+    // delete Generator[parallelismId];
     return merge({}, this, { zombi$: result });
   }
 
@@ -177,6 +200,7 @@ export class Generator<Props> {
 
     await new Promise(resolve => {
       this.zombi$.subscribe(async g => {
+        console.log(g);
         const { prompts, sequence } = g;
 
         if (!prompts.length && !sequence.length) {
@@ -194,7 +218,10 @@ export class Generator<Props> {
         startTime = process.hrtime();
 
         // Execute sequence
-        for (const task of sequence) await task(g);
+        for (const task of sequence) {
+          if (isArray(task)) await Promise.all(task.map(t => t(g)));
+          else task(g);
+        }
 
         timeElapsed = process.hrtime(startTime);
 

@@ -6,7 +6,7 @@ import { resolve } from 'path';
 
 // Local modules
 import { zombi } from '../index';
-import { copy, prompt } from '../operators/index';
+import { copy, prompt } from '../operators';
 import { getNpmConfig } from '../utils/get-npm-config';
 import { PackageJsonProps } from './package-json';
 import { promptAuthor } from './prompt-author';
