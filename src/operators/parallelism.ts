@@ -5,7 +5,7 @@ import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
 // Types
-import { Callback, Operator, SideEffect } from '../types';
+import { Operator, SideEffect } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 

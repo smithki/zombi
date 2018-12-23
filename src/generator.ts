@@ -17,14 +17,12 @@ import {
 } from './utils/resolve-template-root';
 
 // Types
-import { map } from 'rxjs/operators';
 import { endParallelism, startParallelism } from './operators/parallelism';
 import {
   GeneratorConfig,
   GeneratorOutput,
   GeneratorStream,
   Operator,
-  SideEffect,
 } from './types';
 
 // --- Business logic ------------------------------------------------------- //
