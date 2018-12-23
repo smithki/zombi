@@ -15,3 +15,4 @@ export function zombi<Props>(options: GeneratorConfig<Props> = {}) {
 }
 
 export * from './operators';
+export * from './types';
