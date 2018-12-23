@@ -4,7 +4,6 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": false,
-    "noImplicitThis": true,
     "target": "es5",
     "sourceMap": true,
     "outDir": "./dist",
