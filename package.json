@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/smithki/zombi"
+    "url": "https://github.com/smithki/zombi"
   },
   "files": [
     "dist",
