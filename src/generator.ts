@@ -206,7 +206,7 @@ export class Generator<Props> {
         // Execute sequence
         for (const task of sequence) {
           if (isArray(task)) await Promise.all(task.map(t => t(g)));
-          else task(g);
+          else await task(g);
         }
 
         timeElapsed = process.hrtime(startTime);
