@@ -19,7 +19,6 @@ import { Operator } from '../types';
  * @param options Same options that would be passed to Node's `child_process.spawn` or `child_process.spawnSync`.
  */
 export function exec<T>(command: string, options?: SpawnOptions): Operator<T> {
-  spawn;
   return sideEffect(async () => {
     const parts = command.split(' ');
     const cmd = parts.shift();
