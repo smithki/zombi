@@ -1,6 +1,6 @@
 {
   "name": "zombi",
-  "version": "1.0.0",
+  "version": "0.13.0",
   "description": "Dead simple, streaming scaffolding and task runner for people with braaains.",
   "author": {
     "name": "Ian K Smith",
@@ -29,7 +29,7 @@
     "compile_watch": "tsc --watch",
     "lint": "tslint --project ./tsconfig.json",
     "precommit": "lint-staged",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "lint-staged": {
     "*.ts": [
