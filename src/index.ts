@@ -3,7 +3,7 @@
 import { Generator } from './generator';
 import { GeneratorConfig } from './types';
 
-// --- Business logic ------------------------------------------------------- //
+// --- Generator factory ---------------------------------------------------- //
 
 /**
  * Create a new `zombi` generator.
