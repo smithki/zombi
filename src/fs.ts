@@ -8,11 +8,12 @@ import {
   outputJson,
   pathExists,
   readdir,
+  readFile,
   readJson,
   stat,
 } from 'fs-extra';
 import { prompt } from 'inquirer';
-import { merge } from 'lodash';
+import { isEmpty, isNil, merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 
 // Internal
@@ -63,7 +64,7 @@ export class FileSystem<Props> {
     try {
       const ctx = this.getContextBuilder(options)(to, from);
 
-      if (this.isFile(from)) {
+      if (await this.isFile(from)) {
         await this.copyFile(ctx.from, ctx.to, data, options);
       } else if (this.isDirectory(from)) {
         await this.copyDirectory(ctx.from, ctx.to, data, options);
@@ -82,12 +83,20 @@ export class FileSystem<Props> {
     try {
       const ctx = this.getContextBuilder(options)(to, from);
 
-      await new Promise(resolve => {
-        renderFile(ctx.from, data || {}, async (err, string) => {
-          if (err) throw err;
+      await new Promise(async resolve => {
+        if (isNil(data) || isEmpty(data)) {
+          // Render file without EJS processing.
+          const string = await readFile(ctx.from);
           await this.sideEffects.outputFile(ctx)(string);
           resolve();
-        });
+        } else {
+          // Render file with EJS processing.
+          renderFile(ctx.from, data || {}, async (err, string) => {
+            if (err) throw err;
+            await this.sideEffects.outputFile(ctx)(string);
+            resolve();
+          });
+        }
       });
     } catch (err) {
       throw err;
