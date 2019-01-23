@@ -1,6 +1,6 @@
 {
   "name": "zombi",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Dead simple, streaming scaffolding and task runner for people with braaains.",
   "author": {
     "name": "Ian K Smith",
