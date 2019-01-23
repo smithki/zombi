@@ -56,8 +56,8 @@ export function copy<T>(
         try {
           const resolveData = resolveDataBuilder(generator);
           const toPath = await resolveData(to);
-          const ejsData = await resolveEjsDataBuilder(generator)(data);
-          const opts = await resolveData(options);
+          const ejsData = await resolveEjsDataBuilder(generator)(data!);
+          const opts = await resolveData(options!);
 
           const fromData = await resolveData(from);
           const fromPath = isAbsolute(fromData)

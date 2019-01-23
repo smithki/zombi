@@ -24,7 +24,7 @@ export function extendJson<T>(
     try {
       const resolveData = await resolveDataBuilder(generator);
       const filePath = await resolveData(file);
-      const data = await resolveData(extensions);
+      const data = await resolveData(extensions!);
 
       await generator.fs.extendJson(filePath, data);
     } catch (err) {

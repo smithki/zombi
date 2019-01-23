@@ -26,7 +26,7 @@ export function createFile<T>(
       const resolveData = resolveDataBuilder(generator);
       const filePath = await resolveData(file);
       const data = await resolveData(content);
-      const opts = await resolveData(options);
+      const opts = await resolveData(options!);
 
       await generator.fs.createFile(filePath, data, opts);
     } catch (err) {

@@ -65,9 +65,9 @@ export class FileSystem<Props> {
       const ctx = this.getContextBuilder(options)(to, from);
 
       if (await this.isFile(from)) {
-        await this.copyFile(ctx.from, ctx.to, data, options);
+        await this.copyFile(ctx.from!, ctx.to!, data, options);
       } else if (this.isDirectory(from)) {
-        await this.copyDirectory(ctx.from, ctx.to, data, options);
+        await this.copyDirectory(ctx.from!, ctx.to!, data, options);
       }
     } catch (err) {
       throw err;
@@ -86,12 +86,12 @@ export class FileSystem<Props> {
       await new Promise(async resolve => {
         if (isNil(data) || isEmpty(data)) {
           // Render file without EJS processing.
-          const string = await readFile(ctx.from);
+          const string = await readFile(ctx.from!);
           await this.sideEffects.outputFile(ctx)(string);
           resolve();
         } else {
           // Render file with EJS processing.
-          renderFile(ctx.from, data || {}, async (err, string) => {
+          renderFile(ctx.from!, data || {}, async (err, string) => {
             if (err) throw err;
             await this.sideEffects.outputFile(ctx)(string);
             resolve();
@@ -149,7 +149,7 @@ export class FileSystem<Props> {
     try {
       // Get context and JSON data
       const ctx = this.getContextBuilder()(filePath);
-      const json = await readJson(ctx.to);
+      const json = await readJson(ctx.to!);
 
       merge(json, extensions || {});
 
@@ -209,7 +209,7 @@ export class FileSystem<Props> {
     write: () => Promise<void>,
   ) {
     const prettyTo = this.prettifyPath(ctx).to;
-    const doesExist = await pathExists(ctx.to);
+    const doesExist = await pathExists(ctx.to!);
 
     if (!ctx.force) {
       if (doesExist) {
@@ -255,8 +255,8 @@ export class FileSystem<Props> {
 
   private prettifyPath(ctx: GeneratorContext<Props>) {
     return {
-      to: ctx.to.replace(process.cwd(), '.'),
-      from: ctx.from.replace(process.cwd(), '.'),
+      to: ctx.to!.replace(process.cwd(), '.'),
+      from: ctx.from!.replace(process.cwd(), '.'),
     };
   }
 }

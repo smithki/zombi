@@ -4,6 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": false,
+    "strictNullChecks": true,
     "target": "es5",
     "sourceMap": true,
     "outDir": "./dist",

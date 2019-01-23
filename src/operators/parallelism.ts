@@ -9,7 +9,7 @@ import { Operator, SideEffect } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
-let savedSet: (SideEffect<any> | SideEffect<any>[])[] = undefined;
+let savedSet: (SideEffect<any> | SideEffect<any>[])[] | undefined = undefined;
 
 /**
  * Start piping a set of parallel tasks into the generator.

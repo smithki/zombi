@@ -40,12 +40,11 @@ export interface GeneratorOutput<Props> {
 
 /** */
 export interface GeneratorConfig<Props>
-  extends Partial<
-    Pick<Generator<Props>, 'name' | 'templateRoot' | 'destinationRoot'>
-  > {
+  extends Partial<Pick<Generator<Props>, 'name' | 'destinationRoot'>> {
   initialProps?: Props | Partial<Props>;
   force?: boolean;
   silent?: boolean;
+  templateRoot?: string | boolean;
 }
 
 export interface FSOptions {

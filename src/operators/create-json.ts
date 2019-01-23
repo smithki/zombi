@@ -25,8 +25,8 @@ export function createJson<T>(
     try {
       const resolveData = resolveDataBuilder(generator);
       const filePath = await resolveData(file);
-      const json = await resolveData(data);
-      const opts = await resolveData(options);
+      const json = await resolveData(data!);
+      const opts = await resolveData(options!);
 
       await generator.fs.createJson(filePath, json, opts);
     } catch (err) {

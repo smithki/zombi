@@ -37,7 +37,7 @@ export class Generator<Props> {
 
   // Config properties
   public name: string;
-  public templateRoot: string | boolean;
+  public templateRoot: string | undefined;
   public destinationRoot: string;
   public force: boolean;
 
@@ -63,7 +63,7 @@ export class Generator<Props> {
       ResolveTemplateRootDepth.FromGenerator,
       templateRoot,
     );
-    this.force = force;
+    this.force = force || false;
 
     // Silence logs if so desired.
     if (silent) setSilent(silent);
@@ -83,7 +83,7 @@ export class Generator<Props> {
       props: config.initialProps || {},
       prompts: [],
       sequence: [],
-      fs: undefined,
+      fs: undefined as any,
     };
 
     g.fs = new FileSystem(g);
@@ -242,7 +242,7 @@ export class Generator<Props> {
    */
   public template(...pathSegments: string[]) {
     if (this.templateRoot) {
-      return resolve(this.templateRoot as string, ...pathSegments);
+      return resolve(this.templateRoot, ...pathSegments);
     }
   }
 
