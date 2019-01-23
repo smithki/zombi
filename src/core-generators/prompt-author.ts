@@ -1,4 +1,4 @@
-// Imports ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
 import { zombi } from '../index';
 import { prompt } from '../operators';
@@ -12,7 +12,7 @@ export interface AuthorshipProps {
   authorUrl: string;
 }
 
-// Logic -----------------------------------------------------------------------
+// --- Business logic ------------------------------------------------------- //
 
 /** Prompts for authorship information */
 export const promptAuthor = zombi<AuthorshipProps>({

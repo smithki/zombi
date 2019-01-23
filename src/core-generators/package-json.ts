@@ -1,4 +1,4 @@
-// Imports ---------------------------------------------------------------------
+// --- Imports -------------------------------------------------------------- //
 
 // Node modules
 import { basename } from 'path';
@@ -11,7 +11,7 @@ import { getNpmConfig } from '../utils/get-npm-config';
 import { promptLicense } from './license-file';
 import { promptAuthor } from './prompt-author';
 
-// Interfaces ------------------------------------------------------------------
+// --- Types ---------------------------------------------------------------- //
 
 export interface PackageJsonProps {
   npmOrg: string;
@@ -21,7 +21,7 @@ export interface PackageJsonProps {
   pkgLicense: 'MIT' | 'BSD-3';
 }
 
-// Logic -----------------------------------------------------------------------
+// --- Business logic ------------------------------------------------------- //
 
 /** Prompts for and writes a `package.json` file. */
 export const packageJson = zombi<PackageJsonProps>({
