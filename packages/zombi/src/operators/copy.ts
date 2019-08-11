@@ -25,7 +25,7 @@ import { FSOptions, GeneratorData, Operator } from '../types';
  * Copies files from the template directory to the destination directory.
  *
  * @param from The template path. A relative path will be automatically resolved
- * to the calling generator's `templateRoot` (and not the contextual
+ * to the calling generator's `templateRoot` (rather than the contextual
  * `templateRoot`).
  * @param to The destination path. A relative path will be automatically
  * resolved to the contextual `destinationRoot`.
@@ -39,7 +39,19 @@ export function copy<T>(
   options?: GeneratorData<FSOptions, T>,
 ): Operator<T> {
   return stream => {
-    return stream.pipe(
+    // Find the `templateRoot` nearest to the calling generator (and not the
+    // current context). This enables us to use relative paths in the `from`
+    // parameter when copying template files.
+    const source = merge({}, stream); // Use a copy of the current stream.
+    let templateRoot: string;
+    stream.subscribe(g => (templateRoot = g.context.templateRoot));
+    // depth === 2 because we should be 2 modules away from the generator.
+    const templateDir = resolveTemplateRoot(
+      ResolveTemplateRootDepth.FromOperator,
+      templateRoot,
+    );
+
+    return source.pipe(
       sideEffect(async generator => {
         try {
           const resolveData = resolveDataBuilder(generator);
@@ -50,7 +62,7 @@ export function copy<T>(
           const fromData = await resolveData(from);
           const fromPath = isAbsolute(fromData)
             ? fromData
-            : join(generator.context.templateRoot, fromData);
+            : join(templateDir as string, fromData);
 
           await generator.fs.copy(fromPath, toPath, ejsData, opts);
         } catch (err) {
