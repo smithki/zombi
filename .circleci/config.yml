@@ -46,7 +46,9 @@ aliases: [
   # CircleCI workspace.
   &dependency-paths {
     paths: [
-      "node_modules"
+      "node_modules",
+      "packages/generators/node_modules",
+      "packages/zombi/node_modules",
     ]
   },
 
