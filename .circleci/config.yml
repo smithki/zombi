@@ -212,7 +212,7 @@ jobs:
       - *attach-workspace
       - run:
           name: Install github-release-notes package
-          command: yarn global add github-release-notes
+          command: yarn add -D -W github-release-notes
       - run:
           name: Generate release notes and publish to GitHub
           command: npx gren release --override --token $GITHUB_REPO_TOKEN
@@ -226,7 +226,7 @@ jobs:
       - *attach-workspace
       - run:
           name: Install github-release-notes package
-          command: yarn global add github-release-notes
+          command: yarn add -D -W github-release-notes
       - run:
           name: Generate release notes and publish to GitHub
           command: npx gren release --override --prerelease --token $GITHUB_REPO_TOKEN
