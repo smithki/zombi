@@ -10,7 +10,7 @@ import { ensureArray } from '../utils/ensure-array';
 import { resolveDataBuilder } from '../utils/resolve-data';
 
 // Types
-import { GeneratorData, Operator, Question } from '../types';
+import { GeneratorData, Question, ZombiOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -24,7 +24,7 @@ import { GeneratorData, Operator, Question } from '../types';
  */
 export function prompt<T, K extends T = T>(
   questions: GeneratorData<Question<K> | Question<K>[], T>,
-): Operator<T> {
+): ZombiOperator<T> {
   return map(g => {
     const result = merge({}, g);
 

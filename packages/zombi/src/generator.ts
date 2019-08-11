@@ -22,7 +22,7 @@ import {
   GeneratorConfig,
   GeneratorOutput,
   GeneratorStream,
-  Operator,
+  ZombiOperator,
 } from './types';
 
 // --- Business logic ------------------------------------------------------- //
@@ -100,7 +100,7 @@ export class Generator<Props> {
    *
    * @param operators Operators that will run _in sequence_.
    */
-  public sequence(...operators: Operator<Props>[]): Generator<Props> {
+  public sequence(...operators: ZombiOperator<Props>[]): Generator<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
     return merge({}, this, { zombi$: result });
   }
@@ -110,7 +110,7 @@ export class Generator<Props> {
    *
    * @param operators Operators that will run _in parallel_.
    */
-  public parallel(...operators: Operator<Props>[]): Generator<Props> {
+  public parallel(...operators: ZombiOperator<Props>[]): Generator<Props> {
     const result = (this.zombi$.pipe as any)(
       startParallelism(),
       ...operators,
@@ -145,14 +145,13 @@ export class Generator<Props> {
     let result;
 
     const target = merge({}, this.zombi$);
-
-    const s = target.subscribe(g => {
+    target.subscribe(g => {
       result = g;
     });
 
     const doCompose = (z: Generator<any>) => {
       const source = merge({}, z.zombi$);
-      const s = source.subscribe((g: GeneratorOutput<any>) => {
+      source.subscribe((g: GeneratorOutput<any>) => {
         result.prompts.push(...g.prompts);
         result.sequence.push(...g.sequence);
       });

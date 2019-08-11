@@ -5,7 +5,7 @@ import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
 
 // Types
-import { FSOptions, GeneratorData, JsonData, Operator } from '../types';
+import { FSOptions, GeneratorData, JsonData, ZombiOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -20,7 +20,7 @@ export function createJson<T>(
   file: GeneratorData<string, T>,
   data?: GeneratorData<JsonData, T>,
   options?: GeneratorData<FSOptions, T>,
-): Operator<T> {
+): ZombiOperator<T> {
   return sideEffect(async generator => {
     try {
       const resolveData = resolveDataBuilder(generator);

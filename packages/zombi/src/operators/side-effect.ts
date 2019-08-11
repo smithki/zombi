@@ -5,7 +5,7 @@ import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
 // Types
-import { Callback, Operator, SideEffectOperatorOptions } from '../types';
+import { Callback, SideEffectOperatorOptions, ZombiOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -21,7 +21,7 @@ import { Callback, Operator, SideEffectOperatorOptions } from '../types';
 export function sideEffect<T>(
   callback: Callback<T>,
   options: SideEffectOperatorOptions = {},
-): Operator<T> {
+): ZombiOperator<T> {
   return map(g => {
     const result = merge({}, g);
 
