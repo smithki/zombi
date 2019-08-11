@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">🧟‍♀️</h1>
-  <h1 align="center">Zombi</h1>
+  <h3 align="center">Zombi</h3>
   <p align="center"><i>Dead simple, streaming scaffolding for people with braaains.</i></p>
 </p>
 
