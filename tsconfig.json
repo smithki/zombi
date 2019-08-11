@@ -1,19 +1,18 @@
 {
   "compilerOptions": {
-    "lib": ["es2018"],
+    "lib": ["es2018", "dom"],
     "module": "commonjs",
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": false,
-    "strictNullChecks": true,
-    "target": "es5",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "noImplicitThis": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "declaration": true,
     "sourceMap": true,
-    "outDir": "./dist",
-    "declaration": true
-  },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules/**/*"
-  ]
+    "target": "es5",
+    "skipLibCheck": true,
+    "typeRoots": ["node_modules/@0x/typescript-typings/types", "node_modules/@types"]
+  }
 }

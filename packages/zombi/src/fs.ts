@@ -37,9 +37,8 @@ export class FileSystem<Props> {
   // --- Properties --- //
 
   public static conflictCount: number = 0;
-  private generator: GeneratorOutput<Props>;
 
-  constructor(generator: GeneratorOutput<Props>) {
+  constructor(private readonly generator: GeneratorOutput<Props>) {
     this.generator = generator;
   }
 

@@ -1,8 +1,8 @@
 // --- Imports -------------------------------------------------------------- //
 
-import { zombi } from '../index';
-import { prompt } from '../operators';
-import { getNpmConfig } from '../utils/get-npm-config';
+// Node modules
+import { prompt, zombi } from 'zombi';
+import { getNpmConfig } from 'zombi/dist/utils/get-npm-config';
 
 // --- Types ---------------------------------------------------------------- //
 

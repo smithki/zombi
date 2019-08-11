@@ -3,11 +3,10 @@
 // Node modules
 import { kebabCase } from 'lodash';
 import { resolve } from 'path';
+import { copy, prompt, zombi } from 'zombi';
+import { getNpmConfig } from 'zombi/dist/utils/get-npm-config';
 
 // Local modules
-import { zombi } from '../index';
-import { copy, prompt } from '../operators';
-import { getNpmConfig } from '../utils/get-npm-config';
 import { PackageJsonProps } from './package-json';
 import { promptAuthor } from './prompt-author';
 
@@ -20,7 +19,7 @@ export interface LicenseProps extends Pick<PackageJsonProps, 'pkgLicense'> {}
 const generator = zombi<LicenseProps>({
   name: 'zombi-license-file',
   // We are starting in `dist/` so we need to travel up an additional directory.
-  templateRoot: resolve(__dirname, '..', '..', 'template'),
+  templateRoot: resolve(__dirname, '..', 'template'),
 });
 
 /** Prompts for license information. */
