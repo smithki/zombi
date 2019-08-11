@@ -196,12 +196,12 @@ jobs:
       - run:
           name: Git tag the release with the `package.json` version number
           command: |
-            PACKAGE_VERSION=$(node -pe "require('./package.json')['version']")
+            PACKAGE_VERSION=$(node -pe "require('./lerna.json')['version']")
             git tag v$PACKAGE_VERSION
       - run:
           name: Push git tag to the remote repository
           command: |
-            PACKAGE_VERSION=$(node -pe "require('./package.json')['version']")
+            PACKAGE_VERSION=$(node -pe "require('./lerna.json')['version']")
             git push -q https://$GITHUB_REPO_TOKEN@github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git v$PACKAGE_VERSION
 
   # Create release notes on GitHub using the `github-release-notes` package.
