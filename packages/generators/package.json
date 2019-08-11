@@ -1,7 +1,7 @@
 {
   "name": "@zombi/generators",
   "version": "0.1.0",
-  "description": "Core scaffolds built using Zombi.",
+  "description": "Core generator scaffolds built using Zombi.",
   "author": "Ian K Smith <smithki707@gmail.com>",
   "license": "MIT",
   "repository": {
