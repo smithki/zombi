@@ -99,8 +99,8 @@ jobs:
       - restore_cache:
           key: *dependency-cache-key
       - run:
-          name: Install App Dependencies
-          command: yarn install --frozen-lockfile
+          name: Install Module Dependencies
+          command: yarn bootstrap
       - save_cache:
           <<: *dependency-paths
           key: *dependency-cache-key
