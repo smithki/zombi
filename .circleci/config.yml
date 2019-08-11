@@ -107,6 +107,9 @@ jobs:
       - restore_cache:
           key: *dependency-cache-key
       - run:
+          name: Install Lerna
+          command: yarn global add lerna
+      - run:
           name: Install Module Dependencies
           command: yarn bootstrap
       - save_cache:
