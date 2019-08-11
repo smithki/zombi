@@ -39,18 +39,6 @@ export function copy<T>(
   options?: GeneratorData<FSOptions, T>,
 ): Operator<T> {
   return stream => {
-    // Find the `templateRoot` nearest to the calling generator (and not the
-    // current context). This enables us to use relative paths in the `from`
-    // parameter when copying template files.
-    const source = merge({}, stream); // Use a copy of the current stream.
-    let templateRoot;
-    stream.subscribe(g => (templateRoot = g.context.templateRoot));
-    // depth === 2 because we should be 2 modules away from the generator.
-    const templateDir = resolveTemplateRoot(
-      ResolveTemplateRootDepth.FromOperator,
-      templateRoot,
-    );
-
     return stream.pipe(
       sideEffect(async generator => {
         try {
@@ -62,7 +50,7 @@ export function copy<T>(
           const fromData = await resolveData(from);
           const fromPath = isAbsolute(fromData)
             ? fromData
-            : join(templateDir as string, fromData);
+            : join(generator.context.templateRoot, fromData);
 
           await generator.fs.copy(fromPath, toPath, ejsData, opts);
         } catch (err) {

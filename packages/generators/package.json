@@ -1,0 +1,33 @@
+{
+  "name": "@zombi/generators",
+  "version": "0.15.0",
+  "description": "Core generator scaffolds built using Zombi.",
+  "author": "Ian K Smith <smithki707@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smithki/zombi"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "npm-run-all -s clean compile_watch",
+    "build": "npm-run-all -s clean compile",
+    "clean": "rimraf ./dist",
+    "test": "echo 'tests coming soon!'",
+    "test_watch": "echo 'tests coming soon!'",
+    "lint": "tslint --project ./tsconfig.json",
+    "compile": "tsc",
+    "compile_watch": "tsc --watch",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "tslint --fix",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "zombi": "0.15.0"
+  }
+}

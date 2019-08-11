@@ -1,8 +1,7 @@
 // --- Imports -------------------------------------------------------------- //
 
 // Node modules
-import * as caller from 'caller';
-import chalk from 'chalk';
+import caller from 'caller';
 import { existsSync, lstatSync } from 'fs-extra';
 import { isBoolean, isString } from 'lodash';
 import { basename, dirname, isAbsolute, join } from 'path';
@@ -15,11 +14,6 @@ import {
 } from '../exceptions';
 
 // --- Constants/enums ------------------------------------------------------ //
-
-const { cyan, gray, green } = chalk;
-
-// Prettify `templateRoot` string (we may need it for error messages soon).
-const templRoot = cyan('templateRoot');
 
 export enum ResolveTemplateRootDepth {
   FromGenerator = 3,
@@ -40,11 +34,12 @@ export function resolveTemplateRoot(
   startingDepth: ResolveTemplateRootDepth | number,
   current: string | boolean = true,
 ) {
-  // First, we check the `current` value to determine whether we should proceed
-  // with stack trace calculations.
+  // [1] Check the `current` value to determine whether we should proceed
+  //     with stack trace calculations.
 
   // If `templateRoot` is already set to false, keep it that way.
   if (isBoolean(current) && !current) return;
+
   if (isString(current)) {
     if (!isAbsolute(current)) throw new TemplateRootAbsolutePathError();
     if (!existsSync(current)) {
@@ -58,8 +53,8 @@ export function resolveTemplateRoot(
     }
   }
 
-  // Next, if we made it this far, we need to determine the calling module's
-  // path and check for a `template/` directory next to it.
+  // [2] Next, if we made it this far, we need to determine the calling module's
+  //     path and check for a `template/` directory next to it.
 
   // Resolve to `depth` of the stack trace using `caller(...)`.
   const callerPath = caller(startingDepth);
@@ -89,13 +84,12 @@ export function resolveTemplateRoot(
       'template/',
       path.replace(process.cwd(), '.'),
     );
-  }
-
-  if (exists) {
+  } else {
     if (lstatSync(path).isDirectory()) {
       // If path is found and IS a directory, then we have our mark!
       return path;
     }
+
     // If the path is found but IS NOT a directory, then raise an error...
     throw new TemplateRootNonDirectoryError();
   }

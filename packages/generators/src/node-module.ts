@@ -1,7 +1,9 @@
 // --- Imports -------------------------------------------------------------- //
 
+// Node modules
+import { zombi } from 'zombi';
+
 // Local modules
-import { zombi } from '../index';
 import { licenseFile } from './license-file';
 import { packageJson } from './package-json';
 

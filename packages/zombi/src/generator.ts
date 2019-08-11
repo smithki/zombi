@@ -138,7 +138,6 @@ export class Generator<Props> {
    *
    * @param {...Generator<any>[]} zombis The other generators to compose.
    * @returns {Generator<any>}
-   * @memberof Generator
    */
   public compose(...zombis: Generator<any>[]): Generator<any> {
     if (!zombis.length) return this;
@@ -173,17 +172,14 @@ export class Generator<Props> {
 
   /**
    * Execute the generator's task sequence and output side-effects.
-   *
-   * @returns
-   * @memberof Zombi
    */
   public async run() {
     log();
     log(green.bold('🧟‍  Zombi is running ') + cyan.bold(this.name));
     log();
 
-    let startTime;
-    let timeElapsed;
+    let startTime: [number, number];
+    let timeElapsed: [number, number];
 
     await new Promise(resolve => {
       this.zombi$.subscribe(async g => {
@@ -237,8 +233,6 @@ export class Generator<Props> {
    * Resolves a path to the generator's `templateRoot`.
    *
    * @param {...string[]} pathSegments Strings from which to resolve a path.
-   * @returns
-   * @memberof Zombi
    */
   public template(...pathSegments: string[]) {
     if (this.templateRoot) {
@@ -250,8 +244,6 @@ export class Generator<Props> {
    * Resolves a path to the generator's `destinationRoot`.
    *
    * @param {...string[]} pathSegments Strings from which to resolve a path.
-   * @returns
-   * @memberof Zombi
    */
   public destination(...pathSegments: string[]) {
     return resolve(this.destinationRoot, ...pathSegments);
