@@ -8,7 +8,7 @@ import * as spawn from 'cross-spawn';
 import { sideEffect } from './side-effect';
 
 // Types
-import { Operator } from '../types';
+import { ZombiOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -18,7 +18,10 @@ import { Operator } from '../types';
  * @param command A string representation of the shell command to execute.
  * @param options Same options that would be passed to Node's `child_process.spawn` or `child_process.spawnSync`.
  */
-export function exec<T>(command: string, options?: SpawnOptions): Operator<T> {
+export function exec<T>(
+  command: string,
+  options?: SpawnOptions,
+): ZombiOperator<T> {
   return sideEffect(async () => {
     const parts = command.split(' ');
     const cmd = parts.shift();

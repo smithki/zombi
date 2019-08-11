@@ -17,7 +17,7 @@ import {
 import { sideEffect } from './side-effect';
 
 // Types
-import { FSOptions, GeneratorData, Operator } from '../types';
+import { FSOptions, GeneratorData, ZombiOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -37,7 +37,7 @@ export function copy<T>(
   to: GeneratorData<string, T>,
   data?: GeneratorData<EjsData, T>,
   options?: GeneratorData<FSOptions, T>,
-): Operator<T> {
+): ZombiOperator<T> {
   return stream => {
     // Find the `templateRoot` nearest to the calling generator (and not the
     // current context). This enables us to use relative paths in the `from`

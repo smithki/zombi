@@ -52,7 +52,7 @@ export interface FSOptions {
 }
 
 /** */
-export interface Operator<T>
+export interface ZombiOperator<T>
   extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {}
 
 /** */

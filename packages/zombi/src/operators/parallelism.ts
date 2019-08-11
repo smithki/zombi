@@ -5,7 +5,7 @@ import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
 // Types
-import { Operator, SideEffect } from '../types';
+import { SideEffect, ZombiOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -14,7 +14,7 @@ let savedSet: (SideEffect<any> | SideEffect<any>[])[] | undefined = undefined;
 /**
  * Start piping a set of parallel tasks into the generator.
  */
-export function startParallelism<T>(): Operator<T> {
+export function startParallelism<T>(): ZombiOperator<T> {
   return map(g => {
     const result = merge({}, g);
     // Copy the current sequence by value.
@@ -27,7 +27,7 @@ export function startParallelism<T>(): Operator<T> {
 /**
  * Finish piping a set of parallel tasks into the generator.
  */
-export function endParallelism<T>(): Operator<T> {
+export function endParallelism<T>(): ZombiOperator<T> {
   return map(g => {
     const result = merge({}, g);
     const parallelSet = [...result.sequence];
