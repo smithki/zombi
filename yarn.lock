@@ -883,6 +883,11 @@
   dependencies:
     any-observable "^0.3.0"
 
+"@types/caller@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/caller/-/caller-1.0.0.tgz#21044c8254e95e57c86a2079bd99430d5f892c62"
+  integrity sha512-zbyHsdYFn5gCQFn+fF7Ad9En1fJdj3o0YP7DPTD9J3at4M9auNfoLrVYH4hFdLfFDhnB0kTZw3RAKp4iD516uw==
+
 "@types/chalk@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@types/chalk/-/chalk-2.2.0.tgz#b7f6e446f4511029ee8e3f43075fb5b73fbaa0ba"
@@ -3459,7 +3464,7 @@ lodash.uniq@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
   integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
 
-lodash@^4.17.12, lodash@^4.17.14, lodash@^4.17.5, lodash@^4.2.1, lodash@^4.3.0:
+lodash@^4.17.12, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.5, lodash@^4.2.1, lodash@^4.3.0:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
@@ -5738,3 +5743,20 @@ yargs@^12.0.1:
     which-module "^2.0.0"
     y18n "^3.2.1 || ^4.0.0"
     yargs-parser "^11.1.1"
+
+zombi@0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/zombi/-/zombi-0.14.0.tgz#341562359eda31d8fa5fecce653ad65df66ee5ec"
+  integrity sha512-eWqpjDss1Wio6+KCM/dthHWwBxiM5Bl2Pei4DGpUncbvxfFX7sF+uOX3Wj90eJ0i50ziuhJUKzmk5AOcYd60Bw==
+  dependencies:
+    caller "~1.0.1"
+    chalk "^2.4.1"
+    cross-spawn "^6.0.5"
+    ejs "^2.5.7"
+    fs-extra "^5.0.0"
+    ini "~1.3.5"
+    inquirer "^5.1.0"
+    lodash "^4.17.5"
+    pretty-time "~1.1.0"
+    refine-deep "^1.0.1"
+    rxjs "^6.3.3"

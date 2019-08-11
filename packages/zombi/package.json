@@ -1,6 +1,6 @@
 {
   "name": "zombi",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Dead simple, streaming scaffolding and task runner for people with braaains.",
   "author": "Ian K Smith <smithki707@gmail.com>",
   "license": "MIT",
@@ -37,7 +37,7 @@
     "ini": "~1.3.5",
     "inquirer": "^5.1.0",
     "listr": "^0.14.3",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.15",
     "pretty-time": "~1.1.0",
     "refine-deep": "^1.0.1",
     "rxjs": "^6.3.3"
