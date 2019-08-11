@@ -49,7 +49,8 @@ aliases: [
 
   &build-output-paths {
     paths: [
-      "dist"
+      "packages/generators/dist",
+      "packages/zombi/dist"
     ]
   },
 

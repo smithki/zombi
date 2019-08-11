@@ -19,8 +19,7 @@
     "lint": "tslint --project ./tsconfig.json",
     "compile": "tsc",
     "compile_watch": "tsc --watch",
-    "precommit": "lint-staged",
-    "prepublishOnly": "yarn build"
+    "precommit": "lint-staged"
   },
   "lint-staged": {
     "*.ts": [
