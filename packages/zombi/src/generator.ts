@@ -145,14 +145,13 @@ export class Generator<Props> {
     let result;
 
     const target = merge({}, this.zombi$);
-
-    const s = target.subscribe(g => {
+    target.subscribe(g => {
       result = g;
     });
 
     const doCompose = (z: Generator<any>) => {
       const source = merge({}, z.zombi$);
-      const s = source.subscribe((g: GeneratorOutput<any>) => {
+      source.subscribe((g: GeneratorOutput<any>) => {
         result.prompts.push(...g.prompts);
         result.sequence.push(...g.sequence);
       });
