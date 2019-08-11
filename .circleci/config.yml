@@ -115,7 +115,9 @@ jobs:
       - *attach-workspace
       - run:
           name: Lint TypeScripts
-          command: yarn lint
+          command: |
+            $PKG=zombi yarn lint
+            $PKG=@zombi/generators yarn lint
 
   # Builds modules and persists the build output to the workspace.
   build:
@@ -125,7 +127,9 @@ jobs:
       - *attach-workspace
       - run:
           name: Build modules
-          command: yarn build
+          command: |
+            $PKG=zombi yarn build
+            $PKG=@zombi/generators yarn build
       - persist_to_workspace:
           <<: *build-output-paths
           root: *workspace-root
@@ -138,7 +142,9 @@ jobs:
       - *attach-workspace
       - run:
           name: Run tests
-          command: yarn test
+          command: |
+            $PKG=zombi yarn test
+            $PKG=@zombi/generators yarn test
 
   # Publish the package to NPM. This should depend on the `build` job.
   create-release:
@@ -151,7 +157,7 @@ jobs:
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
       - run:
           name: Publish package to NPM
-          command: npm publish
+          command: yarn release
 
   # Publish the package as a pre-release version to NPM. This should depend on
   # the `build` job.
@@ -165,7 +171,7 @@ jobs:
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
       - run:
           name: Publish pre-release package to NPM
-          command: npm publish --tag next
+          command: yarn release_canary
 
   # Create a git tag for this release and push to the remote repository.
   tag-release:
