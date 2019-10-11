@@ -10,12 +10,13 @@ import { of } from 'rxjs';
 // Local modules
 import { FileSystem } from './fs';
 import { endParallelism, startParallelism } from './operators/parallelism';
-import { log, setSilent } from './utils/log';
+import { log } from './utils/log';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
 import {
   resolveTemplateRoot,
   ResolveTemplateRootDepth,
 } from './utils/resolve-template-root';
+import { timer } from './utils/timer';
 
 // Types
 import {
@@ -64,9 +65,6 @@ export class Generator<Props> {
       templateRoot,
     );
     this.force = force || false;
-
-    // Silence logs if so desired.
-    if (silent) setSilent(silent);
 
     // --- Build the initial generator output --- //
 
@@ -173,30 +171,23 @@ export class Generator<Props> {
    * Execute the generator's task sequence and output side-effects.
    */
   public async run() {
-    log();
     log(green.bold('🧟‍  Zombi is running ') + cyan.bold(this.name));
-    log();
 
-    let startTime: [number, number];
     let timeElapsed: [number, number];
 
-    await new Promise(resolve => {
+    const didGenerateFiles = await new Promise(resolve => {
       this.zombi$.subscribe(async g => {
         const { prompts, sequence } = g;
 
         if (!prompts.length && !sequence.length) {
           log(yellow.bold(`🤷  There's nothing to Generate.`));
-          resolve();
+          resolve(false);
         }
 
         // Execute prompts
         for (const task of prompts) await task(g);
 
-        log();
-        log(green.bold('🧠  Generating...'));
-        log();
-
-        startTime = process.hrtime();
+        timer.start();
 
         // Execute sequence
         for (const task of sequence) {
@@ -204,20 +195,17 @@ export class Generator<Props> {
           else await task(g);
         }
 
-        timeElapsed = process.hrtime(startTime);
+        timeElapsed = timer.stop();
 
-        resolve();
+        resolve(true);
       });
     });
 
-    const prettyTimeElapsed = prettyTime(timeElapsed);
+    if (didGenerateFiles) {
+      const prettyTimeElapsed = prettyTime(timeElapsed);
+      log.completedMessage(prettyTimeElapsed);
+    }
 
-    log();
-    log(
-      green.bold(
-        `⚡  It's aliiive! ${gray(`Generated in ${cyan(prettyTimeElapsed)}`)}`,
-      ),
-    );
     return;
   }
 

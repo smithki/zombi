@@ -18,14 +18,7 @@
     "test_watch": "echo 'tests coming soon!'",
     "lint": "tslint --project ./tsconfig.json",
     "compile": "tsc",
-    "compile_watch": "tsc --watch",
-    "precommit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "tslint --fix",
-      "git add"
-    ]
+    "compile_watch": "tsc --watch"
   },
   "dependencies": {
     "caller": "~1.0.1",
@@ -34,7 +27,7 @@
     "ejs": "^2.5.7",
     "fs-extra": "^5.0.0",
     "ini": "~1.3.5",
-    "inquirer": "^5.1.0",
+    "inquirer": "^7.0.0",
     "listr": "^0.14.3",
     "lodash": "^4.17.15",
     "pretty-time": "~1.1.0",

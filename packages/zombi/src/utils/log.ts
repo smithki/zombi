@@ -1,42 +1,61 @@
+// tslint:disable:prefer-template
+
 // --- Imports -------------------------------------------------------------- //
 
 // Node modules
 import chalk from 'chalk';
 import { merge } from 'lodash';
 
+// Local modules
+import { status } from './inquirer';
+
 // --- Constants ------------------------------------------------------------ //
 
-const { green, magenta, gray, red, yellow } = chalk;
+const { green, gray, white, cyan, black } = chalk;
 
 // --- Business logic ------------------------------------------------------- //
 
-let silent = false;
-export const setSilent = (value: boolean) => (silent = value);
-
-const doLog = (message?: any, ...optionalParams: any[]) => {
-  if (!silent) console.log(message || '', ...optionalParams);
+const renderStatus = (...messages: any[]) => {
+  status.updateBottomBar(`${messages.join(' ')}`);
 };
 
-const fileAdd = (name: string) => doLog(green('+ ') + name);
+const clearStatus = () => status.updateBottomBar('');
 
-const fileExtend = (name: string) =>
-  doLog(magenta('+ ') + name + gray(' (extended)'));
+const fileAdd = (name: string) => {
+  renderStatus(white.bgGreenBright(' ADD ') + name);
+};
 
-const fileOverwrite = (name: string) =>
-  doLog(red('+ ') + name + gray(' (overwritten)'));
+const fileExtend = (name: string) => {
+  renderStatus(white.bgGreenBright(' EXTEND ') + ' ' + name);
+};
 
-const fileForcedOverwrite = (name: string) =>
-  doLog(red('+ ') + name + gray(' (forcefully overwritten)'));
+const fileOverwrite = (name: string) => {
+  renderStatus(white.bgRedBright(' OVERWRITTEN ') + ' ' + name);
+};
 
-const fileSkip = (name: string) =>
-  doLog(yellow('x ') + name + gray(' (skipped)'));
+const fileForcedOverwrite = (name: string) => {
+  renderStatus(white.bgRedBright(' FORCEFULLY OVERWRITTEN ') + ' ' + name);
+};
+
+const fileSkip = (name: string) => {
+  renderStatus(black.bgYellowBright(' SKIP ') + ' ' + name);
+};
+
+const completedMessage = timeElapsed => {
+  renderStatus(
+    green.bold(
+      `⚡  It's aliiive! ${gray(`Generated in ${cyan(timeElapsed)}`)}`,
+    ),
+  );
+};
 
 // Merge with standard console
-export const log = merge(doLog, {
+export const log = merge(console.log.bind({}) as typeof console.log, {
+  clearStatus,
   fileAdd,
   fileExtend,
   fileOverwrite,
   fileForcedOverwrite,
   fileSkip,
-  ...console,
+  completedMessage,
 });

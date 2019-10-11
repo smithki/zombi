@@ -49,6 +49,7 @@ export interface GeneratorConfig<Props>
 
 export interface FSOptions {
   force?: boolean;
+  ejs?: boolean;
 }
 
 /** */

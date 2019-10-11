@@ -23,9 +23,13 @@ export function exec<T>(
   options?: SpawnOptions,
 ): ZombiOperator<T> {
   return sideEffect(async () => {
-    const parts = command.split(' ');
-    const cmd = parts.shift();
-    const resolvedOptions = { stdio: 'inherit', ...options };
-    await spawn.sync(cmd, parts, resolvedOptions);
+    try {
+      const parts = command.split(' ');
+      const cmd = parts.shift();
+      const resolvedOptions = { stdio: 'inherit', ...options };
+      await spawn.sync(cmd, parts, resolvedOptions);
+    } catch (err) {
+      throw err;
+    }
   });
 }

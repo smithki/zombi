@@ -51,6 +51,9 @@ export function resolveTemplateRoot(
     if (!lstatSync(current).isDirectory()) {
       throw new TemplateRootNonDirectoryError();
     }
+
+    // The supplied template path is valid!
+    return current;
   }
 
   // [2] Next, if we made it this far, we need to determine the calling module's
