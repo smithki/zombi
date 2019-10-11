@@ -2,7 +2,7 @@
 #                               CI INSTRUCTIONS                                #
 #                               ~~~~~~~~~~~~~~~                                #
 #   This configuration is optimized for continuous delivery of NPM packages    #
-#                          using Yarn + TypeScript.                            #
+#                              using Lerna + Yarn.                             #
 # ---------------------------------------------------------------------------- #
 #                                                                              #
 #  1) Publish the initial version of your NPM package manually, ensuring the   #
@@ -22,19 +22,30 @@
 #    development -- Work-in-progress code (not published). This should be set  #
 #                   as the default branch!                                     #
 #                                                                              #
-#  4) The following scripts should be created in each lerna package's          #
+#                                                                              #
+#  4) The following configuration should be add in your root `package.json`:   #
+#                                                                              #
+#        {                                                                     #
+#          "workspaces": [                                                     #
+#            "packages/*"                                                      #
+#          ]                                                                   #
+#        }                                                                     #
+#                                                                              #
+#                                                                              #
+#  5) The following scripts should be created in each lerna package's own      #
 #     `package.json`:                                                          #
 #                                                                              #
 #     lint -- Run a linter against source files.                               #
 #    build -- Build output required for publishing to NPM.                     #
 #     test -- Run unit/integration/e2e tests.                                  #
 #                                                                              #
-#  5) Ensure the aliases for `&dependency-paths` and `&build-output-paths`     #
+#                                                                              #
+#  6) Ensure the aliases for `&dependency-paths` and `&build-output-paths`     #
 #     below properly reflect the dependency and output directories of your     #
 #     app or module.                                                           #
 #                                                                              #
 #                                                                              #
-#  6) [OPTIONAL] Configure GREN to your liking using `.grenrc`.                #
+#  7) [OPTIONAL] Configure GREN to your liking using `.grenrc`.                #
 #                                                                              #
 #     See: https://github.com/github-tools/github-release-notes                #
 #                                                                              #
@@ -48,7 +59,6 @@ aliases: [
   # List of dependency paths that should be persisted to the
   # CircleCI workspace.
   &dependency-paths [
-    "node_modules",
     "packages/generators/node_modules",
     "packages/zombi/node_modules",
   ],
