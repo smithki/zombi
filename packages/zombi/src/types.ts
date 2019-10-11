@@ -13,9 +13,11 @@ import { Generator } from './generator';
 
 // --- Core types ----------------------------------------------------------- //
 
-// @TODO: Add doc comments to each of these types.
-
-export interface GeneratorContext<Props>
+/**
+ * Values provided to the stream picked from the executing `Generator` instance
+ * (referring to the instance that invoked `Generator.run()`).
+ */
+export interface ExecutingGeneratorContext<Props>
   extends Pick<
     Generator<Props>,
     | 'name'
@@ -29,16 +31,19 @@ export interface GeneratorContext<Props>
   from?: string;
 }
 
-/** */
+/** Object type produced by a `Generator`'s underlying RxJS stream. */
 export interface GeneratorOutput<Props> {
-  context: GeneratorContext<Props>;
+  context: ExecutingGeneratorContext<Props>;
   props: Props;
   prompts: SideEffect<Props>[];
   sequence: (SideEffect<Props> | SideEffect<Props>[])[];
   fs: FileSystem<Props>;
 }
 
-/** */
+/**
+ * Options given to the `Generator` constructor or passed via the standard
+ * `zombi(...)` interface.
+ */
 export interface GeneratorConfig<Props>
   extends Partial<Pick<Generator<Props>, 'name' | 'destinationRoot'>> {
   initialProps?: Props | Partial<Props>;
@@ -47,45 +52,49 @@ export interface GeneratorConfig<Props>
   templateRoot?: string | boolean;
 }
 
+/** Options given to `FileSystem` methods that render _new_ files. */
 export interface FSOptions {
   force?: boolean;
   ejs?: boolean;
 }
 
-/** */
+/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
 export interface ZombiOperator<T>
   extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {}
 
-/** */
+/** Ecapsulates the concept of a "side-effect" as it relates to `Generator`. */
 export interface SideEffect<Props>
   extends Callback<Props>,
     SideEffectOperatorOptions {}
 
-/** */
+/** Options given to the core `sideEffect` operator. */
 export interface SideEffectOperatorOptions {
   enforcePre?: boolean;
 }
 
-/** */
+/**
+ * A function which executes during the "side-effect" phase of the `Generator`
+ * lifecycle.
+ */
 export interface Callback<Props, R = void> {
   (generator: GeneratorOutput<Props>): Promise<R>;
 }
 
-/** */
+/** The RxJS observable underlying a `Generator`. */
 export interface GeneratorStream<Props>
   extends RxObservable<GeneratorOutput<Props>> {}
 
-/** */
+/** Object describing the shape of an `Inquirer` prompt. */
 export interface Question<Props> extends InquirerQuestion {
   name?: Extract<keyof Props, string>;
 }
 
 // --- Data-types ----------------------------------------------------------- //
 
-/** */
+/** Arbitrary data or a callback that resolves to arbitrary data. */
 export type GeneratorData<R, Props> = R | Callback<Props, R>;
 
-/** */
+/** A placeholder type for arbitrary JSON data. */
 export interface JsonData {
   [key: string]: any;
 }

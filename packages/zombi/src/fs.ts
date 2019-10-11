@@ -22,8 +22,8 @@ import { timer } from './utils/timer';
 
 // Types
 import {
+  ExecutingGeneratorContext,
   FSOptions,
-  GeneratorContext,
   GeneratorOutput,
   JsonData,
 } from './types';
@@ -151,9 +151,10 @@ export class FileSystem<Props> {
   ) {
     try {
       const ctx = this.getContextBuilder(options)(filePath);
-
       await this.sideEffects.outputJson(ctx)(data || {});
-    } catch (err) {}
+    } catch (err) {
+      throw err;
+    }
   }
 
   public async extendJson(filePath: string, extensions: JsonData) {
@@ -201,12 +202,15 @@ export class FileSystem<Props> {
 
   private getContextBuilder(
     options: FSOptions = {},
-  ): (to: string, from?: string) => GeneratorContext<Props> & FSOptions {
+  ): (
+    to: string,
+    from?: string,
+  ) => ExecutingGeneratorContext<Props> & FSOptions {
     return (to, from) => {
       const context = { ...this.generator.context };
 
       const defaultFsOptions: Partial<FSOptions> = { ejs: true };
-      const defaultToFrom: Partial<GeneratorContext<Props>> = {
+      const defaultToFrom: Partial<ExecutingGeneratorContext<Props>> = {
         to: isAbsolute(to) ? to : context.destination(to),
         from: from && (isAbsolute(from) ? from : context.template(from)),
       };
@@ -216,7 +220,7 @@ export class FileSystem<Props> {
   }
 
   private async checkForConflicts(
-    ctx: GeneratorContext<Props>,
+    ctx: ExecutingGeneratorContext<Props>,
     write: () => Promise<void>,
   ) {
     const prettyTo = this.prettifyPath(ctx).to;
@@ -265,10 +269,10 @@ export class FileSystem<Props> {
     }
   }
 
-  private prettifyPath(ctx: GeneratorContext<Props>) {
+  private prettifyPath(ctx: ExecutingGeneratorContext<Props>) {
     return {
-      to: ctx.to!.replace(process.cwd(), '.'),
-      from: ctx.from!.replace(process.cwd(), '.'),
+      to: !!ctx.to ? ctx.to.replace(process.cwd(), '.') : undefined,
+      from: !!ctx.from ? ctx.from.replace(process.cwd(), '.') : undefined,
     };
   }
 }

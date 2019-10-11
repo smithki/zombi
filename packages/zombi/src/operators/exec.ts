@@ -15,8 +15,8 @@ import { ZombiOperator } from '../types';
 /**
  * Run a shell command.
  *
- * @param command A string representation of the shell command to execute.
- * @param options Same options that would be passed to Node's `child_process.spawn` or `child_process.spawnSync`.
+ * @param command - A string representation of the shell command to execute.
+ * @param options - Same options that would be passed to Node's `child_process.spawn` or `child_process.spawnSync`.
  */
 export function exec<T>(
   command: string,

@@ -13,6 +13,9 @@ import {
   TemplateRootPathNotFoundError,
 } from '../exceptions';
 
+// Types
+import { GeneratorStream } from '../types';
+
 // --- Constants/enums ------------------------------------------------------ //
 
 export enum ResolveTemplateRootDepth {
@@ -96,4 +99,12 @@ export function resolveTemplateRoot(
     // If the path is found but IS NOT a directory, then raise an error...
     throw new TemplateRootNonDirectoryError();
   }
+}
+
+export function getContextualTemplateRootFromStream<
+  TStream extends GeneratorStream<any>
+>(stream: TStream, depth: ResolveTemplateRootDepth) {
+  let templateRoot: string;
+  stream.subscribe(g => (templateRoot = g.context.templateRoot));
+  return resolveTemplateRoot(depth, templateRoot);
 }

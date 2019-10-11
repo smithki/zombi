@@ -15,11 +15,10 @@ import { GeneratorData, Question, ZombiOperator } from '../types';
 // --- Business logic ------------------------------------------------------- //
 
 /**
- * A wrapper for [Inquirer's prompt
- * API](https://github.com/SBoudrias/Inquirer.js/#methods). Prompts for user
- * input and saves the resulting data into props.
+ * A wrapper for [Inquirer's prompt API](https://github.com/SBoudrias/Inquirer.js/#methods).
+ * Prompts for user input and saves the resulting data into props.
  *
- * @param questions Array of Inquirer-compatible
+ * @param questions - Array of Inquirer-compatible
  * [question](https://github.com/SBoudrias/Inquirer.js/#question) objects.
  */
 export function prompt<T, K extends T = T>(
