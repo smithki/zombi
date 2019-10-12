@@ -23,7 +23,7 @@
 #                   as the default branch!                                     #
 #                                                                              #
 #                                                                              #
-#  4) The following configuration should be add in your root `package.json`:   #
+#  4) The following configuration should be added in your root `package.json`: #
 #                                                                              #
 #        {                                                                     #
 #          "workspaces": [                                                     #
@@ -32,7 +32,15 @@
 #        }                                                                     #
 #                                                                              #
 #                                                                              #
-#  5) The following scripts should be created in each lerna package's own      #
+#  5) The following configuration should be added to your `lerna.json`:        #
+#                                                                              #
+#        {                                                                     #
+#          "npmClient": "yarn",                                                #
+#          "useWorkspaces": true                                               #
+#        }                                                                     #
+#                                                                              #
+#                                                                              #
+#  6) The following scripts should be created in each lerna package's own      #
 #     `package.json`:                                                          #
 #                                                                              #
 #     lint -- Run a linter against source files.                               #
@@ -40,12 +48,12 @@
 #     test -- Run unit/integration/e2e tests.                                  #
 #                                                                              #
 #                                                                              #
-#  6) Ensure the aliases for `&dependency-paths` and `&build-output-paths`     #
+#  7) Ensure the aliases for `&dependency-paths` and `&build-output-paths`     #
 #     below properly reflect the dependency and output directories of your     #
 #     app or module.                                                           #
 #                                                                              #
 #                                                                              #
-#  7) [OPTIONAL] Configure GREN to your liking using `.grenrc`.                #
+#  8) [OPTIONAL] Configure GREN to your liking using `.grenrc`.                #
 #                                                                              #
 #     See: https://github.com/github-tools/github-release-notes                #
 #                                                                              #
@@ -134,7 +142,7 @@ jobs:
           command: yarn add -D -W lerna
       - run:
           name: Install Module Dependencies
-          command: npx lerna bootstrap --use-client=yarn --use-workspaces
+          command: npx lerna bootstrap
       - save_cache:
           paths: *dependency-paths
           key: *dependency-cache-key
