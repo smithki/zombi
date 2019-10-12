@@ -134,7 +134,7 @@ jobs:
           command: yarn add -D -W lerna
       - run:
           name: Install Module Dependencies
-          command: npx lerna bootstrap
+          command: npx lerna bootstrap --use-client yarn --use-workspaces
       - save_cache:
           paths: *dependency-paths
           key: *dependency-cache-key
