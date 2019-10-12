@@ -20,7 +20,6 @@ import { GeneratorStream } from '../types';
 
 export enum ResolveTemplateRootDepth {
   FromGenerator = 3,
-  FromOperator = 2,
 }
 
 // --- Business logic ------------------------------------------------------- //
@@ -34,8 +33,10 @@ export enum ResolveTemplateRootDepth {
  * explicitly a `boolean` and false, templates are ignored.
  */
 export function resolveTemplateRoot(
-  startingDepth: ResolveTemplateRootDepth | number,
   current: string | boolean = true,
+  startingDepth:
+    | ResolveTemplateRootDepth
+    | number = ResolveTemplateRootDepth.FromGenerator,
 ) {
   // [1] Check the `current` value to determine whether we should proceed
   //     with stack trace calculations.
@@ -103,8 +104,8 @@ export function resolveTemplateRoot(
 
 export function getContextualTemplateRootFromStream<
   TStream extends GeneratorStream<any>
->(stream: TStream, depth: ResolveTemplateRootDepth) {
+>(stream: TStream) {
   let templateRoot: string;
   stream.subscribe(g => (templateRoot = g.context.templateRoot));
-  return resolveTemplateRoot(depth, templateRoot);
+  return templateRoot;
 }

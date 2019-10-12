@@ -16,7 +16,7 @@ const { green, gray, white, cyan, black } = chalk;
 // --- Business logic ------------------------------------------------------- //
 
 const renderStatus = (...messages: any[]) => {
-  status.updateBottomBar(`${messages.join(' ')}`);
+  status.updateBottomBar(messages.join(' '));
 };
 
 const clearStatus = () => status.updateBottomBar('');
@@ -50,7 +50,8 @@ const completedMessage = timeElapsed => {
 };
 
 // Merge with standard console
-export const log = merge(console.log.bind({}) as typeof console.log, {
+export const log = merge(console.log.bind(console) as typeof console.log, {
+  renderStatus,
   clearStatus,
   fileAdd,
   fileExtend,
@@ -58,4 +59,5 @@ export const log = merge(console.log.bind({}) as typeof console.log, {
   fileForcedOverwrite,
   fileSkip,
   completedMessage,
+  ...console,
 });

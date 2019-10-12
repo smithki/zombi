@@ -2,18 +2,15 @@
 
 // Node modules
 import { Data as EjsData } from 'ejs';
-import { merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 
 // Local modules
+import { copyObject } from '../utils/copy-object';
 import {
   resolveDataBuilder,
   resolveEjsDataBuilder,
 } from '../utils/resolve-data';
-import {
-  getContextualTemplateRootFromStream,
-  ResolveTemplateRootDepth,
-} from '../utils/resolve-template-root';
+import { getContextualTemplateRootFromStream } from '../utils/resolve-template-root';
 import { sideEffect } from './side-effect';
 
 // Types
@@ -39,11 +36,8 @@ export function copy<T>(
   options?: GeneratorData<FSOptions, T>,
 ): ZombiOperator<T> {
   return stream => {
-    const source = merge({}, stream); // Use a copy of the current stream.
-    const templateDir = getContextualTemplateRootFromStream(
-      stream,
-      ResolveTemplateRootDepth.FromOperator,
-    );
+    const source = copyObject(stream); // Use a copy of the current stream.
+    const templateDir = getContextualTemplateRootFromStream(stream);
 
     return source.pipe(
       sideEffect(async generator => {

@@ -5,6 +5,7 @@ import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
 // Local modules
+import { copyObject } from '../utils/copy-object';
 import { ensureArray } from '../utils/ensure-array';
 import { prompt as ask } from '../utils/inquirer';
 import { resolveDataBuilder } from '../utils/resolve-data';
@@ -25,7 +26,7 @@ export function prompt<T, K extends T = T>(
   questions: GeneratorData<Question<K> | Question<K>[], T>,
 ): ZombiOperator<T> {
   return map(g => {
-    const result = merge({}, g);
+    const result = copyObject(g);
 
     result.prompts.push(async cache => {
       const q = ensureArray(await resolveDataBuilder(cache)(questions));

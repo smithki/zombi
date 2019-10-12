@@ -4,6 +4,9 @@
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
+// Local modules
+import { copyObject } from '../utils/copy-object';
+
 // Types
 import { Callback, SideEffectOperatorOptions, ZombiOperator } from '../types';
 
@@ -23,7 +26,7 @@ export function sideEffect<T>(
   options: SideEffectOperatorOptions = {},
 ): ZombiOperator<T> {
   return map(g => {
-    const result = merge({}, g);
+    const result = copyObject(g);
 
     if (options.enforcePre) result.sequence.unshift(callback);
     else result.sequence.push(merge(callback, options));

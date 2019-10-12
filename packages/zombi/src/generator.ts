@@ -12,10 +12,7 @@ import { FileSystem } from './fs';
 import { endParallelism, startParallelism } from './operators/parallelism';
 import { log } from './utils/log';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
-import {
-  resolveTemplateRoot,
-  ResolveTemplateRootDepth,
-} from './utils/resolve-template-root';
+import { resolveTemplateRoot } from './utils/resolve-template-root';
 import { timer } from './utils/timer';
 
 // Types
@@ -60,10 +57,7 @@ export class Generator<Props> {
     // Assign attributes
     this.name = normalizeGeneratorName(name);
     this.destinationRoot = destinationRoot || process.cwd();
-    this.templateRoot = resolveTemplateRoot(
-      ResolveTemplateRootDepth.FromGenerator,
-      templateRoot,
-    );
+    this.templateRoot = resolveTemplateRoot(templateRoot);
     this.force = force || false;
 
     // --- Build the initial generator output --- //

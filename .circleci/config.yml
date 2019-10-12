@@ -5,11 +5,11 @@
 #                              using Lerna + Yarn.                             #
 # ---------------------------------------------------------------------------- #
 #                                                                              #
-#  1) Publish the initial version of your NPM packages manually, ensuring the  #
-#     correct org scope and settings.                                          #
+#  1) Install & initialize Lerna: `yarn add -D lerna && lerna init`            #
 #                                                                              #
 #                                                                              #
-#  2) Install & initialize Lerna: `yarn add -D lerna && lerna init`            #
+#  2) Publish the initial version of your NPM packages manually, ensuring the  #
+#     correct org scope and settings: `lerna publish`                          #
 #                                                                              #
 #                                                                              #
 #  3) Environment variables required in CircleCI:                              #
