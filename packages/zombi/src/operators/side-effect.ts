@@ -14,8 +14,8 @@ import { Callback, SideEffectOperatorOptions, ZombiOperator } from '../types';
  * [`do`](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-do)
  * or [`tap`](http://reactivex.io/rxjs/function/index.html#static-function-tap).
  *
- * @param callback A function to be executed during the run process.
- * @param options Customize the flow of tasks by providing an options object
+ * @param callback - A function to be executed during the run process.
+ * @param options - Customize the flow of tasks by providing an options object
  * with `enforcePre` set to true.
  */
 export function sideEffect<T>(

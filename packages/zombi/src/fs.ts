@@ -10,19 +10,21 @@ import {
   readdir,
   readFile,
   readJson,
+  remove,
   stat,
 } from 'fs-extra';
-import { prompt } from 'inquirer';
 import { isEmpty, isNil, merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 
-// Internal
+// Local modules
+import { prompt } from './utils/inquirer';
 import { log } from './utils/log';
+import { timer } from './utils/timer';
 
 // Types
 import {
+  ExecutingGeneratorContext,
   FSOptions,
-  GeneratorContext,
   GeneratorOutput,
   JsonData,
 } from './types';
@@ -34,7 +36,7 @@ const { red } = chalk;
 // --- Business logic ------------------------------------------------------- //
 
 export class FileSystem<Props> {
-  // --- Properties --- //
+  // --- Properties & constructor --- //
 
   public static conflictCount: number = 0;
 
@@ -79,21 +81,32 @@ export class FileSystem<Props> {
     data: EjsData,
     options?: FSOptions,
   ) {
-    try {
-      const ctx = this.getContextBuilder(options)(to, from);
+    const ctx = this.getContextBuilder(options)(to, from);
 
-      await new Promise(async resolve => {
-        if (isNil(data) || isEmpty(data)) {
+    const renderWithoutEjs = async () => {
+      try {
+        const string = await readFile(ctx.from!);
+        await this.sideEffects.outputFile(ctx)(string);
+      } catch (err) {
+        throw err;
+      }
+    };
+
+    try {
+      await new Promise(async (resolve, reject) => {
+        if (isNil(data) || isEmpty(data) || !ctx.ejs) {
           // Render file without EJS processing.
-          const string = await readFile(ctx.from!);
-          await this.sideEffects.outputFile(ctx)(string);
-          resolve();
+          renderWithoutEjs()
+            .then(resolve)
+            .catch(reject);
         } else {
           // Render file with EJS processing.
-          renderFile(ctx.from!, data || {}, async (err, string) => {
-            if (err) throw err;
-            await this.sideEffects.outputFile(ctx)(string);
-            resolve();
+          renderFile(ctx.from!, data || {}, (err, string) => {
+            if (err) reject(new Error(ctx.to));
+            this.sideEffects
+              .outputFile(ctx)(string)
+              .then(resolve)
+              .catch(reject);
           });
         }
       });
@@ -109,9 +122,18 @@ export class FileSystem<Props> {
     options?: FSOptions,
   ) {
     try {
+      const ctx = this.getContextBuilder(options)(to, from);
+
       const listing = await readdir(from);
       for (const item of listing) {
         await this.copy(join(from, item), join(to, item), data, options);
+      }
+
+      if (ctx.replaceDirectories) {
+        const destListing = await readdir(to);
+        for (const destItem of destListing) {
+          if (!listing.includes(destItem)) await remove(join(to, destItem));
+        }
       }
     } catch (err) {
       throw err;
@@ -139,9 +161,10 @@ export class FileSystem<Props> {
   ) {
     try {
       const ctx = this.getContextBuilder(options)(filePath);
-
       await this.sideEffects.outputJson(ctx)(data || {});
-    } catch (err) {}
+    } catch (err) {
+      throw err;
+    }
   }
 
   public async extendJson(filePath: string, extensions: JsonData) {
@@ -159,7 +182,7 @@ export class FileSystem<Props> {
     }
   }
 
-  // --- Getters/setters --- //
+  // --- Private getters/setters --- //
 
   private get sideEffects() {
     return {
@@ -188,23 +211,29 @@ export class FileSystem<Props> {
   // --- Private methods --- //
 
   private getContextBuilder(
-    options?: FSOptions,
-  ): (to: string, from?: string) => GeneratorContext<Props> {
+    options: FSOptions = {},
+  ): (
+    to: string,
+    from?: string,
+  ) => ExecutingGeneratorContext<Props> & FSOptions {
     return (to, from) => {
-      const { context } = this.generator;
-      if (options) context.force = options.force || context.force;
-      return merge(
-        {
-          to: isAbsolute(to) ? to : context.destination(to),
-          from: from && (isAbsolute(from) ? from : context.template(from)),
-        },
-        context,
-      );
+      const context = { ...this.generator.context };
+
+      const defaultFsOptions: Partial<FSOptions> = {
+        ejs: true,
+        replaceDirectories: true,
+      };
+      const defaultToFrom: Partial<ExecutingGeneratorContext<Props>> = {
+        to: isAbsolute(to) ? to : context.destination(to),
+        from: from && (isAbsolute(from) ? from : context.template(from)),
+      };
+
+      return merge(defaultToFrom, context, { ...defaultFsOptions, ...options });
     };
   }
 
   private async checkForConflicts(
-    ctx: GeneratorContext<Props>,
+    ctx: ExecutingGeneratorContext<Props>,
     write: () => Promise<void>,
   ) {
     const prettyTo = this.prettifyPath(ctx).to;
@@ -212,9 +241,10 @@ export class FileSystem<Props> {
 
     if (!ctx.force) {
       if (doesExist) {
-        if (FileSystem.conflictCount !== 0) log(); // Add line break for aesthetic
+        timer.pause();
 
         // Ask if we should overwrite the existing file.
+        log.clearStatus();
         const { overwrite } = await prompt({
           type: 'confirm',
           name: 'overwrite',
@@ -222,14 +252,14 @@ export class FileSystem<Props> {
           default: false,
         });
 
+        timer.resume();
+
         if (overwrite) {
           // Overwrite the existing file
           await write();
-          log();
           log.fileOverwrite(prettyTo);
         } else {
           // Skip the existing file
-          log();
           log.fileSkip(prettyTo);
         }
 
@@ -252,10 +282,10 @@ export class FileSystem<Props> {
     }
   }
 
-  private prettifyPath(ctx: GeneratorContext<Props>) {
+  private prettifyPath(ctx: ExecutingGeneratorContext<Props>) {
     return {
-      to: ctx.to!.replace(process.cwd(), '.'),
-      from: ctx.from!.replace(process.cwd(), '.'),
+      to: !!ctx.to ? ctx.to.replace(process.cwd(), '.') : undefined,
+      from: !!ctx.from ? ctx.from.replace(process.cwd(), '.') : undefined,
     };
   }
 }

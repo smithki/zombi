@@ -1,30 +1,53 @@
 # ---------------------------------------------------------------------------- #
 #                               CI INSTRUCTIONS                                #
 #                               ~~~~~~~~~~~~~~~                                #
-#   This configuration is optimized for continuous delivery of NPM packages.   #
+#   This configuration is optimized for continuous delivery of NPM packages    #
+#                              using Lerna + Yarn.                             #
 # ---------------------------------------------------------------------------- #
 #                                                                              #
-#  1. Environment variables required in CircleCI:                              #
+#  1) Publish the initial version of your NPM package manually, ensuring the   #
+#     correct org scope and settings.                                          #
+#                                                                              #
+#                                                                              #
+#  2) Environment variables required in CircleCI:                              #
 #                                                                              #
 #            $NPM_TOKEN -- NPM publishing auth token.                          #
 #    $GITHUB_REPO_TOKEN -- GitHub repo-scoped auth token (for use with GREN).  #
 #                                                                              #
-# ---------------------------------------------------------------------------- #
 #                                                                              #
-#  2. The following branches should be created & protected on GitHub:          #
+#  3) The following branches should be created & protected on GitHub:          #
 #                                                ^^^^^^^^^                     #
 #         master -- Production code (currently published NPM version).         #
 #           next -- Pre-release code (published under the `next` tag on NPM).  #
 #    development -- Work-in-progress code (not published). This should be set  #
 #                   as the default branch!                                     #
 #                                                                              #
-# ---------------------------------------------------------------------------- #
 #                                                                              #
-#  3. The following scripts should be created in `package.json`:               #
+#  4) The following configuration should be add in your root `package.json`:   #
+#                                                                              #
+#        {                                                                     #
+#          "workspaces": [                                                     #
+#            "packages/*"                                                      #
+#          ]                                                                   #
+#        }                                                                     #
+#                                                                              #
+#                                                                              #
+#  5) The following scripts should be created in each lerna package's own      #
+#     `package.json`:                                                          #
 #                                                                              #
 #     lint -- Run a linter against source files.                               #
 #    build -- Build output required for publishing to NPM.                     #
 #     test -- Run unit/integration/e2e tests.                                  #
+#                                                                              #
+#                                                                              #
+#  6) Ensure the aliases for `&dependency-paths` and `&build-output-paths`     #
+#     below properly reflect the dependency and output directories of your     #
+#     app or module.                                                           #
+#                                                                              #
+#                                                                              #
+#  7) [OPTIONAL] Configure GREN to your liking using `.grenrc`.                #
+#                                                                              #
+#     See: https://github.com/github-tools/github-release-notes                #
 #                                                                              #
 # ---------------------------------------------------------------------------- #
 
@@ -33,34 +56,30 @@ version: 2.1
 # --- YAML Aliases ----------------------------------------------------------- #
 
 aliases: [
+  # List of dependency paths that should be persisted to the
+  # CircleCI workspace.
+  &dependency-paths [
+    "node_modules",
+    "packages/generators/node_modules",
+    "packages/zombi/node_modules",
+  ],
+
+  # List of build output paths that should be persisted to the
+  # CircleCI workspace.
+  &build-output-paths [
+    "packages/generators/dist",
+    "packages/zombi/dist"
+  ],
+
+  # Yarn lockfile cache key (update "vN" => "vN+1" to cache-bust).
+  &dependency-cache-key "v1-dependency-cache-{{ checksum \"yarn.lock\" }}",
+
   &workspace-root "/home/circleci/project",
 
   &attach-workspace {
     attach_workspace: {
       at: *workspace-root
     }
-  },
-
-  # Yarn lockfile cache key (update "vN" => "vN+1" to cache-bust).
-  &dependency-cache-key "v1-dependency-cache-{{ checksum \"yarn.lock\" }}",
-
-  # List of dependency paths that should be persisted to the
-  # CircleCI workspace.
-  &dependency-paths {
-    paths: [
-      "node_modules",
-      "packages/generators/node_modules",
-      "packages/zombi/node_modules",
-    ]
-  },
-
-  # List of build output paths that should be persisted to the
-  # CircleCI workspace.
-  &build-output-paths {
-    paths: [
-      "packages/generators/dist",
-      "packages/zombi/dist"
-    ]
   },
 
   # Filter pull requests not in "master" or "next" (development code)
@@ -112,15 +131,15 @@ jobs:
           key: *dependency-cache-key
       - run:
           name: Install Lerna
-          command: yarn global add lerna
+          command: yarn add -D -W lerna
       - run:
           name: Install Module Dependencies
-          command: yarn bootstrap
+          command: npx lerna bootstrap
       - save_cache:
-          <<: *dependency-paths
+          paths: *dependency-paths
           key: *dependency-cache-key
       - persist_to_workspace:
-          <<: *dependency-paths
+          paths: *dependency-paths
           root: *workspace-root
 
   # Runs the linter against relevant source files.
@@ -130,10 +149,11 @@ jobs:
       - checkout
       - *attach-workspace
       - run:
+          name: Install Lerna
+          command: yarn add -D -W lerna
+      - run:
           name: Lint source files
-          command: |
-            PKG=zombi yarn lint
-            PKG=@zombi/generators yarn lint
+          command: npx lerna exec -- yarn lint
 
   # Builds modules and persists the build output to the workspace.
   build:
@@ -142,12 +162,13 @@ jobs:
       - checkout
       - *attach-workspace
       - run:
+          name: Install Lerna
+          command: yarn add -D -W lerna
+      - run:
           name: Build modules
-          command: |
-            PKG=zombi yarn build
-            PKG=@zombi/generators yarn build
+          command: npx lerna exec -- yarn build
       - persist_to_workspace:
-          <<: *build-output-paths
+          paths: *build-output-paths
           root: *workspace-root
 
   # Run unit/integration/e2e tests.
@@ -157,10 +178,11 @@ jobs:
       - checkout
       - *attach-workspace
       - run:
+          name: Install Lerna
+          command: yarn add -D -W lerna
+      - run:
           name: Run tests
-          command: |
-            PKG=zombi yarn test
-            PKG=@zombi/generators yarn test
+          command: npx lerna exec -- yarn test
 
   # Publish the package to NPM. This should depend on the `build` job.
   create-release:
@@ -172,8 +194,11 @@ jobs:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
       - run:
+          name: Install Lerna
+          command: yarn add -D -W lerna
+      - run:
           name: Publish package to NPM
-          command: yarn release
+          command: npx lerna publish from-package --yes
 
   # Publish the package as a pre-release version to NPM. This should depend on
   # the `build` job.
@@ -186,8 +211,11 @@ jobs:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
       - run:
+          name: Install Lerna
+          command: yarn add -D -W lerna
+      - run:
           name: Publish pre-release package to NPM
-          command: yarn release_canary
+          command: npx lerna publish from-package --canary --yes
 
   # Create a git tag for this release and push to the remote repository.
   tag-release:
@@ -272,6 +300,8 @@ workflows:
           requires:
             - lint
 
+        # Manual approval step as a final gatekeeper to prevent
+        # possible mistakes!
       - confirm-release:
           type: approval
           requires:
@@ -294,7 +324,7 @@ workflows:
 
   # Builds modules, verifies code with the linter, runs unit tests, and
   # publishes a pre-release version of the built package to NPM.
-  publish-canary-to-npm:
+  publish-prerelease-to-npm:
     jobs:
       - install-dependencies: *filter-prerelease-branches-only
 
@@ -310,22 +340,15 @@ workflows:
           requires:
             - lint
 
-      - confirm-prerelease:
-          type: approval
+      - create-prerelease:
           requires:
             - build
             - test
 
-      - create-prerelease:
-          requires:
-            - confirm-prerelease
-
       - tag-release:
           requires:
-            - confirm-prerelease
             - create-prerelease
 
       - create-prerelease-notes:
           requires:
-            - confirm-prerelease
             - tag-release
