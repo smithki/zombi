@@ -18,14 +18,7 @@
     "test_watch": "echo 'tests coming soon!'",
     "lint": "tslint --project ./tsconfig.json",
     "compile": "tsc",
-    "compile_watch": "tsc --watch",
-    "precommit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "tslint --fix",
-      "git add"
-    ]
+    "compile_watch": "tsc --watch"
   },
   "dependencies": {
     "zombi": "0.15.3"

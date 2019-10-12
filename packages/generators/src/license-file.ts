@@ -4,7 +4,7 @@
 import { kebabCase } from 'lodash';
 import { resolve } from 'path';
 import { copy, prompt, zombi } from 'zombi';
-import { getNpmConfig } from 'zombi/dist/utils/get-npm-config';
+import { getNpmConfig } from './utils/get-npm-config';
 
 // Local modules
 import { PackageJsonProps } from './package-json';

@@ -12,14 +12,15 @@ import { FSOptions, GeneratorData, JsonData, ZombiOperator } from '../types';
 /**
  * Create a JSON-formatted file.
  *
- * @param file The destination path. A relative path will be automatically
- * resolved to the contextual `destinationRoot`.
- * @param data JSON data with which to fill the new file.
+ * @param file - The destination path. A relative path will be automatically
+ * resolved to the executing generator's `destinationRoot`.
+ * @param data - JSON data with which to fill the new file.
+ * @param options - Options for customizing file system and side-effect behavior.
  */
 export function createJson<T>(
   file: GeneratorData<string, T>,
   data?: GeneratorData<JsonData, T>,
-  options?: GeneratorData<FSOptions, T>,
+  options?: GeneratorData<Pick<FSOptions, 'ejs' | 'force'>, T>,
 ): ZombiOperator<T> {
   return sideEffect(async generator => {
     try {

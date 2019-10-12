@@ -3,7 +3,7 @@
 // Node modules
 import { basename } from 'path';
 import { createJson, prompt, zombi } from 'zombi';
-import { getNpmConfig } from 'zombi/dist/utils/get-npm-config';
+import { getNpmConfig } from './utils/get-npm-config';
 
 // Local modules
 import { refineDeep } from 'refine-deep';

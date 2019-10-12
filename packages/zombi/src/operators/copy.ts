@@ -11,7 +11,7 @@ import {
   resolveEjsDataBuilder,
 } from '../utils/resolve-data';
 import {
-  resolveTemplateRoot,
+  getContextualTemplateRootFromStream,
   ResolveTemplateRootDepth,
 } from '../utils/resolve-template-root';
 import { sideEffect } from './side-effect';
@@ -24,13 +24,13 @@ import { FSOptions, GeneratorData, ZombiOperator } from '../types';
 /**
  * Copies files from the template directory to the destination directory.
  *
- * @param from The template path. A relative path will be automatically resolved
- * to the calling generator's `templateRoot` (rather than the contextual
- * `templateRoot`).
- * @param to The destination path. A relative path will be automatically
- * resolved to the contextual `destinationRoot`.
- * @param data EJS-compatible data object for injecting additional values
+ * @param from - The template path. A relative path will be automatically resolved
+ * to the contextual generator's `templateRoot`.
+ * @param to - The destination path. A relative path will be automatically
+ * resolved to executing generator's `destinationRoot`.
+ * @param data - EJS-compatible data object for injecting additional values
  * into the template file. Props are automatically injected.
+ * @param options - Options for customizing file system and side-effect behavior.
  */
 export function copy<T>(
   from: GeneratorData<string, T>,
@@ -39,16 +39,10 @@ export function copy<T>(
   options?: GeneratorData<FSOptions, T>,
 ): ZombiOperator<T> {
   return stream => {
-    // Find the `templateRoot` nearest to the calling generator (and not the
-    // current context). This enables us to use relative paths in the `from`
-    // parameter when copying template files.
     const source = merge({}, stream); // Use a copy of the current stream.
-    let templateRoot: string;
-    stream.subscribe(g => (templateRoot = g.context.templateRoot));
-    // depth === 2 because we should be 2 modules away from the generator.
-    const templateDir = resolveTemplateRoot(
+    const templateDir = getContextualTemplateRootFromStream(
+      stream,
       ResolveTemplateRootDepth.FromOperator,
-      templateRoot,
     );
 
     return source.pipe(

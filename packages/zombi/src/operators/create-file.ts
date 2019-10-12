@@ -12,14 +12,15 @@ import { FSOptions, GeneratorData, ZombiOperator } from '../types';
 /**
  * Create a new file.
  *
- * @param file The destination path. A relative path will be automatically
- * resolved to the contextual `destinationRoot`.
- * @param content Data with which to fill the new file.
+ * @param file - The destination path. A relative path will be automatically
+ * resolved to the executing generator's `destinationRoot`.
+ * @param content - Data with which to fill the new file.
+ * @param options - Options for customizing file system and side-effect behavior.
  */
 export function createFile<T>(
   file: GeneratorData<string, T>,
   content?: GeneratorData<any, T>,
-  options?: GeneratorData<FSOptions, T>,
+  options?: GeneratorData<Pick<FSOptions, 'ejs' | 'force'>, T>,
 ): ZombiOperator<T> {
   return sideEffect(async generator => {
     try {

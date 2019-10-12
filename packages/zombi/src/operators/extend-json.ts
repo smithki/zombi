@@ -12,9 +12,9 @@ import { resolveDataBuilder } from '../utils/resolve-data';
 /**
  * Extend a JSON file.
  *
- * @param file The target file path. A relative path will be automatically
- * resolved to the contextual `destinationRoot`.
- * @param extensions JSON data with which to extend the existing file.
+ * @param file - The target file path. A relative path will be automatically
+ * resolved to the executing generator's `destinationRoot`.
+ * @param extensions - JSON data with which to extend the existing file.
  */
 export function extendJson<T>(
   file: GeneratorData<string, T>,
