@@ -5,17 +5,20 @@
 #                              using Lerna + Yarn.                             #
 # ---------------------------------------------------------------------------- #
 #                                                                              #
-#  1) Publish the initial version of your NPM package manually, ensuring the   #
+#  1) Publish the initial version of your NPM packages manually, ensuring the  #
 #     correct org scope and settings.                                          #
 #                                                                              #
 #                                                                              #
-#  2) Environment variables required in CircleCI:                              #
+#  2) Install Lerna: `yarn add lerna`                                          #
+#                                                                              #
+#                                                                              #
+#  3) Environment variables required in CircleCI:                              #
 #                                                                              #
 #            $NPM_TOKEN -- NPM publishing auth token.                          #
 #    $GITHUB_REPO_TOKEN -- GitHub repo-scoped auth token (for use with GREN).  #
 #                                                                              #
 #                                                                              #
-#  3) The following branches should be created & protected on GitHub:          #
+#  4) The following branches should be created & protected on GitHub:          #
 #                                                ^^^^^^^^^                     #
 #         master -- Production code (currently published NPM version).         #
 #           next -- Pre-release code (published under the `next` tag on NPM).  #
@@ -23,7 +26,7 @@
 #                   as the default branch!                                     #
 #                                                                              #
 #                                                                              #
-#  4) The following configuration should be add in your root `package.json`:   #
+#  5) The following configuration should be added in your root `package.json`: #
 #                                                                              #
 #        {                                                                     #
 #          "workspaces": [                                                     #
@@ -32,7 +35,15 @@
 #        }                                                                     #
 #                                                                              #
 #                                                                              #
-#  5) The following scripts should be created in each lerna package's own      #
+#  6) The following configuration should be added to your `lerna.json`:        #
+#                                                                              #
+#        {                                                                     #
+#          "npmClient": "yarn",                                                #
+#          "useWorkspaces": true                                               #
+#        }                                                                     #
+#                                                                              #
+#                                                                              #
+#  7) The following scripts should be created in each lerna package's own      #
 #     `package.json`:                                                          #
 #                                                                              #
 #     lint -- Run a linter against source files.                               #
@@ -40,12 +51,12 @@
 #     test -- Run unit/integration/e2e tests.                                  #
 #                                                                              #
 #                                                                              #
-#  6) Ensure the aliases for `&dependency-paths` and `&build-output-paths`     #
+#  8) Ensure the aliases for `&dependency-paths` and `&build-output-paths`     #
 #     below properly reflect the dependency and output directories of your     #
 #     app or module.                                                           #
 #                                                                              #
 #                                                                              #
-#  7) [OPTIONAL] Configure GREN to your liking using `.grenrc`.                #
+#  9) [OPTIONAL] Configure GREN to your liking using `.grenrc`.                #
 #                                                                              #
 #     See: https://github.com/github-tools/github-release-notes                #
 #                                                                              #
@@ -130,10 +141,10 @@ jobs:
       - restore_cache:
           key: *dependency-cache-key
       - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
-      - run:
           name: Install Module Dependencies
+          command: yarn install --frozen-lockfile
+      - run:
+          name: Lerna Bootstrap
           command: npx lerna bootstrap
       - save_cache:
           paths: *dependency-paths
@@ -149,9 +160,6 @@ jobs:
       - checkout
       - *attach-workspace
       - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
-      - run:
           name: Lint source files
           command: npx lerna exec -- yarn lint
 
@@ -161,9 +169,6 @@ jobs:
     steps:
       - checkout
       - *attach-workspace
-      - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
       - run:
           name: Build modules
           command: npx lerna exec -- yarn build
@@ -178,9 +183,6 @@ jobs:
       - checkout
       - *attach-workspace
       - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
-      - run:
           name: Run tests
           command: npx lerna exec -- yarn test
 
@@ -193,9 +195,6 @@ jobs:
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-      - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
       - run:
           name: Publish package to NPM
           command: npx lerna publish from-package --yes
@@ -210,9 +209,6 @@ jobs:
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-      - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
       - run:
           name: Publish pre-release package to NPM
           command: npx lerna publish from-package --canary --yes
