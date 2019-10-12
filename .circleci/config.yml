@@ -9,7 +9,7 @@
 #     correct org scope and settings.                                          #
 #                                                                              #
 #                                                                              #
-#  2) Install Lerna: `yarn add lerna`                                          #
+#  2) Install & initialize Lerna: `yarn add -D lerna && lerna init`            #
 #                                                                              #
 #                                                                              #
 #  3) Environment variables required in CircleCI:                              #
@@ -18,15 +18,7 @@
 #    $GITHUB_REPO_TOKEN -- GitHub repo-scoped auth token (for use with GREN).  #
 #                                                                              #
 #                                                                              #
-#  4) The following branches should be created & protected on GitHub:          #
-#                                                ^^^^^^^^^                     #
-#         master -- Production code (currently published NPM version).         #
-#           next -- Pre-release code (published under the `next` tag on NPM).  #
-#    development -- Work-in-progress code (not published). This should be set  #
-#                   as the default branch!                                     #
-#                                                                              #
-#                                                                              #
-#  5) The following configuration should be added in your root `package.json`: #
+#  4) The following configuration should be added in your root `package.json`: #
 #                                                                              #
 #        {                                                                     #
 #          "workspaces": [                                                     #
@@ -35,12 +27,20 @@
 #        }                                                                     #
 #                                                                              #
 #                                                                              #
-#  6) The following configuration should be added to your `lerna.json`:        #
+#  5) The following configuration should be added to your `lerna.json`:        #
 #                                                                              #
 #        {                                                                     #
 #          "npmClient": "yarn",                                                #
 #          "useWorkspaces": true                                               #
 #        }                                                                     #
+#                                                                              #
+#                                                                              #
+#  6) The following branches should be created & protected on GitHub:          #
+#                                                ^^^^^^^^^                     #
+#         master -- Production code (currently published NPM version).         #
+#           next -- Pre-release code (published under the `next` tag on NPM).  #
+#    development -- Work-in-progress code (not published). This should be set  #
+#                   as the default branch!                                     #
 #                                                                              #
 #                                                                              #
 #  7) The following scripts should be created in each lerna package's own      #
