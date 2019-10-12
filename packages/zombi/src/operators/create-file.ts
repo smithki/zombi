@@ -20,7 +20,7 @@ import { FSOptions, GeneratorData, ZombiOperator } from '../types';
 export function createFile<T>(
   file: GeneratorData<string, T>,
   content?: GeneratorData<any, T>,
-  options?: GeneratorData<FSOptions, T>,
+  options?: GeneratorData<Pick<FSOptions, 'ejs' | 'force'>, T>,
 ): ZombiOperator<T> {
   return sideEffect(async generator => {
     try {

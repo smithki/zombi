@@ -10,9 +10,10 @@ import {
   readdir,
   readFile,
   readJson,
+  remove,
   stat,
 } from 'fs-extra';
-import { isEmpty, isNil, isUndefined, merge } from 'lodash';
+import { isEmpty, isNil, merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 
 // Local modules
@@ -121,9 +122,18 @@ export class FileSystem<Props> {
     options?: FSOptions,
   ) {
     try {
+      const ctx = this.getContextBuilder(options)(to, from);
+
       const listing = await readdir(from);
       for (const item of listing) {
         await this.copy(join(from, item), join(to, item), data, options);
+      }
+
+      if (ctx.replaceDirectories) {
+        const destListing = await readdir(to);
+        for (const destItem of destListing) {
+          if (!listing.includes(destItem)) await remove(join(to, destItem));
+        }
       }
     } catch (err) {
       throw err;
@@ -209,7 +219,10 @@ export class FileSystem<Props> {
     return (to, from) => {
       const context = { ...this.generator.context };
 
-      const defaultFsOptions: Partial<FSOptions> = { ejs: true };
+      const defaultFsOptions: Partial<FSOptions> = {
+        ejs: true,
+        replaceDirectories: true,
+      };
       const defaultToFrom: Partial<ExecutingGeneratorContext<Props>> = {
         to: isAbsolute(to) ? to : context.destination(to),
         from: from && (isAbsolute(from) ? from : context.template(from)),

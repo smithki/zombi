@@ -47,6 +47,7 @@ export interface GeneratorOutput<Props> {
 export interface GeneratorConfig<Props>
   extends Partial<Pick<Generator<Props>, 'name' | 'destinationRoot'>> {
   initialProps?: Props | Partial<Props>;
+  /** Whether to force overwrites on file conflicts. */
   force?: boolean;
   silent?: boolean;
   templateRoot?: string | boolean;
@@ -54,8 +55,15 @@ export interface GeneratorConfig<Props>
 
 /** Options given to `FileSystem` methods that render _new_ files. */
 export interface FSOptions {
+  /** Whether to force overwrites on file conflicts. */
   force?: boolean;
+  /** Whether to render a file with EJS data. */
   ejs?: boolean;
+  /**
+   * When copying directories with this option enabled, files living at the
+   * supplied location will be deleted, even if they produce no conflicts.
+   */
+  replaceDirectories?: boolean;
 }
 
 /** The RxJS unary function that underlies a `Generator`'s observable pipe. */
@@ -69,6 +77,7 @@ export interface SideEffect<Props>
 
 /** Options given to the core `sideEffect` operator. */
 export interface SideEffectOperatorOptions {
+  /** Whether to execute this operator at during the "prompting" phase of a `Generator`'s lifecyle. */
   enforcePre?: boolean;
 }
 
