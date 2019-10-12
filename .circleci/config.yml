@@ -138,11 +138,11 @@ jobs:
       - restore_cache:
           key: *dependency-cache-key
       - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
-      - run:
           name: Install Module Dependencies
-          command: npx lerna bootstrap
+          command: yarn install --frozen-lockfile
+      - run:
+          name: Lerna Bootstrap
+          command: lerna bootstrap
       - save_cache:
           paths: *dependency-paths
           key: *dependency-cache-key
@@ -157,11 +157,8 @@ jobs:
       - checkout
       - *attach-workspace
       - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
-      - run:
           name: Lint source files
-          command: npx lerna exec -- yarn lint
+          command: lerna exec -- yarn lint
 
   # Builds modules and persists the build output to the workspace.
   build:
@@ -170,11 +167,8 @@ jobs:
       - checkout
       - *attach-workspace
       - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
-      - run:
           name: Build modules
-          command: npx lerna exec -- yarn build
+          command: lerna exec -- yarn build
       - persist_to_workspace:
           paths: *build-output-paths
           root: *workspace-root
@@ -186,11 +180,8 @@ jobs:
       - checkout
       - *attach-workspace
       - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
-      - run:
           name: Run tests
-          command: npx lerna exec -- yarn test
+          command: lerna exec -- yarn test
 
   # Publish the package to NPM. This should depend on the `build` job.
   create-release:
@@ -202,11 +193,8 @@ jobs:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
       - run:
-          name: Install Lerna
-          command: yarn add -D -W lerna
-      - run:
           name: Publish package to NPM
-          command: npx lerna publish from-package --yes
+          command: lerna publish from-package --yes
 
   # Publish the package as a pre-release version to NPM. This should depend on
   # the `build` job.
@@ -220,10 +208,10 @@ jobs:
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
       - run:
           name: Install Lerna
-          command: yarn add -D -W lerna
+          command: yarn global lerna
       - run:
           name: Publish pre-release package to NPM
-          command: npx lerna publish from-package --canary --yes
+          command: lerna publish from-package --canary --yes
 
   # Create a git tag for this release and push to the remote repository.
   tag-release:
