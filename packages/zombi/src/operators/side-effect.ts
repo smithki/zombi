@@ -8,7 +8,12 @@ import { map } from 'rxjs/operators';
 import { copyObject } from '../utils/copy-object';
 
 // Types
-import { Callback, SideEffectOperatorOptions, ZombiOperator } from '../types';
+import {
+  Callback,
+  SideEffect,
+  SideEffectOperatorOptions,
+  ZombiSideEffectOperator,
+} from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -23,14 +28,25 @@ import { Callback, SideEffectOperatorOptions, ZombiOperator } from '../types';
  */
 export function sideEffect<T>(
   callback: Callback<T>,
-  options: SideEffectOperatorOptions = {},
-): ZombiOperator<T> {
-  return map(g => {
-    const result = copyObject(g);
+  options: SideEffectOperatorOptions<T> = {},
+): ZombiSideEffectOperator<T> {
+  return map(generator => {
+    const result = copyObject(generator);
 
-    if (options.enforcePre) result.sequence.unshift(callback);
-    else result.sequence.push(merge(callback, options));
+    const defaultOptions: SideEffectOperatorOptions<T> = {
+      enforcePre: false,
+      condition: true,
+    };
+
+    const sideEffectCallback: SideEffect<T> = merge(
+      callback,
+      defaultOptions,
+      options,
+    );
+
+    if (options.enforcePre) result.sequence.unshift(sideEffectCallback);
+    else result.sequence.push(sideEffectCallback);
 
     return result;
-  });
+  }) as ZombiSideEffectOperator<T>;
 }

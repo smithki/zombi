@@ -4,7 +4,7 @@
 import { sideEffect } from './side-effect';
 
 // Types
-import { GeneratorData, JsonData, ZombiOperator } from '../types';
+import { GeneratorData, JsonData, ZombiSideEffectOperator } from '../types';
 import { resolveDataBuilder } from '../utils/resolve-data';
 
 // --- Business logic ------------------------------------------------------- //
@@ -19,7 +19,7 @@ import { resolveDataBuilder } from '../utils/resolve-data';
 export function extendJson<T>(
   file: GeneratorData<string, T>,
   extensions?: GeneratorData<JsonData, T>,
-): ZombiOperator<T> {
+): ZombiSideEffectOperator<T> {
   return sideEffect(async generator => {
     try {
       const resolveData = await resolveDataBuilder(generator);

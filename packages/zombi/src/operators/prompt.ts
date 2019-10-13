@@ -11,7 +11,7 @@ import { prompt as ask } from '../utils/inquirer';
 import { resolveDataBuilder } from '../utils/resolve-data';
 
 // Types
-import { GeneratorData, Question, ZombiOperator } from '../types';
+import { GeneratorData, Question, ZombiPromptOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -24,7 +24,7 @@ import { GeneratorData, Question, ZombiOperator } from '../types';
  */
 export function prompt<T, K extends T = T>(
   questions: GeneratorData<Question<K> | Question<K>[], T>,
-): ZombiOperator<T> {
+): ZombiPromptOperator<T> {
   return map(g => {
     const result = copyObject(g);
 
@@ -35,5 +35,5 @@ export function prompt<T, K extends T = T>(
     });
 
     return result;
-  });
+  }) as ZombiPromptOperator<T>;
 }

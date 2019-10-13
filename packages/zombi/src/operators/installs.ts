@@ -4,20 +4,20 @@
 import { exec } from './exec';
 
 // Types
-import { ZombiOperator } from '../types';
+import { ZombiSideEffectOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
 /**
  * Install dependencies via NPM.
  */
-export function npmInstall<T>(): ZombiOperator<T> {
+export function npmInstall<T>(): ZombiSideEffectOperator<T> {
   return exec('npm install');
 }
 
 /**
  * Install dependencies via Yarn.
  */
-export function yarnInstall<T>(): ZombiOperator<T> {
+export function yarnInstall<T>(): ZombiSideEffectOperator<T> {
   return exec('yarn install');
 }

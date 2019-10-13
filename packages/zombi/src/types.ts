@@ -49,7 +49,6 @@ export interface GeneratorConfig<Props>
   initialProps?: Props | Partial<Props>;
   /** Whether to force overwrites on file conflicts. */
   force?: boolean;
-  silent?: boolean;
   templateRoot?: string | boolean;
 }
 
@@ -67,18 +66,38 @@ export interface FSOptions {
 }
 
 /** The RxJS unary function that underlies a `Generator`'s observable pipe. */
-export interface ZombiOperator<T>
-  extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {}
+export interface ZombiSideEffectOperator<T>
+  extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {
+  _zombiSideEffectOperatorBrand: void;
+}
+
+/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
+export interface ZombiPromptOperator<T>
+  extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {
+  _zombiPromptOperatorBrand: void;
+}
+
+/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
+export interface ZombiParallelismOperator<T>
+  extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {
+  _zombiParallelismOperator: void;
+}
+
+/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
+export type ZombiOperator<T> =
+  | ZombiSideEffectOperator<T>
+  | ZombiPromptOperator<T>
+  | ZombiParallelismOperator<T>;
 
 /** Ecapsulates the concept of a "side-effect" as it relates to `Generator`. */
-export interface SideEffect<Props>
-  extends Callback<Props>,
-    SideEffectOperatorOptions {}
+export type SideEffect<Props> = Callback<Props> &
+  SideEffectOperatorOptions<Props>;
 
 /** Options given to the core `sideEffect` operator. */
-export interface SideEffectOperatorOptions {
+export interface SideEffectOperatorOptions<Props> {
   /** Whether to execute this operator at during the "prompting" phase of a `Generator`'s lifecyle. */
   enforcePre?: boolean;
+  condition?: GeneratorData<boolean, Props>;
 }
 
 /**
@@ -100,7 +119,9 @@ export interface Question<Props> extends InquirerQuestion {
 
 // --- Data-types ----------------------------------------------------------- //
 
-/** Arbitrary data or a callback that resolves to arbitrary data. */
+/**
+ * Arbitrary data or a callback that resolves to arbitrary data.
+ */
 export type GeneratorData<R, Props> = R | Callback<Props, R>;
 
 /** A placeholder type for arbitrary JSON data. */
