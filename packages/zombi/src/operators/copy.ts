@@ -40,7 +40,7 @@ export function copy<T>(
   data?: GeneratorData<EjsData, T>,
   options?: GeneratorData<FSOptions, T>,
 ): ZombiSideEffectOperator<T> {
-  return ((stream, context) => {
+  return ((stream, context = { condition: true }) => {
     const templateDir = getContextualTemplateRootFromStream(stream);
     return stream.pipe(
       sideEffect(
