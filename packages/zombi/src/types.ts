@@ -2,14 +2,15 @@
 
 // Node modules
 import { Question as InquirerQuestion } from 'inquirer';
-import {
-  Observable as RxObservable,
-  UnaryFunction as RxUnaryFunction,
-} from 'rxjs';
+import { Observable as RxObservable } from 'rxjs';
 
 // Local modules
 import { FileSystem } from './fs';
 import { Generator } from './generator';
+
+// --- Utility types -------------------------------------------------------- //
+
+type Nominal<K, T> = K & { __nominalBrand: T };
 
 // --- Core types ----------------------------------------------------------- //
 
@@ -65,29 +66,42 @@ export interface FSOptions {
   replaceDirectories?: boolean;
 }
 
-/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
-export interface ZombiSideEffectOperator<T>
-  extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {
-  _zombiSideEffectOperatorBrand: void;
+/** */
+export interface ZombiOperatorFunction<Props, Context = any> {
+  (stream: GeneratorStream<Props>, context?: Context): GeneratorStream<Props>;
+}
+
+/** */
+export interface ConditionContext<Props> {
+  condition: GeneratorData<boolean, Props>;
 }
 
 /** The RxJS unary function that underlies a `Generator`'s observable pipe. */
-export interface ZombiPromptOperator<T>
-  extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {
-  _zombiPromptOperatorBrand: void;
-}
+export interface ZombiSideEffectOperator<Props, Context = any>
+  extends Nominal<
+    ZombiOperatorFunction<Props, Context>,
+    'ZombiSideEffectOperator'
+  > {}
 
 /** The RxJS unary function that underlies a `Generator`'s observable pipe. */
-export interface ZombiParallelismOperator<T>
-  extends RxUnaryFunction<GeneratorStream<T>, GeneratorStream<T>> {
-  _zombiParallelismOperator: void;
-}
+export interface ZombiPromptOperator<Props, Context = any>
+  extends Nominal<
+    ZombiOperatorFunction<Props, Context>,
+    'ZombiPromptOperator'
+  > {}
 
 /** The RxJS unary function that underlies a `Generator`'s observable pipe. */
-export type ZombiOperator<T> =
-  | ZombiSideEffectOperator<T>
-  | ZombiPromptOperator<T>
-  | ZombiParallelismOperator<T>;
+export interface ZombiParallelismOperator<Props, Context = any>
+  extends Nominal<
+    ZombiOperatorFunction<Props, Context>,
+    'ZombiParallelismOperator'
+  > {}
+
+/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
+export type ZombiOperator<Props> =
+  | ZombiSideEffectOperator<Props>
+  | ZombiPromptOperator<Props>
+  | ZombiParallelismOperator<Props>;
 
 /** Ecapsulates the concept of a "side-effect" as it relates to `Generator`. */
 export type SideEffect<Props> = Callback<Props> &
@@ -101,11 +115,11 @@ export interface SideEffectOperatorOptions<Props> {
 }
 
 /**
- * A function which executes during the "side-effect" phase of the `Generator`
- * lifecycle.
+ * A function which executes during the "side-effect" phase of the
+ * `Generator` lifecycle.
  */
 export interface Callback<Props, R = void> {
-  (generator: GeneratorOutput<Props>): Promise<R>;
+  (generator: GeneratorOutput<Props>): R | Promise<R>;
 }
 
 /** The RxJS observable underlying a `Generator`. */
@@ -117,7 +131,7 @@ export interface Question<Props> extends InquirerQuestion {
   name?: Extract<keyof Props, string>;
 }
 
-// --- Data-types ----------------------------------------------------------- //
+// --- Data types ----------------------------------------------------------- //
 
 /**
  * Arbitrary data or a callback that resolves to arbitrary data.

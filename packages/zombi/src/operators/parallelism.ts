@@ -1,11 +1,11 @@
 // --- Imports -------------------------------------------------------------- //
 
 // Node modules
+import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
 // Types
 import { SideEffect, ZombiParallelismOperator } from '../types';
-import { copyObject } from '../utils/copy-object';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -15,8 +15,8 @@ let savedSet: (SideEffect<any> | SideEffect<any>[])[] | undefined = undefined;
  * Start piping a set of parallel tasks into the generator.
  */
 export function startParallelism<T>(): ZombiParallelismOperator<T> {
-  return map(g => {
-    const result = copyObject(g);
+  return map(generator => {
+    const result = merge({}, generator);
     // Copy the current sequence by value.
     savedSet = [...result.sequence];
     result.sequence = [];
@@ -28,8 +28,8 @@ export function startParallelism<T>(): ZombiParallelismOperator<T> {
  * Finish piping a set of parallel tasks into the generator.
  */
 export function endParallelism<T>(): ZombiParallelismOperator<T> {
-  return map(g => {
-    const result = copyObject(g);
+  return map(generator => {
+    const result = merge({}, generator);
     const parallelSet = [...result.sequence];
     // Restore original sequence and append the current sequence as a list of
     // parallel tasks.

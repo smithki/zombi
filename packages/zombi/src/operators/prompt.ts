@@ -5,7 +5,6 @@ import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
 // Local modules
-import { copyObject } from '../utils/copy-object';
 import { ensureArray } from '../utils/ensure-array';
 import { prompt as ask } from '../utils/inquirer';
 import { resolveDataBuilder } from '../utils/resolve-data';
@@ -25,15 +24,19 @@ import { GeneratorData, Question, ZombiPromptOperator } from '../types';
 export function prompt<T, K extends T = T>(
   questions: GeneratorData<Question<K> | Question<K>[], T>,
 ): ZombiPromptOperator<T> {
-  return map(g => {
-    const result = copyObject(g);
+  return (stream => {
+    return stream.pipe(
+      map(generator => {
+        const result = merge({}, generator);
 
-    result.prompts.push(async cache => {
-      const q = ensureArray(await resolveDataBuilder(cache)(questions));
-      const answers = await ask(q);
-      merge(cache.props, answers);
-    });
+        result.prompts.push(async cache => {
+          const q = ensureArray(await resolveDataBuilder(cache)(questions));
+          const answers = await ask(q);
+          merge(cache.props, answers);
+        });
 
-    return result;
+        return result;
+      }),
+    );
   }) as ZombiPromptOperator<T>;
 }

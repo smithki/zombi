@@ -4,9 +4,6 @@
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
-// Local modules
-import { copyObject } from '../utils/copy-object';
-
 // Types
 import {
   Callback,
@@ -30,23 +27,27 @@ export function sideEffect<T>(
   callback: Callback<T>,
   options: SideEffectOperatorOptions<T> = {},
 ): ZombiSideEffectOperator<T> {
-  return map(generator => {
-    const result = copyObject(generator);
+  return (stream => {
+    return stream.pipe(
+      map(generator => {
+        const result = merge({}, generator);
 
-    const defaultOptions: SideEffectOperatorOptions<T> = {
-      enforcePre: false,
-      condition: true,
-    };
+        const defaultOptions: SideEffectOperatorOptions<T> = {
+          enforcePre: false,
+          condition: true,
+        };
 
-    const sideEffectCallback: SideEffect<T> = merge(
-      callback,
-      defaultOptions,
-      options,
+        const sideEffectCallback: SideEffect<T> = merge(
+          callback,
+          defaultOptions,
+          options,
+        );
+
+        if (options.enforcePre) result.sequence.unshift(sideEffectCallback);
+        else result.sequence.push(sideEffectCallback);
+
+        return result;
+      }),
     );
-
-    if (options.enforcePre) result.sequence.unshift(sideEffectCallback);
-    else result.sequence.push(sideEffectCallback);
-
-    return result;
   }) as ZombiSideEffectOperator<T>;
 }
