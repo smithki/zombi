@@ -5,7 +5,7 @@ import { Data as EjsData } from 'ejs';
 import { isAbsolute, join } from 'path';
 
 // Local modules
-import { copyObject } from '../utils/copy-object';
+import { applyOperatorContext } from '../utils/apply-operator-context';
 import {
   resolveDataBuilder,
   resolveEjsDataBuilder,
@@ -14,7 +14,12 @@ import { getContextualTemplateRootFromStream } from '../utils/resolve-template-r
 import { sideEffect } from './side-effect';
 
 // Types
-import { FSOptions, GeneratorData, ZombiOperator } from '../types';
+import {
+  ConditionContext,
+  FSOptions,
+  GeneratorData,
+  ZombiSideEffectOperator,
+} from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -34,29 +39,30 @@ export function copy<T>(
   to: GeneratorData<string, T>,
   data?: GeneratorData<EjsData, T>,
   options?: GeneratorData<FSOptions, T>,
-): ZombiOperator<T> {
-  return stream => {
-    const source = copyObject(stream); // Use a copy of the current stream.
+): ZombiSideEffectOperator<T> {
+  return ((stream, context) => {
     const templateDir = getContextualTemplateRootFromStream(stream);
+    return stream.pipe(
+      sideEffect(
+        async generator => {
+          try {
+            const resolveData = resolveDataBuilder(generator);
+            const toPath = await resolveData(to);
+            const ejsData = await resolveEjsDataBuilder(generator)(data!);
+            const opts = await resolveData(options!);
 
-    return source.pipe(
-      sideEffect(async generator => {
-        try {
-          const resolveData = resolveDataBuilder(generator);
-          const toPath = await resolveData(to);
-          const ejsData = await resolveEjsDataBuilder(generator)(data!);
-          const opts = await resolveData(options!);
+            const fromData = await resolveData(from);
+            const fromPath = isAbsolute(fromData)
+              ? fromData
+              : join(templateDir as string, fromData);
 
-          const fromData = await resolveData(from);
-          const fromPath = isAbsolute(fromData)
-            ? fromData
-            : join(templateDir as string, fromData);
-
-          await generator.fs.copy(fromPath, toPath, ejsData, opts);
-        } catch (err) {
-          throw err;
-        }
-      }),
+            await generator.fs.copy(fromPath, toPath, ejsData, opts);
+          } catch (err) {
+            throw err;
+          }
+        },
+        { condition: context.condition },
+      ),
     );
-  };
+  }) as ZombiSideEffectOperator<T, ConditionContext<T>>;
 }

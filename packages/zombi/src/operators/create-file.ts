@@ -5,7 +5,7 @@ import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
 
 // Types
-import { FSOptions, GeneratorData, ZombiOperator } from '../types';
+import { FSOptions, GeneratorData, ZombiSideEffectOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -21,7 +21,7 @@ export function createFile<T>(
   file: GeneratorData<string, T>,
   content?: GeneratorData<any, T>,
   options?: GeneratorData<Pick<FSOptions, 'ejs' | 'force'>, T>,
-): ZombiOperator<T> {
+): ZombiSideEffectOperator<T> {
   return sideEffect(async generator => {
     try {
       const resolveData = resolveDataBuilder(generator);
