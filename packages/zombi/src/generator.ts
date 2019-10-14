@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { isArray, merge, uniq } from 'lodash';
 import { resolve } from 'path';
 import prettyTime from 'pretty-time';
-import { generate, of } from 'rxjs';
+import { of } from 'rxjs';
 
 // Local modules
 import { FileSystem } from './fs';
@@ -21,7 +21,6 @@ import {
   GeneratorOutput,
   GeneratorStream,
   SideEffect,
-  ZombiOperator,
   ZombiPromptOperator,
   ZombiSideEffectOperator,
 } from './types';
