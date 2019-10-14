@@ -12,10 +12,7 @@ import { FileSystem } from './fs';
 import { endParallelism, startParallelism } from './operators/parallelism';
 import { log } from './utils/log';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
-import {
-  resolveTemplateRoot,
-  ResolveTemplateRootDepth,
-} from './utils/resolve-template-root';
+import { resolveTemplateRoot } from './utils/resolve-template-root';
 import { timer } from './utils/timer';
 
 // Types
@@ -23,12 +20,15 @@ import {
   GeneratorConfig,
   GeneratorOutput,
   GeneratorStream,
-  ZombiOperator,
+  SideEffect,
+  ZombiPromptOperator,
+  ZombiSideEffectOperator,
 } from './types';
+import { resolveDataBuilder } from './utils/resolve-data';
 
 // --- Business logic ------------------------------------------------------- //
 
-const { cyan, green, yellow, gray } = chalk;
+const { cyan, green, yellow } = chalk;
 
 /**
  * A class representing the `zombi` generator interface.
@@ -55,15 +55,12 @@ export class Generator<Props> {
   constructor(config: GeneratorConfig<Props> = {}) {
     // --- Configuration & setup --- //
 
-    const { name, templateRoot, destinationRoot, force, silent } = config;
+    const { name, templateRoot, destinationRoot, force } = config;
 
     // Assign attributes
     this.name = normalizeGeneratorName(name);
     this.destinationRoot = destinationRoot || process.cwd();
-    this.templateRoot = resolveTemplateRoot(
-      ResolveTemplateRootDepth.FromGenerator,
-      templateRoot,
-    );
+    this.templateRoot = resolveTemplateRoot(templateRoot);
     this.force = force || false;
 
     // --- Build the initial generator output --- //
@@ -98,7 +95,11 @@ export class Generator<Props> {
    *
    * @param operators Operators that will run _in sequence_.
    */
-  public sequence(...operators: ZombiOperator<Props>[]): Generator<Props> {
+  public sequence(
+    ...operators: (
+      | ZombiSideEffectOperator<Props>
+      | ZombiPromptOperator<Props>)[]
+  ): Generator<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
     return merge({}, this, { zombi$: result });
   }
@@ -108,7 +109,9 @@ export class Generator<Props> {
    *
    * @param operators Operators that will run _in parallel_.
    */
-  public parallel(...operators: ZombiOperator<Props>[]): Generator<Props> {
+  public parallel(
+    ...operators: ZombiSideEffectOperator<Props>[]
+  ): Generator<Props> {
     const result = (this.zombi$.pipe as any)(
       startParallelism(),
       ...operators,
@@ -176,25 +179,31 @@ export class Generator<Props> {
     let timeElapsed: [number, number];
 
     const didGenerateFiles = await new Promise(resolve => {
-      this.zombi$.subscribe(async g => {
-        const { prompts, sequence } = g;
+      this.zombi$.subscribe(async generator => {
+        const { prompts, sequence } = generator;
 
         if (!prompts.length && !sequence.length) {
           log(yellow.bold(`🤷  There's nothing to Generate.`));
           resolve(false);
         }
 
-        // Execute prompts
-        for (const task of prompts) await task(g);
+        // Execute all prompting tasks
+        for (const task of prompts) await task(generator);
+
+        /**
+         * Executes a side-effect task if the configured conditional is truthy.
+         */
+        const executeTask = async (task: SideEffect<Props>) => {
+          const condition = await resolveDataBuilder(generator)(task.condition);
+          if (condition) await task(generator);
+        };
 
         timer.start();
-
-        // Execute sequence
+        // Execute all side-effect tasks
         for (const task of sequence) {
-          if (isArray(task)) await Promise.all(task.map(t => t(g)));
-          else await task(g);
+          if (isArray(task)) await Promise.all(task.map(t => executeTask(t)));
+          else await executeTask(task);
         }
-
         timeElapsed = timer.stop();
 
         resolve(true);

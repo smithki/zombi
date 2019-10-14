@@ -3,6 +3,7 @@
   "name": "zombi-ecosystem",
   "scripts": {
     "bootstrap": "lerna bootstrap",
+    "version": "lerna version",
     "exec": "lerna exec --scope \"$PKG\" -- $@",
     "dev": "lerna exec --scope \"$PKG\" -- yarn dev",
     "build": "lerna exec --scope \"$PKG\" -- yarn build",

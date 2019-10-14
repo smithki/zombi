@@ -2,22 +2,24 @@
 
 // Node modules
 import { Data as EjsData } from 'ejs';
-import { merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 
 // Local modules
+import { applyOperatorContext } from '../utils/apply-operator-context';
 import {
   resolveDataBuilder,
   resolveEjsDataBuilder,
 } from '../utils/resolve-data';
-import {
-  getContextualTemplateRootFromStream,
-  ResolveTemplateRootDepth,
-} from '../utils/resolve-template-root';
+import { getContextualTemplateRootFromStream } from '../utils/resolve-template-root';
 import { sideEffect } from './side-effect';
 
 // Types
-import { FSOptions, GeneratorData, ZombiOperator } from '../types';
+import {
+  ConditionContext,
+  FSOptions,
+  GeneratorData,
+  ZombiSideEffectOperator,
+} from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -37,32 +39,30 @@ export function copy<T>(
   to: GeneratorData<string, T>,
   data?: GeneratorData<EjsData, T>,
   options?: GeneratorData<FSOptions, T>,
-): ZombiOperator<T> {
-  return stream => {
-    const source = merge({}, stream); // Use a copy of the current stream.
-    const templateDir = getContextualTemplateRootFromStream(
-      stream,
-      ResolveTemplateRootDepth.FromOperator,
+): ZombiSideEffectOperator<T> {
+  return ((stream, context) => {
+    const templateDir = getContextualTemplateRootFromStream(stream);
+    return stream.pipe(
+      sideEffect(
+        async generator => {
+          try {
+            const resolveData = resolveDataBuilder(generator);
+            const toPath = await resolveData(to);
+            const ejsData = await resolveEjsDataBuilder(generator)(data!);
+            const opts = await resolveData(options!);
+
+            const fromData = await resolveData(from);
+            const fromPath = isAbsolute(fromData)
+              ? fromData
+              : join(templateDir as string, fromData);
+
+            await generator.fs.copy(fromPath, toPath, ejsData, opts);
+          } catch (err) {
+            throw err;
+          }
+        },
+        { condition: context.condition },
+      ),
     );
-
-    return source.pipe(
-      sideEffect(async generator => {
-        try {
-          const resolveData = resolveDataBuilder(generator);
-          const toPath = await resolveData(to);
-          const ejsData = await resolveEjsDataBuilder(generator)(data!);
-          const opts = await resolveData(options!);
-
-          const fromData = await resolveData(from);
-          const fromPath = isAbsolute(fromData)
-            ? fromData
-            : join(templateDir as string, fromData);
-
-          await generator.fs.copy(fromPath, toPath, ejsData, opts);
-        } catch (err) {
-          throw err;
-        }
-      }),
-    );
-  };
+  }) as ZombiSideEffectOperator<T, ConditionContext<T>>;
 }

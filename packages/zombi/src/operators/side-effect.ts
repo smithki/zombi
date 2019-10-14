@@ -5,7 +5,12 @@ import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
 
 // Types
-import { Callback, SideEffectOperatorOptions, ZombiOperator } from '../types';
+import {
+  Callback,
+  SideEffect,
+  SideEffectOperatorOptions,
+  ZombiSideEffectOperator,
+} from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -20,14 +25,29 @@ import { Callback, SideEffectOperatorOptions, ZombiOperator } from '../types';
  */
 export function sideEffect<T>(
   callback: Callback<T>,
-  options: SideEffectOperatorOptions = {},
-): ZombiOperator<T> {
-  return map(g => {
-    const result = merge({}, g);
+  options: SideEffectOperatorOptions<T> = {},
+): ZombiSideEffectOperator<T> {
+  return (stream => {
+    return stream.pipe(
+      map(generator => {
+        const result = merge({}, generator);
 
-    if (options.enforcePre) result.sequence.unshift(callback);
-    else result.sequence.push(merge(callback, options));
+        const defaultOptions: SideEffectOperatorOptions<T> = {
+          enforcePre: false,
+          condition: true,
+        };
 
-    return result;
-  });
+        const sideEffectCallback: SideEffect<T> = merge(
+          callback,
+          defaultOptions,
+          options,
+        );
+
+        if (options.enforcePre) result.sequence.unshift(sideEffectCallback);
+        else result.sequence.push(sideEffectCallback);
+
+        return result;
+      }),
+    );
+  }) as ZombiSideEffectOperator<T>;
 }

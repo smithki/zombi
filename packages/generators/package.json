@@ -21,6 +21,6 @@
     "compile_watch": "tsc --watch"
   },
   "dependencies": {
-    "zombi": "0.16.0"
+    "zombi": "0.17.0"
   }
 }

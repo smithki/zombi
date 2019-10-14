@@ -10,7 +10,7 @@ import { prompt as ask } from '../utils/inquirer';
 import { resolveDataBuilder } from '../utils/resolve-data';
 
 // Types
-import { GeneratorData, Question, ZombiOperator } from '../types';
+import { GeneratorData, Question, ZombiPromptOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -23,16 +23,20 @@ import { GeneratorData, Question, ZombiOperator } from '../types';
  */
 export function prompt<T, K extends T = T>(
   questions: GeneratorData<Question<K> | Question<K>[], T>,
-): ZombiOperator<T> {
-  return map(g => {
-    const result = merge({}, g);
+): ZombiPromptOperator<T> {
+  return (stream => {
+    return stream.pipe(
+      map(generator => {
+        const result = merge({}, generator);
 
-    result.prompts.push(async cache => {
-      const q = ensureArray(await resolveDataBuilder(cache)(questions));
-      const answers = await ask(q);
-      merge(cache.props, answers);
-    });
+        result.prompts.push(async cache => {
+          const q = ensureArray(await resolveDataBuilder(cache)(questions));
+          const answers = await ask(q);
+          merge(cache.props, answers);
+        });
 
-    return result;
-  });
+        return result;
+      }),
+    );
+  }) as ZombiPromptOperator<T>;
 }

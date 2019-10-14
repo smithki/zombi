@@ -1,13 +1,12 @@
+type HrTime = [number, number];
+
 /**
  * Calculate the difference between two Node hrtime (`[second, nanosecond]`)
  * tuples.
  *
  * Based on: https://github.com/firefoxes/diff-hrtime/blob/master/index.js
  */
-const subtractTime = (
-  a: [number, number],
-  b: [number, number],
-): [number, number] => {
+const subtractTime = (a: HrTime, b: HrTime): HrTime => {
   // Capture seconds and nanoseconds
   const [aS, aNS] = a;
   const [bS, bNS] = b;
@@ -23,24 +22,24 @@ const subtractTime = (
   return [s, ns];
 };
 
-let startTime: [number, number];
-let pauses: ([number, number])[] = [];
-let resumes: ([number, number])[] = [];
+let startTime: HrTime;
+let pauses: HrTime[] = [];
+let resumes: HrTime[] = [];
 
 export const timer = {
-  /** */
   start: () => {
     startTime = process.hrtime();
     pauses = resumes = [];
   },
 
-  /** */
-  pause: () => pauses.push(process.hrtime()),
+  pause: () => {
+    pauses.push(process.hrtime());
+  },
 
-  /** */
-  resume: () => resumes.push(process.hrtime(pauses.pop())),
+  resume: () => {
+    resumes.push(process.hrtime(pauses.pop()));
+  },
 
-  /** */
   stop: () =>
     resumes.reduce(
       (prev, curr) => subtractTime(prev, curr),

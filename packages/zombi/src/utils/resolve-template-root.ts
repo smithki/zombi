@@ -20,7 +20,6 @@ import { GeneratorStream } from '../types';
 
 export enum ResolveTemplateRootDepth {
   FromGenerator = 3,
-  FromOperator = 2,
 }
 
 // --- Business logic ------------------------------------------------------- //
@@ -34,8 +33,10 @@ export enum ResolveTemplateRootDepth {
  * explicitly a `boolean` and false, templates are ignored.
  */
 export function resolveTemplateRoot(
-  startingDepth: ResolveTemplateRootDepth | number,
   current: string | boolean = true,
+  startingDepth:
+    | ResolveTemplateRootDepth
+    | number = ResolveTemplateRootDepth.FromGenerator,
 ) {
   // [1] Check the `current` value to determine whether we should proceed
   //     with stack trace calculations.
@@ -101,10 +102,21 @@ export function resolveTemplateRoot(
   }
 }
 
+/**
+ * Gets the `templateRoot` of the currently scoped generator stream, referring
+ * to templates that are relevant to the generator currently doing work (even if
+ * it's deeply composed into other generators).
+ *
+ * > **NOTE:** This function should be invoked _outside_ of a `SideEffect`,
+ * > usually within the body of a `ZombiOperator` function.
+ */
 export function getContextualTemplateRootFromStream<
   TStream extends GeneratorStream<any>
->(stream: TStream, depth: ResolveTemplateRootDepth) {
+>(stream: TStream) {
   let templateRoot: string;
+  // Since we can resolve `context.templateRoot` synchronously, this will work
+  // as expected! Note that if we tried to resolve async data here, it would be
+  // impossible...
   stream.subscribe(g => (templateRoot = g.context.templateRoot));
-  return resolveTemplateRoot(depth, templateRoot);
+  return templateRoot;
 }

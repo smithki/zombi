@@ -8,7 +8,7 @@ import * as spawn from 'cross-spawn';
 import { sideEffect } from './side-effect';
 
 // Types
-import { ZombiOperator } from '../types';
+import { ZombiSideEffectOperator } from '../types';
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -21,7 +21,7 @@ import { ZombiOperator } from '../types';
 export function exec<T>(
   command: string,
   options?: SpawnOptions,
-): ZombiOperator<T> {
+): ZombiSideEffectOperator<T> {
   return sideEffect(async () => {
     try {
       const parts = command.split(' ');
