@@ -66,38 +66,38 @@ export interface FSOptions {
   replaceDirectories?: boolean;
 }
 
-/** */
+/** The underlying operator function passed to `Generator.sequence` or `Generator.parallelism`. */
 export interface ZombiOperatorFunction<Props, Context = any> {
   (stream: GeneratorStream<Props>, context?: Context): GeneratorStream<Props>;
 }
 
-/** */
+/** A condition context provided to any operator function. */
 export interface ConditionContext<Props> {
   condition: GeneratorData<boolean, Props>;
 }
 
-/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
+/** A side-effecting operator. */
 export interface ZombiSideEffectOperator<Props, Context = any>
   extends Nominal<
     ZombiOperatorFunction<Props, Context>,
     'ZombiSideEffectOperator'
   > {}
 
-/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
+/** A prompting operator. */
 export interface ZombiPromptOperator<Props, Context = any>
   extends Nominal<
     ZombiOperatorFunction<Props, Context>,
     'ZombiPromptOperator'
   > {}
 
-/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
+/** Internal operator for handling parallelism. */
 export interface ZombiParallelismOperator<Props, Context = any>
   extends Nominal<
     ZombiOperatorFunction<Props, Context>,
     'ZombiParallelismOperator'
   > {}
 
-/** The RxJS unary function that underlies a `Generator`'s observable pipe. */
+/** A `Generator`-compatible operator. */
 export type ZombiOperator<Props> =
   | ZombiSideEffectOperator<Props>
   | ZombiPromptOperator<Props>
