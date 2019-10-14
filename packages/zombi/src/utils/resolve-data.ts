@@ -21,7 +21,7 @@ export function resolveEjsDataBuilder(generator: GeneratorOutput<any>) {
 }
 
 export function resolveDataBuilder(generator: GeneratorOutput<any>) {
-  return async <T>(value: T | ((...args: any[]) => T | Promise<T>)) => {
+  return async <T>(value: T | ((...args: any[]) => Promise<T>)) => {
     return typeof value === 'function'
       ? await (value as any)(generator)
       : value;

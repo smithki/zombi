@@ -119,7 +119,7 @@ export interface SideEffectOperatorOptions<Props> {
  * `Generator` lifecycle.
  */
 export interface Callback<Props, R = void> {
-  (generator: GeneratorOutput<Props>): R | Promise<R>;
+  (generator: GeneratorOutput<Props>): Promise<R>;
 }
 
 /** The RxJS observable underlying a `Generator`. */
