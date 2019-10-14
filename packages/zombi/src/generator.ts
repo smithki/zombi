@@ -2,7 +2,7 @@
 
 // Node modules
 import chalk from 'chalk';
-import { isArray, merge, uniq } from 'lodash';
+import { isArray, isBoolean, merge, uniq } from 'lodash';
 import { resolve } from 'path';
 import prettyTime from 'pretty-time';
 import { of } from 'rxjs';
@@ -195,7 +195,7 @@ export class Generator<Props> {
          */
         const executeTask = async (task: SideEffect<Props>) => {
           const condition = await resolveDataBuilder(generator)(task.condition);
-          if (condition) await task(generator);
+          if (isBoolean(condition) && condition) await task(generator);
         };
 
         timer.start();

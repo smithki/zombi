@@ -27,7 +27,7 @@ export function sideEffect<T>(
   callback: Callback<T>,
   options: SideEffectOperatorOptions<T> = {},
 ): ZombiSideEffectOperator<T> {
-  return (stream => {
+  return ((stream, context = { condition: true }) => {
     return stream.pipe(
       map(generator => {
         const result = merge({}, generator);
@@ -40,6 +40,7 @@ export function sideEffect<T>(
         const sideEffectCallback: SideEffect<T> = merge(
           callback,
           defaultOptions,
+          context,
           options,
         );
 
