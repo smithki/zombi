@@ -28,9 +28,9 @@ export enum ResolveTemplateRootDepth {
  * Automatically resolves a valid `template/` path next to the executing
  * generator.
  *
- * @param depth The depth at which to start searching the Error stack.
- * @param current The current `templateRoot` value to resolve against. If
- * explicitly a `boolean` and false, templates are ignored.
+ * @param depth - The depth at which to start searching the Error stack.
+ * @param current - The current `templateRoot` value to resolve against. If
+ * explicitly a `boolean` and `false`, templates are ignored.
  */
 export function resolveTemplateRoot(
   current: string | boolean = true,
@@ -72,12 +72,12 @@ export function resolveTemplateRoot(
   for (let i = 0; i < startingDepth; i++) deepParent = deepParent!.parent;
 
   const path =
-    // If `callerPath` is NOT the same as `dist/core/generator.ts`, then we can
+    // If `callerPath` is NOT the same as `src/generator.ts`, then we can
     // be reasonably sure that the `caller(...)` has correctly identified the
     // module in which the generator was invoked.
     callerPath !== parent!.filename
       ? join(dirname(callerPath), 'template')
-      : // However, if `callerPath` stictly equals `dist/core/generator`, then we
+      : // However, if `callerPath` stictly equals `src/generator.ts`, then we
         // are probably referencing the parent filename at the specified
         // `depth`.
         join(dirname(deepParent!.filename), 'template');

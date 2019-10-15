@@ -1,7 +1,6 @@
 // --- Imports -------------------------------------------------------------- //
 
 // Node modules
-import chalk from 'chalk';
 import { isArray, isBoolean, merge, uniq } from 'lodash';
 import { resolve } from 'path';
 import prettyTime from 'pretty-time';
@@ -27,8 +26,6 @@ import {
 import { resolveDataBuilder } from './utils/resolve-data';
 
 // --- Business logic ------------------------------------------------------- //
-
-const { cyan, green, yellow } = chalk;
 
 /**
  * A class representing the `zombi` generator interface.
@@ -93,7 +90,7 @@ export class Generator<Props> {
   /**
    * Create a sequence of tasks by chaining operators together.
    *
-   * @param operators Operators that will run _in sequence_.
+   * @param operators - Operators that will run _in sequence_.
    */
   public sequence(
     ...operators: (
@@ -107,7 +104,7 @@ export class Generator<Props> {
   /**
    * Create a _parallel_ sequence of tasks by chaining operators together.
    *
-   * @param operators Operators that will run _in parallel_.
+   * @param operators - Operators that will run _in parallel_.
    */
   public parallel(
     ...operators: ZombiSideEffectOperator<Props>[]
@@ -137,13 +134,13 @@ export class Generator<Props> {
   /**
    * Create a new Zombi generator that composes other generators.
    *
-   * @param {...Generator<any>[]} zombis The other generators to compose.
+   * @param {...Generator<any>[]} zombis - The other generators to compose.
    * @returns {Generator<any>}
    */
   public compose(...zombis: Generator<any>[]): Generator<any> {
     if (!zombis.length) return this;
 
-    let result;
+    let result: GeneratorOutput<any>;
 
     const target = merge({}, this.zombi$);
     target.subscribe(g => {
@@ -174,7 +171,7 @@ export class Generator<Props> {
    * Execute the generator's task sequence and output side-effects.
    */
   public async run() {
-    log(green.bold('🧟‍  Zombi is running ') + cyan.bold(this.name));
+    log.startMessage(this.name);
 
     let timeElapsed: [number, number];
 
@@ -183,7 +180,7 @@ export class Generator<Props> {
         const { prompts, sequence } = generator;
 
         if (!prompts.length && !sequence.length) {
-          log(yellow.bold(`🤷  There's nothing to Generate.`));
+          log.nothingToDoMessage();
           resolve(false);
         }
 
@@ -228,7 +225,7 @@ export class Generator<Props> {
   /**
    * Resolves a path to the generator's `templateRoot`.
    *
-   * @param {...string[]} pathSegments Strings from which to resolve a path.
+   * @param {...string[]} pathSegments - Strings from which to resolve a path.
    */
   public template(...pathSegments: string[]) {
     if (this.templateRoot) {
@@ -239,7 +236,7 @@ export class Generator<Props> {
   /**
    * Resolves a path to the generator's `destinationRoot`.
    *
-   * @param {...string[]} pathSegments Strings from which to resolve a path.
+   * @param {...string[]} pathSegments - Strings from which to resolve a path.
    */
   public destination(...pathSegments: string[]) {
     return resolve(this.destinationRoot, ...pathSegments);

@@ -32,7 +32,7 @@ export interface ExecutingGeneratorContext<Props>
   from?: string;
 }
 
-/** Object type produced by a `Generator`'s underlying RxJS stream. */
+/** Object type emitted by a `Generator`'s stream. */
 export interface GeneratorOutput<Props> {
   context: ExecutingGeneratorContext<Props>;
   props: Props;
@@ -76,14 +76,14 @@ export interface ConditionContext<Props> {
   condition: GeneratorData<boolean, Props>;
 }
 
-/** A side-effecting operator. */
+/** An operator which registers a side-effect into the contextual `Generator`. */
 export interface ZombiSideEffectOperator<Props, Context = any>
   extends Nominal<
     ZombiOperatorFunction<Props, Context>,
     'ZombiSideEffectOperator'
   > {}
 
-/** A prompting operator. */
+/** An operator which registers a prompt into the contextual `Generator`. */
 export interface ZombiPromptOperator<Props, Context = any>
   extends Nominal<
     ZombiOperatorFunction<Props, Context>,
@@ -122,7 +122,7 @@ export interface Callback<Props, R = void> {
   (generator: GeneratorOutput<Props>): Promise<R>;
 }
 
-/** The RxJS observable underlying a `Generator`. */
+/** The RxJS observable stream underlying a `Generator`. */
 export interface GeneratorStream<Props>
   extends RxObservable<GeneratorOutput<Props>> {}
 

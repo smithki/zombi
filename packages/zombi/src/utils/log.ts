@@ -11,7 +11,7 @@ import { status } from './inquirer';
 
 // --- Constants ------------------------------------------------------------ //
 
-const { green, gray, white, cyan, black } = chalk;
+const { green, gray, white, cyan, yellow } = chalk;
 
 // --- Business logic ------------------------------------------------------- //
 
@@ -38,10 +38,18 @@ const fileForcedOverwrite = (name: string) => {
 };
 
 const fileSkip = (name: string) => {
-  renderStatus(black.bgYellowBright(' SKIP ') + ' ' + name);
+  renderStatus(white.bgYellowBright(' SKIP ') + ' ' + name);
 };
 
-const completedMessage = timeElapsed => {
+const startMessage = (generatorName: string) => {
+  console.log(green.bold('🧟‍  Zombi is running ') + cyan.bold(generatorName));
+};
+
+const nothingToDoMessage = () => {
+  console.log(yellow.bold(`🤷  There's nothing to Generate.`));
+};
+
+const completedMessage = (timeElapsed: string) => {
   renderStatus(
     green.bold(
       `⚡  It's aliiive! ${gray(`Generated in ${cyan(timeElapsed)}`)}`,
@@ -58,6 +66,8 @@ export const log = merge(console.log.bind(console) as typeof console.log, {
   fileOverwrite,
   fileForcedOverwrite,
   fileSkip,
+  startMessage,
+  nothingToDoMessage,
   completedMessage,
   ...console,
 });
