@@ -12,6 +12,8 @@ import { SideEffect, ZombiParallelismOperator } from '../types';
 let savedSet: (SideEffect<any> | SideEffect<any>[])[] | undefined = undefined;
 
 /**
+ * **[NOTE: THIS IS AN INTERNAL OPERATOR - DO NOT USE]**
+ *
  * Start piping a set of parallel tasks into the generator.
  */
 export function startParallelism<T>(): ZombiParallelismOperator<T> {
@@ -25,6 +27,8 @@ export function startParallelism<T>(): ZombiParallelismOperator<T> {
 }
 
 /**
+ * **[NOTE: THIS IS AN INTERNAL OPERATOR - DO NOT USE]**
+ *
  * Finish piping a set of parallel tasks into the generator.
  */
 export function endParallelism<T>(): ZombiParallelismOperator<T> {
