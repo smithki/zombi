@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 // Local modules
 import { FileSystem } from './fs';
 import { endParallelism, startParallelism } from './operators/parallelism';
+import { prompt } from './operators/prompt';
 import { log } from './utils/log';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
 import { resolveTemplateRoot } from './utils/resolve-template-root';
@@ -17,10 +18,12 @@ import { timer } from './utils/timer';
 // Types
 import {
   GeneratorConfig,
+  GeneratorData,
   GeneratorOutput,
   GeneratorStream,
+  Question,
+  RequiredOnly,
   SideEffect,
-  ZombiPromptOperator,
   ZombiSideEffectOperator,
 } from './types';
 import { resolveDataBuilder } from './utils/resolve-data';
@@ -88,14 +91,32 @@ export class Generator<Props> {
   // --- Public methods --- //
 
   /**
+   * A wrapper for [Inquirer's prompt API](https://github.com/SBoudrias/Inquirer.js/#methods).
+   * Prompts for user input and saves the resulting data into props.
+   *
+   * @param questions - Array of Inquirer-compatible
+   * [question](https://github.com/SBoudrias/Inquirer.js/#question) objects.
+   */
+  public prompt<PropsExtensions = unknown>(
+    questions: GeneratorData<
+      | Question<RequiredOnly<Props & PropsExtensions>>
+      | Question<RequiredOnly<Props & PropsExtensions>>[],
+      Props
+    >,
+  ): Generator<Props & PropsExtensions> {
+    const result = (this.zombi$.pipe as any)(prompt(questions));
+    return (merge({}, this, { zombi$: result }) as unknown) as Generator<
+      Props & PropsExtensions
+    >;
+  }
+
+  /**
    * Create a sequence of tasks by chaining operators together.
    *
    * @param operators - Operators that will run _in sequence_.
    */
   public sequence(
-    ...operators: (
-      | ZombiSideEffectOperator<Props>
-      | ZombiPromptOperator<Props>)[]
+    ...operators: ZombiSideEffectOperator<Props>[]
   ): Generator<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
     return merge({}, this, { zombi$: result });
