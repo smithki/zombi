@@ -9,10 +9,10 @@ import {
   pathExists,
   readdir,
   readFile,
-  readJson,
   remove,
   stat,
 } from 'fs-extra';
+import JSON5 from 'json5';
 import { isEmpty, isNil, merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 
@@ -171,7 +171,8 @@ export class FileSystem<Props> {
     try {
       // Get context and JSON data
       const ctx = this.getContextBuilder()(filePath);
-      const json = await readJson(ctx.to!);
+      const jsonString = await readFile(ctx.to!, 'utf8');
+      const json = JSON5.parse(jsonString);
 
       merge(json, extensions || {});
 

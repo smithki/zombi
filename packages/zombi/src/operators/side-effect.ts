@@ -41,7 +41,7 @@ export function sideEffect<T>(
           callback,
           defaultOptions,
           context,
-          options,
+          options, // Given options take precedence.
         );
 
         if (options.enforcePre) result.sequence.unshift(sideEffectCallback);

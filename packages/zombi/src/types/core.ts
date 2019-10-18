@@ -5,18 +5,11 @@ import { Question as InquirerQuestion } from 'inquirer';
 import { Observable as RxObservable } from 'rxjs';
 
 // Local modules
-import { FileSystem } from './fs';
-import { Generator } from './generator';
+import { FileSystem } from '../fs';
+import { Generator } from '../generator';
 
-// --- Utility types -------------------------------------------------------- //
-
-export type Nominal<K, T> = K & { __nominalBrand: T };
-export type KnownKeys<T> = {
-  [K in keyof T]: string extends K ? never : number extends K ? never : K;
-} extends { [_ in keyof T]: infer U }
-  ? U
-  : never;
-export type RequiredOnly<T extends Record<any, any>> = Pick<T, KnownKeys<T>>;
+// Types
+import { Nominal, RequiredOnly } from './utility';
 
 // --- Core types ----------------------------------------------------------- //
 

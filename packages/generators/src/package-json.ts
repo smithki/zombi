@@ -2,7 +2,8 @@
 
 // Node modules
 import { basename } from 'path';
-import { createJson, prompt, zombi } from 'zombi';
+import { zombi } from 'zombi';
+import { createJson } from 'zombi/operators';
 import { getNpmConfig } from './utils/get-npm-config';
 
 // Local modules
@@ -27,17 +28,14 @@ export const packageJson = zombi<PackageJsonProps>({
   name: 'zombi-package-json',
   templateRoot: false,
 })
-  .sequence(
-    // Prompt for inital package information.
-    prompt(async ({ props }) => [
-      // tslint:disable:prettier
+  .prompt(async ({ props }) => [
+    // tslint:disable:prettier
     { name: 'npmOrg', message: 'NPM organization', when: !props.npmOrg },
     { name: 'pkgName', message: 'Package name', default: basename(process.cwd()), when: !props.pkgName },
     { name: 'pkgVersion', message: 'Package version', default: getNpmConfig('init-version') || '0.1.0', when: !props.pkgVersion },
     { name: 'pkgDescription', message: 'Package description', when: !props.pkgDescription },
     // tslint:enable:prettier
-    ]),
-  )
+  ])
   // Prompt for license information.
   .compose(promptLicense)
   // Prompt for authorship information.
