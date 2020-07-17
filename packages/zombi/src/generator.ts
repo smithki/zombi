@@ -14,7 +14,7 @@ import {
 } from './types';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
 import { resolveTemplateRoot } from './utils/resolve-template-root';
-import { runner } from './utils/runner';
+import { runGenerator } from './run-generator';
 
 /**
  * A class representing the `zombi` generator interface.
@@ -149,7 +149,7 @@ export class Zombi<Props> {
    * Execute the generator's task sequence and output side-effects.
    */
   public async run() {
-    return runner(this.name, this.zombi$);
+    return runGenerator(this.name, this.zombi$);
   }
 
   /**
