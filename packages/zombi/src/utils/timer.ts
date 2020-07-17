@@ -1,4 +1,6 @@
-type HrTime = [number, number];
+import { create } from 'lodash';
+
+export type HrTime = [number, number];
 
 /**
  * Calculate the difference between two Node hrtime (`[second, nanosecond]`)
@@ -26,19 +28,23 @@ let startTime: HrTime;
 let pauses: HrTime[] = [];
 let resumes: HrTime[] = [];
 
-export const timer = {
-  start: () => {
-    startTime = process.hrtime();
-    pauses = resumes = [];
-  },
+export function createTimer() {
+  return {
+    start: () => {
+      startTime = process.hrtime();
+      pauses = resumes = [];
+    },
 
-  pause: () => {
-    pauses.push(process.hrtime());
-  },
+    pause: () => {
+      pauses.push(process.hrtime());
+    },
 
-  resume: () => {
-    resumes.push(process.hrtime(pauses.pop()));
-  },
+    resume: () => {
+      resumes.push(process.hrtime(pauses.pop()));
+    },
 
-  stop: () => resumes.reduce((prev, curr) => subtractTime(prev, curr), process.hrtime(startTime)),
-};
+    stop: () => resumes.reduce((prev, curr) => subtractTime(prev, curr), process.hrtime(startTime)),
+  };
+}
+
+export type Timer = ReturnType<typeof createTimer>;

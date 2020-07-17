@@ -1,30 +1,30 @@
 // tslint:disable:prefer-template
 
 import chalk from 'chalk';
-import { Tools } from '../types';
+import { SideEffectUtils } from '../types';
 
-const { green, gray, white, cyan, yellow } = chalk;
+const { gray, white, cyan, yellow } = chalk;
 
-export function getFSMessages<Props>(tools: Tools<Props>) {
+export function fsMessages<Props>(utils: SideEffectUtils<Props>) {
   return {
     fileAdd(name: string) {
-      tools.status(`${white.bgGreenBright(' ADD ')} ${name}`);
+      utils.status(`${white.bgGreenBright(' ADD ')} ${name}`);
     },
 
     fileExtend(name: string) {
-      tools.status(`${white.bgGreenBright(' EXTEND ')} ${name}`);
+      utils.status(`${white.bgGreenBright(' EXTEND ')} ${name}`);
     },
 
     fileOverwrite(name: string) {
-      tools.status(`${white.bgRedBright(' OVERWRITTEN ')} ${name}`);
+      utils.status(`${white.bgRedBright(' OVERWRITTEN ')} ${name}`);
     },
 
     fileForcedOverwrite(name: string) {
-      tools.status(`${white.bgRedBright(' FORCEFULLY OVERWRITTEN ')} ${name}`);
+      utils.status(`${white.bgRedBright(' FORCEFULLY OVERWRITTEN ')} ${name}`);
     },
 
     fileSkip(name: string) {
-      tools.status(`${white.bgYellowBright(' SKIP ')} ${name}`);
+      utils.status(`${white.bgYellowBright(' SKIP ')} ${name}`);
     },
   };
 }
@@ -42,7 +42,7 @@ function completedMessage(timeElapsed: string) {
 }
 
 export const log = {
-  getFSMessages,
+  fsMessages,
   startMessage,
   nothingToDoMessage,
   completedMessage,

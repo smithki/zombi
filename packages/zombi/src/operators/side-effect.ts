@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
-import { Callback, SideEffect, SideEffectOperatorOptions, ZombiSideEffectOperator } from '../types';
+import { SideEffect, SideEffectOperatorOptions, ZombiSideEffectOperator, SideEffectCallback } from '../types';
 
 /**
  * Perform side-effects during the run process. Similar to RxJS
@@ -12,7 +12,7 @@ import { Callback, SideEffect, SideEffectOperatorOptions, ZombiSideEffectOperato
  * with `enforcePre` set to true.
  */
 export function sideEffect<T>(
-  callback: Callback<T>,
+  callback: SideEffectCallback<T>,
   options: SideEffectOperatorOptions<T> = {},
 ): ZombiSideEffectOperator<T> {
   return ((stream, context = { condition: true }) => {

@@ -1,17 +1,10 @@
 import { Data as EjsData } from 'ejs';
 import { isAbsolute, join } from 'path';
-import {
-  ConditionContext,
-  FSOptions,
-  GeneratorData,
-  ZombiSideEffectOperator,
-} from '../types';
-import {
-  resolveDataBuilder,
-  resolveEjsDataBuilder,
-} from '../utils/resolve-data';
+import { ConditionContext, Resolveable, ZombiSideEffectOperator } from '../types';
+import { resolveDataBuilder, resolveEjsDataBuilder } from '../utils/resolve-data';
 import { getContextualTemplateRootFromStream } from '../utils/resolve-template-root';
 import { sideEffect } from './side-effect';
+import { FSOptions } from '../fs';
 
 /**
  * Copies files from the template directory to the destination directory.
@@ -25,31 +18,25 @@ import { sideEffect } from './side-effect';
  * @param options - Options for customizing file system and side-effect behavior.
  */
 export function copy<T>(
-  from: GeneratorData<string, T>,
-  to: GeneratorData<string, T>,
-  data?: GeneratorData<EjsData, T>,
-  options?: GeneratorData<FSOptions, T>,
+  from: Resolveable<string, T>,
+  to: Resolveable<string, T>,
+  data?: Resolveable<EjsData, T>,
+  options?: Resolveable<FSOptions, T>,
 ): ZombiSideEffectOperator<T> {
   return ((stream, context = { condition: true }) => {
     const templateDir = getContextualTemplateRootFromStream(stream);
     return stream.pipe(
       sideEffect(
         async (generator, { fs }) => {
-          try {
-            const resolveData = resolveDataBuilder(generator);
-            const toPath = await resolveData(to);
-            const ejsData = await resolveEjsDataBuilder(generator)(data!);
-            const opts = await resolveData(options!);
+          const resolveData = resolveDataBuilder(generator);
+          const toPath = await resolveData(to);
+          const ejsData = await resolveEjsDataBuilder(generator)(data);
+          const opts = await resolveData(options);
 
-            const fromData = await resolveData(from);
-            const fromPath = isAbsolute(fromData)
-              ? fromData
-              : join(templateDir as string, fromData);
+          const fromData = await resolveData(from);
+          const fromPath = isAbsolute(fromData) ? fromData : join(templateDir, fromData);
 
-            await fs.copy(fromPath, toPath, ejsData, opts);
-          } catch (err) {
-            throw err;
-          }
+          await fs.copy(fromPath, toPath, ejsData, opts);
         },
         { condition: context.condition },
       ),

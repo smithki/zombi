@@ -1,9 +1,9 @@
 import { Data as EjsData } from 'ejs';
 import { merge } from 'lodash';
-import { GeneratorData, GeneratorOutput } from '../types';
+import { Resolveable, GeneratorOutput } from '../types';
 
 export function resolveEjsDataBuilder(generator: GeneratorOutput<any>) {
-  return async (data: GeneratorData<EjsData, any>) => {
+  return async (data: Resolveable<EjsData, any>) => {
     return merge({}, generator.props, (await resolveDataBuilder(generator)(data)) || {});
   };
 }

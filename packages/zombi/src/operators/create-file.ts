@@ -1,6 +1,7 @@
-import { FSOptions, GeneratorData, ZombiSideEffectOperator } from '../types';
+import { Resolveable, ZombiSideEffectOperator } from '../types';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
+import { FSOptions } from '../fs';
 
 /**
  * Create a new file.
@@ -11,9 +12,9 @@ import { sideEffect } from './side-effect';
  * @param options - Options for customizing file system and side-effect behavior.
  */
 export function createFile<T>(
-  file: GeneratorData<string, T>,
-  content?: GeneratorData<any, T>,
-  options?: GeneratorData<Pick<FSOptions, 'ejs' | 'force'>, T>,
+  file: Resolveable<string, T>,
+  content?: Resolveable<any, T>,
+  options?: Resolveable<Pick<FSOptions, 'ejs' | 'clobber'>, T>,
 ): ZombiSideEffectOperator<T> {
   return sideEffect(async (generator, { fs }) => {
     const resolveData = resolveDataBuilder(generator);

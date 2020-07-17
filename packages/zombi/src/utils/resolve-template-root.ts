@@ -7,7 +7,7 @@ import {
   TemplateRootNonDirectoryError,
   TemplateRootPathNotFoundError,
 } from '../exceptions';
-import { GeneratorStream } from '../types';
+import { ZombiStream } from '../types';
 
 export enum ResolveTemplateRootDepth {
   FromGenerator = 3,
@@ -91,7 +91,7 @@ export function resolveTemplateRoot(
  * > **NOTE:** This function should be invoked _outside_ of a `SideEffect`,
  * > usually within the body of a `ZombiOperator` function.
  */
-export function getContextualTemplateRootFromStream<TStream extends GeneratorStream<any>>(stream: TStream) {
+export function getContextualTemplateRootFromStream<TStream extends ZombiStream<any>>(stream: TStream) {
   let templateRoot: string;
   // Since we can resolve `context.templateRoot` synchronously, this will work
   // as expected! Note that if we tried to resolve async data here, it would be

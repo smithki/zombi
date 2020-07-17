@@ -1,4 +1,4 @@
-import { GeneratorData, JsonData, ZombiSideEffectOperator } from '../types';
+import { Resolveable, JsonData, ZombiSideEffectOperator } from '../types';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
 
@@ -10,11 +10,11 @@ import { sideEffect } from './side-effect';
  * @param extensions - JSON data with which to extend the existing file.
  */
 export function extendJson<T>(
-  file: GeneratorData<string, T>,
-  extensions?: GeneratorData<JsonData, T>,
+  file: Resolveable<string, T>,
+  extensions?: Resolveable<JsonData, T>,
 ): ZombiSideEffectOperator<T> {
   return sideEffect(async (generator, { fs }) => {
-    const resolveData = await resolveDataBuilder(generator);
+    const resolveData = resolveDataBuilder(generator);
     const filePath = await resolveData(file);
     const data = await resolveData(extensions);
 

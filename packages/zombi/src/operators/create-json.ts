@@ -1,6 +1,7 @@
-import { FSOptions, GeneratorData, JsonData, ZombiSideEffectOperator } from '../types';
+import { Resolveable, JsonData, ZombiSideEffectOperator } from '../types';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
+import { FSOptions } from '../fs';
 
 /**
  * Create a JSON-formatted file.
@@ -11,9 +12,9 @@ import { sideEffect } from './side-effect';
  * @param options - Options for customizing file system and side-effect behavior.
  */
 export function createJson<T>(
-  file: GeneratorData<string, T>,
-  data?: GeneratorData<JsonData, T>,
-  options?: GeneratorData<Pick<FSOptions, 'ejs' | 'force'>, T>,
+  file: Resolveable<string, T>,
+  data?: Resolveable<JsonData, T>,
+  options?: Resolveable<Pick<FSOptions, 'ejs' | 'clobber'>, T>,
 ): ZombiSideEffectOperator<T> {
   return sideEffect(async (generator, { fs }) => {
     const resolveData = resolveDataBuilder(generator);
