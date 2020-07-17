@@ -1,15 +1,8 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
-
-// Types
 import { SideEffect, ZombiParallelismOperator } from '../types';
 
-// --- Business logic ------------------------------------------------------- //
-
-let savedSet: (SideEffect<any> | SideEffect<any>[])[] | undefined = undefined;
+let savedSet: (SideEffect<any> | SideEffect<any>[])[] | undefined;
 
 /**
  * **[NOTE: THIS IS AN INTERNAL OPERATOR - DO NOT USE]**

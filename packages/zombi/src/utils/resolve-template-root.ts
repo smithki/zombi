@@ -1,28 +1,17 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import caller from 'caller';
 import { existsSync, lstatSync } from 'fs-extra';
 import { isBoolean, isString } from 'lodash';
 import { basename, dirname, isAbsolute, join } from 'path';
-
-// Local modules
 import {
   TemplateRootAbsolutePathError,
   TemplateRootNonDirectoryError,
   TemplateRootPathNotFoundError,
 } from '../exceptions';
-
-// Types
 import { GeneratorStream } from '../types';
-
-// --- Constants/enums ------------------------------------------------------ //
 
 export enum ResolveTemplateRootDepth {
   FromGenerator = 3,
 }
-
-// --- Business logic ------------------------------------------------------- //
 
 /**
  * Automatically resolves a valid `template/` path next to the executing
@@ -34,9 +23,7 @@ export enum ResolveTemplateRootDepth {
  */
 export function resolveTemplateRoot(
   current: string | boolean = true,
-  startingDepth:
-    | ResolveTemplateRootDepth
-    | number = ResolveTemplateRootDepth.FromGenerator,
+  startingDepth: ResolveTemplateRootDepth | number = ResolveTemplateRootDepth.FromGenerator,
 ) {
   // [1] Check the `current` value to determine whether we should proceed
   //     with stack trace calculations.
@@ -47,10 +34,7 @@ export function resolveTemplateRoot(
   if (isString(current)) {
     if (!isAbsolute(current)) throw new TemplateRootAbsolutePathError();
     if (!existsSync(current)) {
-      throw new TemplateRootPathNotFoundError(
-        `${basename(current)}/`,
-        current.replace(process.cwd(), '.'),
-      );
+      throw new TemplateRootPathNotFoundError(`${basename(current)}/`, current.replace(process.cwd(), '.'));
     }
     if (!lstatSync(current).isDirectory()) {
       throw new TemplateRootNonDirectoryError();
@@ -67,30 +51,27 @@ export function resolveTemplateRoot(
   const callerPath = caller(startingDepth);
 
   // Collect relavent parent modules.
-  const parent = module.parent;
+  const { parent } = module;
   let deepParent = parent;
-  for (let i = 0; i < startingDepth; i++) deepParent = deepParent!.parent;
+  for (let i = 0; i < startingDepth; i++) deepParent = deepParent.parent;
 
   const path =
     // If `callerPath` is NOT the same as `src/generator.ts`, then we can
     // be reasonably sure that the `caller(...)` has correctly identified the
     // module in which the generator was invoked.
-    callerPath !== parent!.filename
+    callerPath !== parent.filename
       ? join(dirname(callerPath), 'template')
       : // However, if `callerPath` stictly equals `src/generator.ts`, then we
         // are probably referencing the parent filename at the specified
         // `depth`.
-        join(dirname(deepParent!.filename), 'template');
+        join(dirname(deepParent.filename), 'template');
 
   // Check if the resolved path exists.
   const exists = existsSync(path);
 
   if (!exists) {
     // Raise error if path is not found.
-    throw new TemplateRootPathNotFoundError(
-      'template/',
-      path.replace(process.cwd(), '.'),
-    );
+    throw new TemplateRootPathNotFoundError('template/', path.replace(process.cwd(), '.'));
   } else {
     if (lstatSync(path).isDirectory()) {
       // If path is found and IS a directory, then we have our mark!
@@ -110,9 +91,7 @@ export function resolveTemplateRoot(
  * > **NOTE:** This function should be invoked _outside_ of a `SideEffect`,
  * > usually within the body of a `ZombiOperator` function.
  */
-export function getContextualTemplateRootFromStream<
-  TStream extends GeneratorStream<any>
->(stream: TStream) {
+export function getContextualTemplateRootFromStream<TStream extends GeneratorStream<any>>(stream: TStream) {
   let templateRoot: string;
   // Since we can resolve `context.templateRoot` synchronously, this will work
   // as expected! Note that if we tried to resolve async data here, it would be

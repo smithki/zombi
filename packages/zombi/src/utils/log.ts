@@ -1,73 +1,49 @@
 // tslint:disable:prefer-template
 
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import chalk from 'chalk';
-import { merge } from 'lodash';
-
-// Local modules
-import { status } from './inquirer';
-
-// --- Constants ------------------------------------------------------------ //
+import { Tools } from '../types';
 
 const { green, gray, white, cyan, yellow } = chalk;
 
-// --- Business logic ------------------------------------------------------- //
+export function getFSMessages<Props>(tools: Tools<Props>) {
+  return {
+    fileAdd(name: string) {
+      tools.status(`${white.bgGreenBright(' ADD ')} ${name}`);
+    },
 
-const renderStatus = (...messages: any[]) => {
-  status.updateBottomBar(messages.join(' '));
-};
+    fileExtend(name: string) {
+      tools.status(`${white.bgGreenBright(' EXTEND ')} ${name}`);
+    },
 
-const clearStatus = () => status.updateBottomBar('');
+    fileOverwrite(name: string) {
+      tools.status(`${white.bgRedBright(' OVERWRITTEN ')} ${name}`);
+    },
 
-const fileAdd = (name: string) => {
-  renderStatus(white.bgGreenBright(' ADD ') + name);
-};
+    fileForcedOverwrite(name: string) {
+      tools.status(`${white.bgRedBright(' FORCEFULLY OVERWRITTEN ')} ${name}`);
+    },
 
-const fileExtend = (name: string) => {
-  renderStatus(white.bgGreenBright(' EXTEND ') + ' ' + name);
-};
+    fileSkip(name: string) {
+      tools.status(`${white.bgYellowBright(' SKIP ')} ${name}`);
+    },
+  };
+}
 
-const fileOverwrite = (name: string) => {
-  renderStatus(white.bgRedBright(' OVERWRITTEN ') + ' ' + name);
-};
+function startMessage(generatorName: string) {
+  console.log(gray('Running generator ') + cyan.bold(generatorName));
+}
 
-const fileForcedOverwrite = (name: string) => {
-  renderStatus(white.bgRedBright(' FORCEFULLY OVERWRITTEN ') + ' ' + name);
-};
+function nothingToDoMessage() {
+  console.log(yellow(`🤷 There's nothing to Generate...`));
+}
 
-const fileSkip = (name: string) => {
-  renderStatus(white.bgYellowBright(' SKIP ') + ' ' + name);
-};
+function completedMessage(timeElapsed: string) {
+  console.log(gray(`Generated in ${cyan.bold(timeElapsed)}`));
+}
 
-const startMessage = (generatorName: string) => {
-  console.log(green.bold('🧟‍  Zombi is running ') + cyan.bold(generatorName));
-};
-
-const nothingToDoMessage = () => {
-  console.log(yellow.bold(`🤷  There's nothing to Generate.`));
-};
-
-const completedMessage = (timeElapsed: string) => {
-  renderStatus(
-    green.bold(
-      `⚡  It's aliiive! ${gray(`Generated in ${cyan(timeElapsed)}`)}`,
-    ),
-  );
-};
-
-// Merge with standard console
-export const log = merge(console.log.bind(console) as typeof console.log, {
-  renderStatus,
-  clearStatus,
-  fileAdd,
-  fileExtend,
-  fileOverwrite,
-  fileForcedOverwrite,
-  fileSkip,
+export const log = {
+  getFSMessages,
   startMessage,
   nothingToDoMessage,
   completedMessage,
-  ...console,
-});
+};

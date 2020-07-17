@@ -1,10 +1,5 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import { zombi } from 'zombi';
 import { getNpmConfig } from './utils/get-npm-config';
-
-// --- Types ---------------------------------------------------------------- //
 
 export interface AuthorshipProps {
   authorName: string;
@@ -12,16 +7,14 @@ export interface AuthorshipProps {
   authorUrl: string;
 }
 
-// --- Business logic ------------------------------------------------------- //
-
 /** Prompts for authorship information */
 export const promptAuthor = zombi<AuthorshipProps>({
   name: 'zombi-prompt-author',
   templateRoot: false,
 }).prompt(async ({ props }) => [
-  // tslint:disable:prettier
-  { name: 'authorName', message: `Author's name`, default: getNpmConfig('init-author-name'), when: !props.authorName, },
-  { name: 'authorEmail', message: `Author's email`, default: getNpmConfig('init-author-email'), when: !props.authorEmail },
-  { name: 'authorUrl', message: `Author's URL`, default: getNpmConfig('init-author-url'), when: !props.authorUrl },
-  // tslint:enable:prettier
+  /* eslint-disable prettier/prettier */
+  { type: 'Input', name: 'authorName', message: `Author's name`, initial: getNpmConfig('init-author-name'), when: !props.authorName, },
+  { type: 'Input', name: 'authorEmail', message: `Author's email`, initial: getNpmConfig('init-author-email'), when: !props.authorEmail },
+  { type: 'Input', name: 'authorUrl', message: `Author's URL`, initial: getNpmConfig('init-author-url'), when: !props.authorUrl },
+  /* eslint-enable prettier/prettier */
 ]);

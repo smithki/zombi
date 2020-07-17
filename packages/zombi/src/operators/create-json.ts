@@ -1,18 +1,6 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Local modules
+import { FSOptions, GeneratorData, JsonData, ZombiSideEffectOperator } from '../types';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
-
-// Types
-import {
-  FSOptions,
-  GeneratorData,
-  JsonData,
-  ZombiSideEffectOperator,
-} from '../types';
-
-// --- Business logic ------------------------------------------------------- //
 
 /**
  * Create a JSON-formatted file.
@@ -27,16 +15,12 @@ export function createJson<T>(
   data?: GeneratorData<JsonData, T>,
   options?: GeneratorData<Pick<FSOptions, 'ejs' | 'force'>, T>,
 ): ZombiSideEffectOperator<T> {
-  return sideEffect(async generator => {
-    try {
-      const resolveData = resolveDataBuilder(generator);
-      const filePath = await resolveData(file);
-      const json = await resolveData(data!);
-      const opts = await resolveData(options!);
+  return sideEffect(async (generator, { fs }) => {
+    const resolveData = resolveDataBuilder(generator);
+    const filePath = await resolveData(file);
+    const json = await resolveData(data);
+    const opts = await resolveData(options);
 
-      await generator.fs.createJson(filePath, json, opts);
-    } catch (err) {
-      throw err;
-    }
+    await fs.createJson(filePath, json, opts);
   });
 }

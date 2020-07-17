@@ -1,9 +1,5 @@
-// --- Imports -------------------------------------------------------------- //
-
 import { Generator } from './generator';
 import { GeneratorConfig } from './types';
-
-// --- Generator factory ---------------------------------------------------- //
 
 /**
  * Create a new `zombi` generator.

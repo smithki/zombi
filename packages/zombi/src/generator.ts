@@ -1,21 +1,14 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
+import { Listr, ListrTaskWrapper } from 'listr2';
+import { DefaultRenderer } from 'listr2/dist/renderer/default.renderer';
 import { isArray, isBoolean, merge, uniq } from 'lodash';
 import { resolve } from 'path';
 import prettyTime from 'pretty-time';
 import { of } from 'rxjs';
-
-// Local modules
+import Semaphore from 'semaphore-async-await';
+import util from 'util';
 import { FileSystem } from './fs';
 import { endParallelism, startParallelism } from './operators/parallelism';
 import { prompt } from './operators/prompt';
-import { log } from './utils/log';
-import { normalizeGeneratorName } from './utils/normalize-generator-name';
-import { resolveTemplateRoot } from './utils/resolve-template-root';
-import { timer } from './utils/timer';
-
-// Types
 import {
   GeneratorConfig,
   GeneratorData,
@@ -24,18 +17,20 @@ import {
   Question,
   RequiredOnly,
   SideEffect,
+  Tools,
   ZombiSideEffectOperator,
 } from './types';
+import { ensureArray } from './utils/ensure-array';
+import { log } from './utils/log';
+import { normalizeGeneratorName } from './utils/normalize-generator-name';
 import { resolveDataBuilder } from './utils/resolve-data';
-
-// --- Business logic ------------------------------------------------------- //
+import { resolveTemplateRoot } from './utils/resolve-template-root';
+import { timer } from './utils/timer';
 
 /**
  * A class representing the `zombi` generator interface.
  */
 export class Generator<Props> {
-  // --- Properties --- //
-
   // Config properties
   public name: string;
   public templateRoot: string | undefined;
@@ -45,16 +40,12 @@ export class Generator<Props> {
   // Stores the underlying RxJS Observable.
   private zombi$: GeneratorStream<Props>;
 
-  // --- Constructor --- //
-
   /**
    * Instantiates a Generator.
    *
    * @param config
    */
   constructor(config: GeneratorConfig<Props> = {}) {
-    // --- Configuration & setup --- //
-
     const { name, templateRoot, destinationRoot, force } = config;
 
     // Assign attributes
@@ -62,8 +53,6 @@ export class Generator<Props> {
     this.destinationRoot = destinationRoot || process.cwd();
     this.templateRoot = resolveTemplateRoot(templateRoot);
     this.force = force || false;
-
-    // --- Build the initial generator output --- //
 
     const g: GeneratorOutput<Partial<Props>> = {
       context: {
@@ -78,17 +67,10 @@ export class Generator<Props> {
       props: config.initialProps || {},
       prompts: [],
       sequence: [],
-      fs: undefined as any,
     };
-
-    g.fs = new FileSystem(g);
-
-    // --- Make an observable of the generator output --- //
 
     this.zombi$ = of(g as any);
   }
-
-  // --- Public methods --- //
 
   /**
    * A wrapper for [Inquirer's prompt API](https://github.com/SBoudrias/Inquirer.js/#methods).
@@ -99,15 +81,12 @@ export class Generator<Props> {
    */
   public prompt<PropsExtensions = unknown>(
     questions: GeneratorData<
-      | Question<RequiredOnly<Props & PropsExtensions>>
-      | Question<RequiredOnly<Props & PropsExtensions>>[],
+      Question<RequiredOnly<Props & PropsExtensions>> | Question<RequiredOnly<Props & PropsExtensions>>[],
       Props
     >,
   ): Generator<Props & PropsExtensions> {
     const result = (this.zombi$.pipe as any)(prompt(questions));
-    return (merge({}, this, { zombi$: result }) as unknown) as Generator<
-      Props & PropsExtensions
-    >;
+    return (merge({}, this, { zombi$: result }) as unknown) as Generator<Props & PropsExtensions>;
   }
 
   /**
@@ -115,9 +94,7 @@ export class Generator<Props> {
    *
    * @param operators - Operators that will run _in sequence_.
    */
-  public sequence(
-    ...operators: ZombiSideEffectOperator<Props>[]
-  ): Generator<Props> {
+  public sequence(...operators: ZombiSideEffectOperator<Props>[]): Generator<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
     return merge({}, this, { zombi$: result });
   }
@@ -127,29 +104,68 @@ export class Generator<Props> {
    *
    * @param operators - Operators that will run _in parallel_.
    */
-  public parallel(
-    ...operators: ZombiSideEffectOperator<Props>[]
-  ): Generator<Props> {
-    const result = (this.zombi$.pipe as any)(
-      startParallelism(),
-      ...operators,
-      endParallelism(),
-    );
+  public parallel(...operators: ZombiSideEffectOperator<Props>[]): Generator<Props> {
+    const result = (this.zombi$.pipe as any)(startParallelism(), ...operators, endParallelism());
     // delete Generator[parallelismId];
     return merge({}, this, { zombi$: result });
   }
 
   // tslint:disable:prettier
-  public compose(): Generator<Props>
+  public compose(): Generator<Props>;
   public compose<Z1>(z1: Generator<Z1>): Generator<Props & Z1>;
   public compose<Z1, Z2>(z1: Generator<Z1>, z2: Generator<Z2>): Generator<Props & Z1 & Z2>;
   public compose<Z1, Z2, Z3>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>): Generator<Props & Z1 & Z2 & Z3>;
-  public compose<Z1, Z2, Z3, Z4>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>): Generator<Props & Z1 & Z2 & Z3 & Z4>;
-  public compose<Z1, Z2, Z3, Z4, Z5>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z5>, z5: Generator<Z5>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
+  public compose<Z1, Z2, Z3, Z4>(
+    z1: Generator<Z1>,
+    z2: Generator<Z2>,
+    z3: Generator<Z3>,
+    z4: Generator<Z4>,
+  ): Generator<Props & Z1 & Z2 & Z3 & Z4>;
+  public compose<Z1, Z2, Z3, Z4, Z5>(
+    z1: Generator<Z1>,
+    z2: Generator<Z2>,
+    z3: Generator<Z3>,
+    z4: Generator<Z5>,
+    z5: Generator<Z5>,
+  ): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6>(
+    z1: Generator<Z1>,
+    z2: Generator<Z2>,
+    z3: Generator<Z3>,
+    z4: Generator<Z4>,
+    z5: Generator<Z5>,
+    z6: Generator<Z6>,
+  ): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(
+    z1: Generator<Z1>,
+    z2: Generator<Z2>,
+    z3: Generator<Z3>,
+    z4: Generator<Z4>,
+    z5: Generator<Z5>,
+    z6: Generator<Z6>,
+    z7: Generator<Z7>,
+  ): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(
+    z1: Generator<Z1>,
+    z2: Generator<Z2>,
+    z3: Generator<Z3>,
+    z4: Generator<Z4>,
+    z5: Generator<Z5>,
+    z6: Generator<Z6>,
+    z7: Generator<Z7>,
+    z8: Generator<Z8>,
+  ): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(
+    z1: Generator<Z1>,
+    z2: Generator<Z2>,
+    z3: Generator<Z3>,
+    z4: Generator<Z4>,
+    z5: Generator<Z5>,
+    z6: Generator<Z6>,
+    z7: Generator<Z7>,
+    z8: Generator<Z8>,
+    z9: Generator<Z9>,
+  ): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
   // tslint:enable:prettier
 
   /**
@@ -193,35 +209,92 @@ export class Generator<Props> {
    */
   public async run() {
     log.startMessage(this.name);
-
     let timeElapsed: [number, number];
 
+    /* eslint-disable-next-line no-shadow */
     const didGenerateFiles = await new Promise(resolve => {
       this.zombi$.subscribe(async generator => {
         const { prompts, sequence } = generator;
+        const listr = new Listr([]);
 
         if (!prompts.length && !sequence.length) {
           log.nothingToDoMessage();
           resolve(false);
+          return;
         }
 
-        // Execute all prompting tasks
-        for (const task of prompts) await task(generator);
+        const askLock = new Semaphore(1);
+
+        /**
+         * Builds contextual utility functions for the side-effect executors.
+         */
+        const getTools = (t: ListrTaskWrapper<any, typeof DefaultRenderer>): Tools<Props> => ({
+          get fs() {
+            return new FileSystem<Props>(generator, this);
+          },
+
+          status: (message, ...messages) => {
+            /* eslint-disable-next-line no-param-reassign */
+            t.output = util.format(message, ...messages);
+          },
+
+          ask: async questions => {
+            await askLock.acquire();
+            timer.pause();
+
+            const questionsArr = ensureArray(questions);
+            const defaultAnswerName = questionsArr[0].name;
+
+            if (!questionsArr.length) return Promise.resolve();
+
+            return t.prompt(questionsArr as any).then(answers => {
+              const answersFormatted = questionsArr.length === 1 ? { [defaultAnswerName]: answers } : answers;
+
+              timer.resume();
+
+              askLock.signal();
+              return answersFormatted;
+            });
+          },
+        });
 
         /**
          * Executes a side-effect task if the configured conditional is truthy.
          */
-        const executeTask = async (task: SideEffect<Props>) => {
-          const condition = await resolveDataBuilder(generator)(task.condition);
-          if (isBoolean(condition) && condition) await task(generator);
+        const executeSideEffect = async (
+          sideEffect: SideEffect<Props>,
+          t: ListrTaskWrapper<any, typeof DefaultRenderer>,
+        ) => {
+          const condition = await resolveDataBuilder(generator)(sideEffect.condition);
+          if (isBoolean(condition) && condition) {
+            await sideEffect(generator, getTools(t));
+          }
         };
 
+        listr.add({
+          title: 'Setup',
+          task: async (_, t) => {
+            // Execute all prompting tasks
+            for (const sideEffect of prompts) {
+              await sideEffect(generator, getTools(t));
+            }
+          },
+        });
+
+        listr.add({
+          title: 'Scaffolding',
+          task: async (_, t) => {
+            // Execute all side-effect tasks
+            for (const sideEffect of sequence) {
+              if (isArray(sideEffect)) {
+                await Promise.all(sideEffect.map(se => executeSideEffect(se, t)));
+              } else await executeSideEffect(sideEffect, t);
+            }
+          },
+        });
+
         timer.start();
-        // Execute all side-effect tasks
-        for (const task of sequence) {
-          if (isArray(task)) await Promise.all(task.map(t => executeTask(t)));
-          else await executeTask(task);
-        }
+        await listr.run();
         timeElapsed = timer.stop();
 
         resolve(true);
@@ -232,8 +305,6 @@ export class Generator<Props> {
       const prettyTimeElapsed = prettyTime(timeElapsed);
       log.completedMessage(prettyTimeElapsed);
     }
-
-    return;
   }
 
   /**

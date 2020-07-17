@@ -1,8 +1,4 @@
-// --- Imports -------------------------------------------------------------- //
-
 import { isArray } from 'lodash';
-
-// --- Business logic ------------------------------------------------------- //
 
 function isArrayType<T>(value: T | T[]): value is T[] {
   return isArray(value);

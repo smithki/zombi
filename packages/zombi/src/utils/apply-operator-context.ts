@@ -1,8 +1,4 @@
-// --- Imports -------------------------------------------------------------- //
-
 import { ZombiOperator } from '../types';
-
-// --- Business logic ------------------------------------------------------- //
 
 /**
  * Applies contextual values to an operator function.
@@ -11,10 +7,7 @@ import { ZombiOperator } from '../types';
  * @param context - Arbitrary data to pass with the `GeneratorStream` to the
  * operator function.
  */
-export function applyOperatorContext<T extends ZombiOperator<any>, C = any>(
-  operator: T,
-  context: C,
-): T {
+export function applyOperatorContext<T extends ZombiOperator<any>, C = any>(operator: T, context: C): T {
   return (stream => {
     return operator.apply(operator, [stream, context]);
   }) as T;

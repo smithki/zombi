@@ -1,27 +1,17 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import { Data as EjsData } from 'ejs';
 import { isAbsolute, join } from 'path';
-
-// Local modules
-import { applyOperatorContext } from '../utils/apply-operator-context';
-import {
-  resolveDataBuilder,
-  resolveEjsDataBuilder,
-} from '../utils/resolve-data';
-import { getContextualTemplateRootFromStream } from '../utils/resolve-template-root';
-import { sideEffect } from './side-effect';
-
-// Types
 import {
   ConditionContext,
   FSOptions,
   GeneratorData,
   ZombiSideEffectOperator,
 } from '../types';
-
-// --- Business logic ------------------------------------------------------- //
+import {
+  resolveDataBuilder,
+  resolveEjsDataBuilder,
+} from '../utils/resolve-data';
+import { getContextualTemplateRootFromStream } from '../utils/resolve-template-root';
+import { sideEffect } from './side-effect';
 
 /**
  * Copies files from the template directory to the destination directory.
@@ -44,7 +34,7 @@ export function copy<T>(
     const templateDir = getContextualTemplateRootFromStream(stream);
     return stream.pipe(
       sideEffect(
-        async generator => {
+        async (generator, { fs }) => {
           try {
             const resolveData = resolveDataBuilder(generator);
             const toPath = await resolveData(to);
@@ -56,7 +46,7 @@ export function copy<T>(
               ? fromData
               : join(templateDir as string, fromData);
 
-            await generator.fs.copy(fromPath, toPath, ejsData, opts);
+            await fs.copy(fromPath, toPath, ejsData, opts);
           } catch (err) {
             throw err;
           }

@@ -6,3 +6,4 @@ src/**/*.js.map
 .vscode/**/*
 .rts2_cache_*
 .npmrc
+/**/*.tsbuildinfo

@@ -1,18 +1,6 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
-
-// Types
-import {
-  Callback,
-  SideEffect,
-  SideEffectOperatorOptions,
-  ZombiSideEffectOperator,
-} from '../types';
-
-// --- Business logic ------------------------------------------------------- //
+import { Callback, SideEffect, SideEffectOperatorOptions, ZombiSideEffectOperator } from '../types';
 
 /**
  * Perform side-effects during the run process. Similar to RxJS

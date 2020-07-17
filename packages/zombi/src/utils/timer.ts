@@ -40,9 +40,5 @@ export const timer = {
     resumes.push(process.hrtime(pauses.pop()));
   },
 
-  stop: () =>
-    resumes.reduce(
-      (prev, curr) => subtractTime(prev, curr),
-      process.hrtime(startTime),
-    ),
+  stop: () => resumes.reduce((prev, curr) => subtractTime(prev, curr), process.hrtime(startTime)),
 };
