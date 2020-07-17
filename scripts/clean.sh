@@ -36,7 +36,7 @@ msg() {
   echo
 }
 
-if [ $CLEAN_DIST = true ]; then msg "build files" && yarn wsrun --parallel -r rimraf dist ; fi
+if [ $CLEAN_DIST = true ]; then msg "build files" && yarn wsrun --parallel -r rimraf dist "*.tsbuildinfo" ; fi
 if [ $CLEAN_CACHE = true ]; then msg "caches" && yarn wsrun --parallel -r rimraf node_modules/.cache ; fi
 if [ $CLEAN_TEST_ARTIFACTS = true ]; then msg "test artifacts" && (yarn wsrun --parallel -r rimraf coverage) && (yarn wsrun --parallel -r rimraf .nyc_output) ; fi
 if [ $CLEAN_NODE_MODULES = true ]; then msg "node_modules" && yarn wsrun --parallel -r rimraf node_modules && rimraf node_modules ; fi
