@@ -1,7 +1,6 @@
 import { kebabCase } from 'lodash';
 import { resolve } from 'path';
-import { zombi } from 'zombi';
-import { copy } from 'zombi/operators';
+import { zombi, copy } from 'zombi';
 import { PackageJsonProps } from './package-json';
 import { promptAuthor } from './prompt-author';
 import { getNpmConfig } from './utils/get-npm-config';
@@ -14,7 +13,9 @@ const generator = zombi<LicenseProps>({
   templateRoot: resolve(__dirname, '..', 'template'),
 });
 
-/** Prompts for license information. */
+/**
+ * Prompts for license information.
+ */
 export const promptLicense = generator.prompt(async ({ props }) => ({
   type: 'List',
   name: 'pkgLicense',
@@ -24,7 +25,9 @@ export const promptLicense = generator.prompt(async ({ props }) => ({
   when: !props.pkgLicense,
 }));
 
-/** Generates a LICENSE file. */
+/**
+ * Generates a LICENSE file.
+ */
 export const licenseFile = generator
   .compose(promptLicense, promptAuthor)
   .sequence(copy(async ({ props }) => `${kebabCase(`${props.pkgLicense}-license`)}.txt`, 'LICENSE'));

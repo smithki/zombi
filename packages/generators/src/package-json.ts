@@ -1,6 +1,5 @@
 import { basename } from 'path';
-import { zombi } from 'zombi';
-import { createJson } from 'zombi/operators';
+import { zombi, createJson } from 'zombi';
 import { refineDeep } from 'refine-deep';
 import { getNpmConfig } from './utils/get-npm-config';
 import { promptLicense } from './license-file';
@@ -14,7 +13,9 @@ export interface PackageJsonProps {
   pkgLicense: 'MIT' | 'BSD-3';
 }
 
-/** Prompts for and writes a `package.json` file. */
+/**
+ * Prompts for and writes a `package.json` file.
+ */
 export const packageJson = zombi<PackageJsonProps>({
   name: 'zombi-package-json',
   templateRoot: false,

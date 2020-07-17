@@ -7,7 +7,9 @@ export interface AuthorshipProps {
   authorUrl: string;
 }
 
-/** Prompts for authorship information */
+/**
+ * Prompts for authorship information
+ */
 export const promptAuthor = zombi<AuthorshipProps>({
   name: 'zombi-prompt-author',
   templateRoot: false,
