@@ -4,7 +4,7 @@ import * as fsExtra from 'fs-extra';
 import JSON5 from 'json5';
 import { isEmpty, isNil, merge } from 'lodash';
 import { isAbsolute, join } from 'path';
-import { GeneratorOutput, JsonData, SideEffectUtils } from './types';
+import { ZombiStreamOutput, JsonData, SideEffectUtils } from './types';
 import { log } from './utils/log';
 import { Zombi } from './generator';
 
@@ -45,9 +45,9 @@ export class FileSystem<Props> {
   public static conflictCount = 0;
   private fsLog: ReturnType<typeof log['fsMessages']>;
 
-  constructor(private readonly generator: GeneratorOutput<Props>, private readonly utils: SideEffectUtils<Props>) {
+  constructor(private readonly generator: ZombiStreamOutput<Props>, private readonly utils: SideEffectUtils<Props>) {
     this.generator = generator;
-    this.fsLog = log.fsMessages(this.utils);
+    this.fsLog = log.fsMessages(this.utils.statusIO);
   }
 
   public async isFile(path: string) {
@@ -195,7 +195,7 @@ export class FileSystem<Props> {
 
     await write();
 
-    if (doesExist) this.fsLog.fileForcedOverwrite(prettyTo);
+    if (doesExist) this.fsLog.fileOverwrite(prettyTo);
     else this.fsLog.fileAdd(prettyTo);
   }
 

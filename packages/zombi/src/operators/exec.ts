@@ -1,5 +1,5 @@
 import { SpawnOptions } from 'child_process';
-import * as spawn from 'cross-spawn';
+import execa from 'execa';
 import { ZombiSideEffectOperator } from '../types';
 import { sideEffect } from './side-effect';
 
@@ -10,10 +10,9 @@ import { sideEffect } from './side-effect';
  * @param options - Same options that would be passed to Node's `child_process.spawn` or `child_process.spawnSync`.
  */
 export function exec<T>(command: string, options?: SpawnOptions): ZombiSideEffectOperator<T> {
-  return sideEffect(async () => {
-    const parts = command.split(' ');
-    const cmd = parts.shift();
-    const resolvedOptions = { stdio: 'inherit', ...options };
-    await spawn.sync(cmd, parts, resolvedOptions);
+  return sideEffect(async (_, { statusIO }) => {
+    const cp = execa.command(command, { stdio: 'pipe', ...options });
+    cp.stdout.pipe(statusIO);
+    await cp;
   });
 }

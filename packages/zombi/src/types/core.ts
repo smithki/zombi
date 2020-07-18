@@ -7,12 +7,17 @@ import { Nominal, RequiredOnly } from './utility';
 /**
  * Object type emitted by a `Zombi` instance's underlying RxJS stream.
  */
-export interface GeneratorOutput<Props> {
+export interface ZombiStreamOutput<Props> {
   context: FSContext<Props>;
   props: Props;
   prompts: SideEffect<Props>[];
   sequence: (SideEffect<Props> | SideEffect<Props>[])[];
 }
+
+/**
+ * The RxJS observable stream underlying a `Zombi` instance.
+ */
+export interface ZombiStream<Props> extends RxObservable<ZombiStreamOutput<Props>> {}
 
 /**
  * Options given to the `Zombi` constructor or passed via the standard
@@ -28,8 +33,8 @@ export interface Configuration<Props> extends Partial<Pick<Zombi<Props>, 'name' 
 }
 
 /**
- * The underlying operator function passed to `Generator.sequence` or
- * `Generator.parallelism`.
+ * The underlying operator function passed to `Zombi.sequence` or
+ * `Zombi.parallelism`.
  */
 export interface ZombiOperatorFunction<Props, Context = any> {
   (stream: ZombiStream<Props>, context?: Context): ZombiStream<Props>;
@@ -72,7 +77,7 @@ export type ZombiOperator<Props> =
  *
  */
 export type SideEffectCallback<Props> = (
-  generator: GeneratorOutput<Props>,
+  generator: ZombiStreamOutput<Props>,
   utils: SideEffectUtils<Props>,
 ) => Promise<void>;
 
@@ -98,14 +103,9 @@ export interface SideEffectOperatorOptions<Props> {
  */
 export interface SideEffectUtils<Props> {
   ask: <T = any>(questions: Question<Props> | Question<Props>[]) => Promise<T>;
-  status: (message?: string, ...messages: string[]) => void;
+  statusIO: NodeJS.WritableStream;
   fs: FileSystem<Props>;
 }
-
-/**
- * The RxJS observable stream underlying a `Zombi` instance.
- */
-export interface ZombiStream<Props> extends RxObservable<GeneratorOutput<Props>> {}
 
 /**
  * Object describing the shape of an `Enquirer` prompt.
@@ -123,7 +123,7 @@ export type Question<Props> = Unionize<
 /**
  * Arbitrary data or a callback that resolves to arbitrary data.
  */
-export type Resolveable<R, Props> = R | ((generator: GeneratorOutput<Props>) => Promise<R>);
+export type Resolveable<R, Props> = R | ((generator: ZombiStreamOutput<Props>) => R | Promise<R>);
 
 /**
  * A placeholder type for arbitrary JSON data.

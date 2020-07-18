@@ -9,7 +9,6 @@
     "clean": "$INIT_CWD/scripts/clean.sh",
     "lint": "$INIT_CWD/scripts/lint.sh",
     "paths": "yarn --silent wsrun --parallel --no-prefix -r silent $INIT_CWD/scripts/cwd.ts",
-    "scaffold": "$INIT_CWD/scripts/scaffold/run.ts",
     "bump_version": "lerna version",
     "release": "lerna publish from-package --yes",
     "release_canary": "lerna publish from-package --canary --yes"

@@ -20,7 +20,7 @@ export const packageJson = zombi<PackageJsonProps>({
   name: 'zombi-package-json',
   templateRoot: false,
 })
-  .prompt(async ({ props }) => [
+  .prompt(({ props }) => [
     /* eslint-disable prettier/prettier */
     { type: 'Input', name: 'npmOrg', message: 'NPM organization', when: !props.npmOrg },
     { type: 'Input', name: 'pkgName', message: 'Package name', initial: basename(process.cwd()), when: !props.pkgName },

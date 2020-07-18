@@ -3,9 +3,8 @@ import { Listr, ListrTaskWrapper } from 'listr2';
 import Semaphore from 'semaphore-async-await';
 import { DefaultRenderer } from 'listr2/dist/renderer/default.renderer';
 import prettyTime from 'pretty-time';
-import util from 'util';
 import { createTimer, HrTime, Timer } from './utils/timer';
-import { SideEffectUtils, SideEffect, ZombiStream, GeneratorOutput } from './types';
+import { SideEffectUtils, SideEffect, ZombiStream, ZombiStreamOutput } from './types';
 import { FileSystem } from './fs';
 import { log } from './utils/log';
 import { ensureArray } from './utils/ensure-array';
@@ -15,7 +14,7 @@ import { resolveDataBuilder } from './utils/resolve-data';
  * Builds contextual utility functions for the side-effect executor.
  */
 function utils<Props>(
-  generator: GeneratorOutput<Props>,
+  generator: ZombiStreamOutput<Props>,
   timer: Timer,
   promptLock: Semaphore,
   executor: ListrTaskWrapper<any, typeof DefaultRenderer>,
@@ -25,10 +24,7 @@ function utils<Props>(
       return new FileSystem<Props>(generator, this);
     },
 
-    status: (message, ...messages) => {
-      /* eslint-disable-next-line no-param-reassign */
-      executor.output = util.format(message, ...messages);
-    },
+    statusIO: executor.stdout(),
 
     ask: async questions => {
       await promptLock.acquire();
@@ -50,7 +46,8 @@ function utils<Props>(
 }
 
 /**
- * Execute the generator's task sequence and output side-effects.
+ * Prompts for user input, then executes a series of effectful tasks attached to
+ * the given `stream`.
  */
 export async function runGenerator<Props>(name: string, stream: ZombiStream<Props>) {
   log.startMessage(name);
@@ -58,7 +55,6 @@ export async function runGenerator<Props>(name: string, stream: ZombiStream<Prop
   const timer = createTimer();
   let timeElapsed: HrTime;
 
-  /* eslint-disable-next-line no-shadow */
   const didGenerateFiles = await new Promise<boolean>((resolve, reject) => {
     stream.subscribe(async generator => {
       const listr = new Listr([]);

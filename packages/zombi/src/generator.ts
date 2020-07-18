@@ -6,7 +6,7 @@ import { prompt } from './operators/prompt';
 import {
   Configuration,
   Resolveable,
-  GeneratorOutput,
+  ZombiStreamOutput,
   ZombiStream,
   Question,
   RequiredOnly,
@@ -17,7 +17,7 @@ import { resolveTemplateRoot } from './utils/resolve-template-root';
 import { runGenerator } from './run-generator';
 
 /**
- * A class representing the `zombi` generator interface.
+ * A class representing the `zombi` interface.
  */
 export class Zombi<Props> {
   public name: string;
@@ -40,7 +40,7 @@ export class Zombi<Props> {
     this.templateRoot = resolveTemplateRoot(templateRoot);
     this.clobber = clobber || false;
 
-    const g: GeneratorOutput<Partial<Props>> = {
+    const g: ZombiStreamOutput<Partial<Props>> = {
       context: {
         name: this.name,
         templateRoot: this.templateRoot,
@@ -118,7 +118,7 @@ export class Zombi<Props> {
   public compose(...zombis: Zombi<any>[]): Zombi<any> {
     if (!zombis.length) return this;
 
-    let result: GeneratorOutput<any>;
+    let result: ZombiStreamOutput<any>;
 
     const target = merge({}, this.zombi$);
     target.subscribe(g => {
@@ -127,7 +127,7 @@ export class Zombi<Props> {
 
     const doCompose = (z: Zombi<any>) => {
       const source = merge({}, z.zombi$);
-      source.subscribe((g: GeneratorOutput<any>) => {
+      source.subscribe((g: ZombiStreamOutput<any>) => {
         result.prompts.push(...g.prompts);
         result.sequence.push(...g.sequence);
       });

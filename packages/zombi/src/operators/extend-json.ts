@@ -13,8 +13,8 @@ export function extendJson<T>(
   file: Resolveable<string, T>,
   extensions?: Resolveable<JsonData, T>,
 ): ZombiSideEffectOperator<T> {
-  return sideEffect(async (generator, { fs }) => {
-    const resolveData = resolveDataBuilder(generator);
+  return sideEffect(async (output, { fs }) => {
+    const resolveData = resolveDataBuilder(output);
     const filePath = await resolveData(file);
     const data = await resolveData(extensions);
 

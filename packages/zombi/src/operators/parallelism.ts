@@ -10,8 +10,8 @@ let savedSet: (SideEffect<any> | SideEffect<any>[])[] | undefined;
  * Start piping a set of parallel tasks into the generator.
  */
 export function startParallelism<T>(): ZombiParallelismOperator<T> {
-  return map(generator => {
-    const result = merge({}, generator);
+  return map(output => {
+    const result = merge({}, output);
     // Copy the current sequence by value.
     savedSet = [...result.sequence];
     result.sequence = [];
@@ -25,8 +25,8 @@ export function startParallelism<T>(): ZombiParallelismOperator<T> {
  * Finish piping a set of parallel tasks into the generator.
  */
 export function endParallelism<T>(): ZombiParallelismOperator<T> {
-  return map(generator => {
-    const result = merge({}, generator);
+  return map(output => {
+    const result = merge({}, output);
     const parallelSet = [...result.sequence];
     // Restore original sequence and append the current sequence as a list of
     // parallel tasks.

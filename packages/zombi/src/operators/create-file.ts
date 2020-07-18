@@ -16,8 +16,8 @@ export function createFile<T>(
   content?: Resolveable<any, T>,
   options?: Resolveable<Pick<FSOptions, 'ejs' | 'clobber'>, T>,
 ): ZombiSideEffectOperator<T> {
-  return sideEffect(async (generator, { fs }) => {
-    const resolveData = resolveDataBuilder(generator);
+  return sideEffect(async (output, { fs }) => {
+    const resolveData = resolveDataBuilder(output);
     const filePath = await resolveData(file);
     const data = await resolveData(content);
     const opts = await resolveData(options);

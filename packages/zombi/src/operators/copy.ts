@@ -27,10 +27,10 @@ export function copy<T>(
     const templateDir = getContextualTemplateRootFromStream(stream);
     return stream.pipe(
       sideEffect(
-        async (generator, { fs }) => {
-          const resolveData = resolveDataBuilder(generator);
+        async (output, { fs }) => {
+          const resolveData = resolveDataBuilder(output);
           const toPath = await resolveData(to);
-          const ejsData = await resolveEjsDataBuilder(generator)(data);
+          const ejsData = await resolveEjsDataBuilder(output)(data);
           const opts = await resolveData(options);
 
           const fromData = await resolveData(from);

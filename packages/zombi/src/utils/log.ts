@@ -1,40 +1,33 @@
-// tslint:disable:prefer-template
-
 import chalk from 'chalk';
-import { SideEffectUtils } from '../types';
 
-const { gray, white, cyan, yellow } = chalk;
+const { gray, cyan, green, red, yellow } = chalk;
 
-export function fsMessages<Props>(utils: SideEffectUtils<Props>) {
+export function fsMessages(io: NodeJS.WritableStream) {
   return {
     fileAdd(name: string) {
-      utils.status(`${white.bgGreenBright(' ADD ')} ${name}`);
+      io.write(`${green.bold('Add')} ${name}`);
     },
 
     fileExtend(name: string) {
-      utils.status(`${white.bgGreenBright(' EXTEND ')} ${name}`);
+      io.write(`${green.bold('Extend')} ${name}`);
     },
 
     fileOverwrite(name: string) {
-      utils.status(`${white.bgRedBright(' OVERWRITTEN ')} ${name}`);
-    },
-
-    fileForcedOverwrite(name: string) {
-      utils.status(`${white.bgRedBright(' FORCEFULLY OVERWRITTEN ')} ${name}`);
+      io.write(`${red.bold('Overwrite')} ${name}`);
     },
 
     fileSkip(name: string) {
-      utils.status(`${white.bgYellowBright(' SKIP ')} ${name}`);
+      io.write(`${yellow.bold('Skip')} ${name}`);
     },
   };
 }
 
-function startMessage(generatorName: string) {
-  console.log(gray('Running generator ') + cyan.bold(generatorName));
+function startMessage(name: string) {
+  console.log(gray('Running generator ') + cyan.bold(name));
 }
 
 function nothingToDoMessage() {
-  console.log(yellow(`🤷 There's nothing to Generate...`));
+  console.log(yellow(`🤷 There's nothing to generate...`));
 }
 
 function completedMessage(timeElapsed: string) {

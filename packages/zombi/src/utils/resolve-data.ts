@@ -1,15 +1,15 @@
 import { Data as EjsData } from 'ejs';
 import { merge } from 'lodash';
-import { Resolveable, GeneratorOutput } from '../types';
+import { Resolveable, ZombiStreamOutput } from '../types';
 
-export function resolveEjsDataBuilder(generator: GeneratorOutput<any>) {
+export function resolveEjsDataBuilder(output: ZombiStreamOutput<any>) {
   return async (data: Resolveable<EjsData, any>) => {
-    return merge({}, generator.props, (await resolveDataBuilder(generator)(data)) || {});
+    return merge({}, output.props, (await resolveDataBuilder(output)(data)) || {});
   };
 }
 
-export function resolveDataBuilder(generator: GeneratorOutput<any>) {
-  return async <T>(value: T | ((...args: any[]) => Promise<T>)) => {
-    return typeof value === 'function' ? (value as any)(generator) : value;
+export function resolveDataBuilder(output: ZombiStreamOutput<any>) {
+  return async <T>(value: T | ((...args: any[]) => T | Promise<T>)) => {
+    return typeof value === 'function' ? (value as any)(output) : value;
   };
 }

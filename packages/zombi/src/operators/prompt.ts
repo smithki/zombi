@@ -21,10 +21,10 @@ export function prompt<T, K extends T = T>(
       map(ctx => {
         const result = merge({}, ctx);
 
-        result.prompts.push(async (g, { ask }) => {
-          const q = ensureArray(await resolveDataBuilder(g)(questions));
+        result.prompts.push(async (output, { ask }) => {
+          const q = ensureArray(await resolveDataBuilder(output)(questions));
           const answers = await ask(q);
-          merge(g.props, answers);
+          merge(output.props, answers);
         });
 
         return result;

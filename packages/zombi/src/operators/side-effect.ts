@@ -17,8 +17,8 @@ export function sideEffect<T>(
 ): ZombiSideEffectOperator<T> {
   return ((stream, context = { condition: true }) => {
     return stream.pipe(
-      map(generator => {
-        const result = merge({}, generator);
+      map(output => {
+        const result = merge({}, output);
 
         const defaultOptions: SideEffectOperatorOptions<T> = {
           enforcePre: false,

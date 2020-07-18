@@ -1,5 +1,3 @@
-import { create } from 'lodash';
-
 export type HrTime = [number, number];
 
 /**
@@ -8,7 +6,7 @@ export type HrTime = [number, number];
  *
  * Based on: https://github.com/firefoxes/diff-hrtime/blob/master/index.js
  */
-const subtractTime = (a: HrTime, b: HrTime): HrTime => {
+function subtractTime(a: HrTime, b: HrTime): HrTime {
   // Capture seconds and nanoseconds
   const [aS, aNS] = a;
   const [bS, bNS] = b;
@@ -22,28 +20,30 @@ const subtractTime = (a: HrTime, b: HrTime): HrTime => {
   }
 
   return [s, ns];
-};
-
-let startTime: HrTime;
-let pauses: HrTime[] = [];
-let resumes: HrTime[] = [];
+}
 
 export function createTimer() {
+  let startTime: HrTime;
+  let pauses: HrTime[] = [];
+  let resumes: HrTime[] = [];
+
   return {
-    start: () => {
+    start() {
       startTime = process.hrtime();
       pauses = resumes = [];
     },
 
-    pause: () => {
+    pause() {
       pauses.push(process.hrtime());
     },
 
-    resume: () => {
+    resume() {
       resumes.push(process.hrtime(pauses.pop()));
     },
 
-    stop: () => resumes.reduce((prev, curr) => subtractTime(prev, curr), process.hrtime(startTime)),
+    stop() {
+      return resumes.reduce((prev, curr) => subtractTime(prev, curr), process.hrtime(startTime));
+    },
   };
 }
 

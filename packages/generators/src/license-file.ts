@@ -30,4 +30,4 @@ export const promptLicense = generator.prompt(async ({ props }) => ({
  */
 export const licenseFile = generator
   .compose(promptLicense, promptAuthor)
-  .sequence(copy(async ({ props }) => `${kebabCase(`${props.pkgLicense}-license`)}.txt`, 'LICENSE'));
+  .sequence(copy(({ props }) => `${kebabCase(`${props.pkgLicense}-license`)}.txt`, 'LICENSE'));
