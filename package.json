@@ -8,6 +8,7 @@
     "build": "$INIT_CWD/scripts/clean.sh && $INIT_CWD/scripts/build.sh",
     "clean": "$INIT_CWD/scripts/clean.sh",
     "lint": "$INIT_CWD/scripts/lint.sh",
+    "test": "echo No tests yet!",
     "paths": "yarn --silent wsrun --parallel --no-prefix -r silent $INIT_CWD/scripts/cwd.ts",
     "bump_version": "lerna version",
     "release": "lerna publish from-package --yes",
