@@ -1,13 +1,7 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Local modules
+import { Resolveable, ZombiSideEffectOperator } from '../types';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
-
-// Types
-import { FSOptions, GeneratorData, ZombiSideEffectOperator } from '../types';
-
-// --- Business logic ------------------------------------------------------- //
+import { FSOptions } from '../fs';
 
 /**
  * Create a new file.
@@ -18,20 +12,16 @@ import { FSOptions, GeneratorData, ZombiSideEffectOperator } from '../types';
  * @param options - Options for customizing file system and side-effect behavior.
  */
 export function createFile<T>(
-  file: GeneratorData<string, T>,
-  content?: GeneratorData<any, T>,
-  options?: GeneratorData<Pick<FSOptions, 'ejs' | 'force'>, T>,
+  file: Resolveable<string, T>,
+  content?: Resolveable<any, T>,
+  options?: Resolveable<Pick<FSOptions, 'ejs' | 'clobber'>, T>,
 ): ZombiSideEffectOperator<T> {
-  return sideEffect(async generator => {
-    try {
-      const resolveData = resolveDataBuilder(generator);
-      const filePath = await resolveData(file);
-      const data = await resolveData(content);
-      const opts = await resolveData(options!);
+  return sideEffect(async (output, { fs }) => {
+    const resolveData = resolveDataBuilder(output);
+    const filePath = await resolveData(file);
+    const data = await resolveData(content);
+    const opts = await resolveData(options);
 
-      await generator.fs.createFile(filePath, data, opts);
-    } catch (err) {
-      throw err;
-    }
+    await fs.createFile(filePath, data, opts);
   });
 }

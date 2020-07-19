@@ -145,7 +145,7 @@ jobs:
           command: yarn install --frozen-lockfile
       - run:
           name: Lerna Bootstrap
-          command: npx lerna bootstrap
+          command: yarn bootstrap
       - save_cache:
           paths: *dependency-paths
           key: *dependency-cache-key
@@ -161,7 +161,7 @@ jobs:
       - *attach-workspace
       - run:
           name: Lint source files
-          command: npx lerna exec -- yarn lint
+          command: yarn lint
 
   # Builds modules and persists the build output to the workspace.
   build:
@@ -171,7 +171,7 @@ jobs:
       - *attach-workspace
       - run:
           name: Build modules
-          command: npx lerna exec -- yarn build
+          command: yarn build
       - persist_to_workspace:
           paths: *build-output-paths
           root: *workspace-root
@@ -184,7 +184,7 @@ jobs:
       - *attach-workspace
       - run:
           name: Run tests
-          command: npx lerna exec -- yarn test
+          command: yarn test
 
   # Publish the package to NPM. This should depend on the `build` job.
   create-release:
@@ -197,7 +197,7 @@ jobs:
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
       - run:
           name: Publish package to NPM
-          command: npx lerna publish from-package --yes
+          command: yarn release
 
   # Publish the package as a pre-release version to NPM. This should depend on
   # the `build` job.
@@ -211,7 +211,7 @@ jobs:
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
       - run:
           name: Publish pre-release package to NPM
-          command: npx lerna publish from-package --canary --yes
+          command: yarn release_canary
 
   # Create a git tag for this release and push to the remote repository.
   tag-release:
@@ -266,17 +266,17 @@ workflows:
     jobs:
       - install-dependencies: *filter-default-branches
 
-      - lint:
+      - build:
           requires:
             - install-dependencies
 
-      - build:
+      - lint:
           requires:
-            - lint
+            - build
 
       - test:
           requires:
-            - lint
+            - build
 
   # Builds modules, verifies code with the linter, runs unit tests, and
   # publishes the built package to NPM.
@@ -284,24 +284,24 @@ workflows:
     jobs:
       - install-dependencies: *filter-release-branches-only
 
-      - lint:
+      - build:
           requires:
             - install-dependencies
 
-      - build:
+      - lint:
           requires:
-            - lint
+            - build
 
       - test:
           requires:
-            - lint
+            - build
 
         # Manual approval step as a final gatekeeper to prevent
         # possible mistakes!
       - confirm-release:
           type: approval
           requires:
-            - build
+            - lint
             - test
 
       - create-release:
@@ -324,21 +324,21 @@ workflows:
     jobs:
       - install-dependencies: *filter-prerelease-branches-only
 
-      - lint:
+      - build:
           requires:
             - install-dependencies
 
-      - build:
+      - lint:
           requires:
-            - lint
+            - build
 
       - test:
           requires:
-            - lint
+            - build
 
       - create-prerelease:
           requires:
-            - build
+            - lint
             - test
 
       - tag-release:

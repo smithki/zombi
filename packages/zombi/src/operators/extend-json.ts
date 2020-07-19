@@ -1,13 +1,6 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Local modules
-import { sideEffect } from './side-effect';
-
-// Types
-import { GeneratorData, JsonData, ZombiSideEffectOperator } from '../types';
+import { Resolveable, JsonData, ZombiSideEffectOperator } from '../types';
 import { resolveDataBuilder } from '../utils/resolve-data';
-
-// --- Business logic ------------------------------------------------------- //
+import { sideEffect } from './side-effect';
 
 /**
  * Extend a JSON file.
@@ -17,18 +10,14 @@ import { resolveDataBuilder } from '../utils/resolve-data';
  * @param extensions - JSON data with which to extend the existing file.
  */
 export function extendJson<T>(
-  file: GeneratorData<string, T>,
-  extensions?: GeneratorData<JsonData, T>,
+  file: Resolveable<string, T>,
+  extensions?: Resolveable<JsonData, T>,
 ): ZombiSideEffectOperator<T> {
-  return sideEffect(async generator => {
-    try {
-      const resolveData = await resolveDataBuilder(generator);
-      const filePath = await resolveData(file);
-      const data = await resolveData(extensions!);
+  return sideEffect(async (output, { fs }) => {
+    const resolveData = resolveDataBuilder(output);
+    const filePath = await resolveData(file);
+    const data = await resolveData(extensions);
 
-      await generator.fs.extendJson(filePath, data);
-    } catch (err) {
-      throw err;
-    }
+    await fs.extendJson(filePath, data);
   });
 }

@@ -1,9 +1,5 @@
-// --- Imports -------------------------------------------------------------- //
-
 import { execSync } from 'child_process';
 import { parse } from 'ini';
-
-// --- Business logic ------------------------------------------------------- //
 
 /**
  * Retrieve a specific config value from `.npmrc` or an object containing all

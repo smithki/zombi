@@ -1,18 +1,6 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
-
-// Types
-import {
-  Callback,
-  SideEffect,
-  SideEffectOperatorOptions,
-  ZombiSideEffectOperator,
-} from '../types';
-
-// --- Business logic ------------------------------------------------------- //
+import { SideEffect, SideEffectContext, ZombiSideEffectOperator, SideEffectCallback } from '../types';
 
 /**
  * Perform side-effects during the run process. Similar to RxJS
@@ -24,15 +12,15 @@ import {
  * with `enforcePre` set to true.
  */
 export function sideEffect<T>(
-  callback: Callback<T>,
-  options: SideEffectOperatorOptions<T> = {},
+  callback: SideEffectCallback<T>,
+  options: SideEffectContext<T> = {},
 ): ZombiSideEffectOperator<T> {
-  return ((stream, context = { condition: true }) => {
+  return ((stream, context) => {
     return stream.pipe(
-      map(generator => {
-        const result = merge({}, generator);
+      map(output => {
+        const result = merge({}, output);
 
-        const defaultOptions: SideEffectOperatorOptions<T> = {
+        const defaultOptions: SideEffectContext<T> = {
           enforcePre: false,
           condition: true,
         };

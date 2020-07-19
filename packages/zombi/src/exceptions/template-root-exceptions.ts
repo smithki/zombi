@@ -1,17 +1,12 @@
-// --- Imports -------------------------------------------------------------- //
-
 import chalk from 'chalk';
 import { ZombiError, ZombiErrorCode } from './zombi-exception-types';
 
 const { cyan, gray, green } = chalk;
 
-// --- Business logic ------------------------------------------------------- //
-
 // Prettify `templateRoot` string.
 const templRoot = cyan('templateRoot');
 
-export class TemplateRootAbsolutePathError extends TypeError
-  implements ZombiError {
+export class TemplateRootAbsolutePathError extends TypeError implements ZombiError {
   code = ZombiErrorCode.TemplateRootAbsolutePathError;
   name = 'TemplateRootAbsolutePathError';
 
@@ -20,30 +15,24 @@ export class TemplateRootAbsolutePathError extends TypeError
   }
 }
 
-export class TemplateRootPathNotFoundError extends TypeError
-  implements ZombiError {
+export class TemplateRootPathNotFoundError extends TypeError implements ZombiError {
   code = ZombiErrorCode.TemplateRootPathNotFoundError;
   name = 'TemplateRootPathNotFoundError';
 
   constructor(templDir: string, templPath: string) {
     super(
-      `Failed to resolve ${templRoot} at ${green(
-        templPath,
-      )}. Ensure there is a ${green(
+      `Failed to resolve ${templRoot} at ${green(templPath)}. Ensure there is a ${green(
         templDir,
       )} directory next to your generator's entry point or set ${templRoot} explicitly like so:\n\n  ${gray(
         'zombi(',
       )} { templateRoot: ${green("'/absolute/path/to/template'")} } ${gray(
         ');',
-      )}\n\nIf your generator does not use or require templates, set ${templRoot} to ${green(
-        'false',
-      )}\n`,
+      )}\n\nIf your generator does not use or require templates, set ${templRoot} to ${green('false')}\n`,
     );
   }
 }
 
-export class TemplateRootNonDirectoryError extends TypeError
-  implements ZombiError {
+export class TemplateRootNonDirectoryError extends TypeError implements ZombiError {
   code = ZombiErrorCode.TemplateRootNonDirectoryError;
   name = 'TemplateRootNonDirectoryError';
 

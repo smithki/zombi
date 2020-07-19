@@ -1,12 +1,5 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Local modules
-import { exec } from './exec';
-
-// Types
 import { ZombiSideEffectOperator } from '../types';
-
-// --- Business logic ------------------------------------------------------- //
+import { exec } from './exec';
 
 /**
  * Install dependencies via NPM.
