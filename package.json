@@ -2,43 +2,52 @@
   "private": true,
   "name": "zombi-ecosystem",
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "bump_version": "lerna version --no-git-tag-version",
-    "exec": "lerna exec --scope \"$PKG\" -- $@",
-    "dev": "lerna exec --scope \"$PKG\" -- yarn dev",
-    "build": "lerna exec --scope \"$PKG\" -- yarn build",
-    "test": "lerna exec --scope \"$PKG\" -- yarn test",
-    "test_watch": "lerna exec --scope \"$PKG\" -- yarn test_watch",
-    "lint": "lerna exec --scope \"$PKG\" -- yarn lint",
-    "clean": "lerna exec --scope \"$PKG\" -- yarn clean",
-    "clean_node_modules": "lerna exec -- rimraf node_modules && rimraf node_modules",
-    "precommit": "lint-staged"
+    "bootstrap": "yarn install && lerna link",
+    "wsrun": "wsrun --bin $INIT_CWD/scripts/runner.sh -p $PKG",
+    "dev": "$INIT_CWD/scripts/clean.sh && $INIT_CWD/scripts/dev.sh",
+    "build": "$INIT_CWD/scripts/clean.sh && $INIT_CWD/scripts/build.sh",
+    "clean": "$INIT_CWD/scripts/clean.sh",
+    "lint": "$INIT_CWD/scripts/lint.sh",
+    "test": "echo No tests yet!",
+    "paths": "yarn --silent wsrun --parallel --no-prefix -r silent $INIT_CWD/scripts/cwd.ts",
+    "bump_version": "lerna version",
+    "release": "lerna publish from-package --yes",
+    "release_canary": "lerna publish from-package --canary --yes"
   },
   "devDependencies": {
-    "@ikscodes/tslint-config": "^5.3.1",
+    "@ikscodes/eslint-config": "^7.0.0",
+    "@ikscodes/prettier-config": "^2.0.0",
     "@types/caller": "^1.0.0",
     "@types/chalk": "^2.2.0",
     "@types/ejs": "^2.5.0",
     "@types/fs-extra": "^5.0.1",
     "@types/inquirer": "0.0.36",
     "@types/listr": "^0.14.2",
-    "@types/lodash": "^4.14.104",
+    "@types/lodash": "^4.14.157",
     "@types/node": "^9.4.6",
     "@types/pretty-time": "^1.1.0",
+    "@typescript-eslint/eslint-plugin": "^3.4.0",
+    "eslint": "^7.3.1",
+    "eslint-import-resolver-typescript": "^2.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.15.1",
+    "eslint-plugin-react-hooks": "^1.7.0",
     "husky": "^0.14.3",
     "lerna": "^3.16.4",
     "lint-staged": "~7.3.0",
     "npm-run-all": "~4.1.2",
-    "prettier": "^1.15.3",
+    "prettier": "^2.0.5",
     "rimraf": "^2.6.2",
-    "tslint": "^5.12.0",
-    "typescript": "^3.6.4"
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7",
+    "wsrun": "^5.2.1"
   },
-  "lint-staged": {
-    "*.ts": [
-      "tslint --fix",
-      "git add"
-    ]
+  "husky": {
+    "hooks": {
+      "pre-commit": "lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents"
+    }
   },
   "workspaces": [
     "packages/*"

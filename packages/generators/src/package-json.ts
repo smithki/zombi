@@ -1,17 +1,9 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import { basename } from 'path';
-import { zombi } from 'zombi';
-import { createJson } from 'zombi/operators';
-import { getNpmConfig } from './utils/get-npm-config';
-
-// Local modules
+import { zombi, createJson } from 'zombi';
 import { refineDeep } from 'refine-deep';
+import { getNpmConfig } from './utils/get-npm-config';
 import { promptLicense } from './license-file';
 import { promptAuthor } from './prompt-author';
-
-// --- Types ---------------------------------------------------------------- //
 
 export interface PackageJsonProps {
   npmOrg: string;
@@ -21,20 +13,20 @@ export interface PackageJsonProps {
   pkgLicense: 'MIT' | 'BSD-3';
 }
 
-// --- Business logic ------------------------------------------------------- //
-
-/** Prompts for and writes a `package.json` file. */
+/**
+ * Prompts for and writes a `package.json` file.
+ */
 export const packageJson = zombi<PackageJsonProps>({
   name: 'zombi-package-json',
   templateRoot: false,
 })
-  .prompt(async ({ props }) => [
-    // tslint:disable:prettier
-    { name: 'npmOrg', message: 'NPM organization', when: !props.npmOrg },
-    { name: 'pkgName', message: 'Package name', default: basename(process.cwd()), when: !props.pkgName },
-    { name: 'pkgVersion', message: 'Package version', default: getNpmConfig('init-version') || '0.1.0', when: !props.pkgVersion },
-    { name: 'pkgDescription', message: 'Package description', when: !props.pkgDescription },
-    // tslint:enable:prettier
+  .prompt(({ props }) => [
+    /* eslint-disable prettier/prettier */
+    { type: 'Input', name: 'npmOrg', message: 'NPM organization', when: !props.npmOrg },
+    { type: 'Input', name: 'pkgName', message: 'Package name', initial: basename(process.cwd()), when: !props.pkgName },
+    { type: 'Input', name: 'pkgVersion', message: 'Package version', initial: getNpmConfig('init-version') || '0.1.0', when: !props.pkgVersion },
+    { type: 'Input', name: 'pkgDescription', message: 'Package description', when: !props.pkgDescription },
+    /* eslint-enable prettier/prettier */
   ])
   // Prompt for license information.
   .compose(promptLicense)

@@ -1,6 +1,6 @@
 # 🧟‍♂️ zombi
 
-> Dead simple, streaming scaffolding for people with braaains.
+> Task runner and scaffolding tool for people with braaains.
 
 ## 🔗 Installation
 

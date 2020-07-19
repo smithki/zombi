@@ -1,16 +1,7 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import { SpawnOptions } from 'child_process';
-import * as spawn from 'cross-spawn';
-
-// Local modules
-import { sideEffect } from './side-effect';
-
-// Types
+import execa from 'execa';
 import { ZombiSideEffectOperator } from '../types';
-
-// --- Business logic ------------------------------------------------------- //
+import { sideEffect } from './side-effect';
 
 /**
  * Run a shell command.
@@ -18,18 +9,10 @@ import { ZombiSideEffectOperator } from '../types';
  * @param command - A string representation of the shell command to execute.
  * @param options - Same options that would be passed to Node's `child_process.spawn` or `child_process.spawnSync`.
  */
-export function exec<T>(
-  command: string,
-  options?: SpawnOptions,
-): ZombiSideEffectOperator<T> {
-  return sideEffect(async () => {
-    try {
-      const parts = command.split(' ');
-      const cmd = parts.shift();
-      const resolvedOptions = { stdio: 'inherit', ...options };
-      await spawn.sync(cmd, parts, resolvedOptions);
-    } catch (err) {
-      throw err;
-    }
+export function exec<T>(command: string, options?: SpawnOptions): ZombiSideEffectOperator<T> {
+  return sideEffect(async (_, { statusIO }) => {
+    const cp = execa.command(command, { stdio: 'pipe', ...options });
+    cp.stdout.pipe(statusIO);
+    await cp;
   });
 }

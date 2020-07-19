@@ -1,94 +1,62 @@
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
-import { isArray, isBoolean, merge, uniq } from 'lodash';
+import { merge, uniq } from 'lodash';
 import { resolve } from 'path';
-import prettyTime from 'pretty-time';
 import { of } from 'rxjs';
-
-// Local modules
-import { FileSystem } from './fs';
 import { endParallelism, startParallelism } from './operators/parallelism';
 import { prompt } from './operators/prompt';
-import { log } from './utils/log';
-import { normalizeGeneratorName } from './utils/normalize-generator-name';
-import { resolveTemplateRoot } from './utils/resolve-template-root';
-import { timer } from './utils/timer';
-
-// Types
 import {
-  GeneratorConfig,
-  GeneratorData,
-  GeneratorOutput,
-  GeneratorStream,
+  Configuration,
+  Resolveable,
+  ZombiStreamOutput,
+  ZombiStream,
   Question,
   RequiredOnly,
-  SideEffect,
   ZombiSideEffectOperator,
 } from './types';
-import { resolveDataBuilder } from './utils/resolve-data';
-
-// --- Business logic ------------------------------------------------------- //
+import { normalizeGeneratorName } from './utils/normalize-generator-name';
+import { resolveTemplateRoot } from './utils/resolve-template-root';
+import { runGenerator } from './run';
 
 /**
- * A class representing the `zombi` generator interface.
+ * A class representing the `zombi` interface.
  */
-export class Generator<Props> {
-  // --- Properties --- //
-
-  // Config properties
+export class Zombi<Props> {
   public name: string;
   public templateRoot: string | undefined;
   public destinationRoot: string;
-  public force: boolean;
-
-  // Stores the underlying RxJS Observable.
-  private zombi$: GeneratorStream<Props>;
-
-  // --- Constructor --- //
+  public clobber: boolean;
+  private zombi$: ZombiStream<Props>;
 
   /**
-   * Instantiates a Generator.
+   * Instantiates a `Zombi` generator.
    *
    * @param config
    */
-  constructor(config: GeneratorConfig<Props> = {}) {
-    // --- Configuration & setup --- //
-
-    const { name, templateRoot, destinationRoot, force } = config;
+  constructor(config: Configuration<Props> = {}) {
+    const { name, templateRoot, destinationRoot, clobber } = config;
 
     // Assign attributes
     this.name = normalizeGeneratorName(name);
     this.destinationRoot = destinationRoot || process.cwd();
     this.templateRoot = resolveTemplateRoot(templateRoot);
-    this.force = force || false;
+    this.clobber = clobber || false;
 
-    // --- Build the initial generator output --- //
-
-    const g: GeneratorOutput<Partial<Props>> = {
+    const g: ZombiStreamOutput<Partial<Props>> = {
       context: {
         name: this.name,
         templateRoot: this.templateRoot,
         destinationRoot: this.destinationRoot,
         template: this.template,
         destination: this.destination,
-        force: this.force,
+        clobber: this.clobber,
       },
 
       props: config.initialProps || {},
       prompts: [],
       sequence: [],
-      fs: undefined as any,
     };
-
-    g.fs = new FileSystem(g);
-
-    // --- Make an observable of the generator output --- //
 
     this.zombi$ = of(g as any);
   }
-
-  // --- Public methods --- //
 
   /**
    * A wrapper for [Inquirer's prompt API](https://github.com/SBoudrias/Inquirer.js/#methods).
@@ -98,16 +66,13 @@ export class Generator<Props> {
    * [question](https://github.com/SBoudrias/Inquirer.js/#question) objects.
    */
   public prompt<PropsExtensions = unknown>(
-    questions: GeneratorData<
-      | Question<RequiredOnly<Props & PropsExtensions>>
-      | Question<RequiredOnly<Props & PropsExtensions>>[],
+    questions: Resolveable<
+      Question<RequiredOnly<Props & PropsExtensions>> | Question<RequiredOnly<Props & PropsExtensions>>[],
       Props
     >,
-  ): Generator<Props & PropsExtensions> {
+  ): Zombi<Props & PropsExtensions> {
     const result = (this.zombi$.pipe as any)(prompt(questions));
-    return (merge({}, this, { zombi$: result }) as unknown) as Generator<
-      Props & PropsExtensions
-    >;
+    return (merge({}, this, { zombi$: result }) as unknown) as Zombi<Props & PropsExtensions>;
   }
 
   /**
@@ -115,9 +80,7 @@ export class Generator<Props> {
    *
    * @param operators - Operators that will run _in sequence_.
    */
-  public sequence(
-    ...operators: ZombiSideEffectOperator<Props>[]
-  ): Generator<Props> {
+  public sequence(...operators: ZombiSideEffectOperator<Props>[]): Zombi<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
     return merge({}, this, { zombi$: result });
   }
@@ -127,50 +90,44 @@ export class Generator<Props> {
    *
    * @param operators - Operators that will run _in parallel_.
    */
-  public parallel(
-    ...operators: ZombiSideEffectOperator<Props>[]
-  ): Generator<Props> {
-    const result = (this.zombi$.pipe as any)(
-      startParallelism(),
-      ...operators,
-      endParallelism(),
-    );
+  public parallel(...operators: ZombiSideEffectOperator<Props>[]): Zombi<Props> {
+    const result = (this.zombi$.pipe as any)(startParallelism(), ...operators, endParallelism());
     // delete Generator[parallelismId];
     return merge({}, this, { zombi$: result });
   }
 
-  // tslint:disable:prettier
-  public compose(): Generator<Props>
-  public compose<Z1>(z1: Generator<Z1>): Generator<Props & Z1>;
-  public compose<Z1, Z2>(z1: Generator<Z1>, z2: Generator<Z2>): Generator<Props & Z1 & Z2>;
-  public compose<Z1, Z2, Z3>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>): Generator<Props & Z1 & Z2 & Z3>;
-  public compose<Z1, Z2, Z3, Z4>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>): Generator<Props & Z1 & Z2 & Z3 & Z4>;
-  public compose<Z1, Z2, Z3, Z4, Z5>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z5>, z5: Generator<Z5>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(z1: Generator<Z1>, z2: Generator<Z2>, z3: Generator<Z3>, z4: Generator<Z4>, z5: Generator<Z5>, z6: Generator<Z6>, z7: Generator<Z7>, z8: Generator<Z8>, z9: Generator<Z9>): Generator<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
-  // tslint:enable:prettier
+  /* eslint-disable prettier/prettier */
+  public compose(): Zombi<Props>;
+  public compose<Z1>(z1: Zombi<Z1>): Zombi<Props & Z1>;
+  public compose<Z1, Z2>(z1: Zombi<Z1>, z2: Zombi<Z2>): Zombi<Props & Z1 & Z2>;
+  public compose<Z1, Z2, Z3>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>): Zombi<Props & Z1 & Z2 & Z3>;
+  public compose<Z1, Z2, Z3, Z4>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>): Zombi<Props & Z1 & Z2 & Z3 & Z4>;
+  public compose<Z1, Z2, Z3, Z4, Z5>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z5>, z5: Zombi<Z5>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>, z5: Zombi<Z5>, z6: Zombi<Z6>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>, z5: Zombi<Z5>, z6: Zombi<Z6>, z7: Zombi<Z7>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>, z5: Zombi<Z5>, z6: Zombi<Z6>, z7: Zombi<Z7>, z8: Zombi<Z8>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>, z5: Zombi<Z5>, z6: Zombi<Z6>, z7: Zombi<Z7>, z8: Zombi<Z8>, z9: Zombi<Z9>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
+  /* eslint-enable prettier/prettier */
 
   /**
    * Create a new Zombi generator that composes other generators.
    *
-   * @param {...Generator<any>[]} zombis - The other generators to compose.
-   * @returns {Generator<any>}
+   * @param {...Zombi<any>[]} zombis - The other generators to compose.
+   * @returns {Zombi<any>}
    */
-  public compose(...zombis: Generator<any>[]): Generator<any> {
+  public compose(...zombis: Zombi<any>[]): Zombi<any> {
     if (!zombis.length) return this;
 
-    let result: GeneratorOutput<any>;
+    let result: ZombiStreamOutput<any>;
 
     const target = merge({}, this.zombi$);
     target.subscribe(g => {
       result = g;
     });
 
-    const doCompose = (z: Generator<any>) => {
+    const doCompose = (z: Zombi<any>) => {
       const source = merge({}, z.zombi$);
-      source.subscribe((g: GeneratorOutput<any>) => {
+      source.subscribe((g: ZombiStreamOutput<any>) => {
         result.prompts.push(...g.prompts);
         result.sequence.push(...g.sequence);
       });
@@ -192,48 +149,7 @@ export class Generator<Props> {
    * Execute the generator's task sequence and output side-effects.
    */
   public async run() {
-    log.startMessage(this.name);
-
-    let timeElapsed: [number, number];
-
-    const didGenerateFiles = await new Promise(resolve => {
-      this.zombi$.subscribe(async generator => {
-        const { prompts, sequence } = generator;
-
-        if (!prompts.length && !sequence.length) {
-          log.nothingToDoMessage();
-          resolve(false);
-        }
-
-        // Execute all prompting tasks
-        for (const task of prompts) await task(generator);
-
-        /**
-         * Executes a side-effect task if the configured conditional is truthy.
-         */
-        const executeTask = async (task: SideEffect<Props>) => {
-          const condition = await resolveDataBuilder(generator)(task.condition);
-          if (isBoolean(condition) && condition) await task(generator);
-        };
-
-        timer.start();
-        // Execute all side-effect tasks
-        for (const task of sequence) {
-          if (isArray(task)) await Promise.all(task.map(t => executeTask(t)));
-          else await executeTask(task);
-        }
-        timeElapsed = timer.stop();
-
-        resolve(true);
-      });
-    });
-
-    if (didGenerateFiles) {
-      const prettyTimeElapsed = prettyTime(timeElapsed);
-      log.completedMessage(prettyTimeElapsed);
-    }
-
-    return;
+    return runGenerator(this.name, this.zombi$);
   }
 
   /**

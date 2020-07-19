@@ -1,73 +1,42 @@
-// tslint:disable:prefer-template
-
-// --- Imports -------------------------------------------------------------- //
-
-// Node modules
 import chalk from 'chalk';
-import { merge } from 'lodash';
 
-// Local modules
-import { status } from './inquirer';
+const { gray, cyan, green, red, yellow } = chalk;
 
-// --- Constants ------------------------------------------------------------ //
+export function fsMessages(io: NodeJS.WritableStream) {
+  return {
+    fileAdd(name: string) {
+      io.write(`${green.bold('Add')} ${name}`);
+    },
 
-const { green, gray, white, cyan, yellow } = chalk;
+    fileExtend(name: string) {
+      io.write(`${green.bold('Extend')} ${name}`);
+    },
 
-// --- Business logic ------------------------------------------------------- //
+    fileOverwrite(name: string) {
+      io.write(`${red.bold('Overwrite')} ${name}`);
+    },
 
-const renderStatus = (...messages: any[]) => {
-  status.updateBottomBar(messages.join(' '));
-};
+    fileSkip(name: string) {
+      io.write(`${yellow.bold('Skip')} ${name}`);
+    },
+  };
+}
 
-const clearStatus = () => status.updateBottomBar('');
+function startMessage(name: string) {
+  console.log(gray('Running generator ') + cyan.bold(name));
+}
 
-const fileAdd = (name: string) => {
-  renderStatus(white.bgGreenBright(' ADD ') + name);
-};
+function nothingToDoMessage() {
+  console.log(yellow(`🤷 There's nothing to generate...`));
+}
 
-const fileExtend = (name: string) => {
-  renderStatus(white.bgGreenBright(' EXTEND ') + ' ' + name);
-};
+function completedMessage(timeElapsed: string) {
+  console.log(gray(`Generated in ${cyan.bold(timeElapsed)}`));
+}
 
-const fileOverwrite = (name: string) => {
-  renderStatus(white.bgRedBright(' OVERWRITTEN ') + ' ' + name);
-};
-
-const fileForcedOverwrite = (name: string) => {
-  renderStatus(white.bgRedBright(' FORCEFULLY OVERWRITTEN ') + ' ' + name);
-};
-
-const fileSkip = (name: string) => {
-  renderStatus(white.bgYellowBright(' SKIP ') + ' ' + name);
-};
-
-const startMessage = (generatorName: string) => {
-  console.log(green.bold('🧟‍  Zombi is running ') + cyan.bold(generatorName));
-};
-
-const nothingToDoMessage = () => {
-  console.log(yellow.bold(`🤷  There's nothing to Generate.`));
-};
-
-const completedMessage = (timeElapsed: string) => {
-  renderStatus(
-    green.bold(
-      `⚡  It's aliiive! ${gray(`Generated in ${cyan(timeElapsed)}`)}`,
-    ),
-  );
-};
-
-// Merge with standard console
-export const log = merge(console.log.bind(console) as typeof console.log, {
-  renderStatus,
-  clearStatus,
-  fileAdd,
-  fileExtend,
-  fileOverwrite,
-  fileForcedOverwrite,
-  fileSkip,
+export const log = {
+  fsMessages,
   startMessage,
   nothingToDoMessage,
   completedMessage,
-  ...console,
-});
+};
