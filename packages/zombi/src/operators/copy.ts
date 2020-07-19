@@ -1,6 +1,6 @@
 import { Data as EjsData } from 'ejs';
 import { isAbsolute, join } from 'path';
-import { ConditionContext, Resolveable, ZombiSideEffectOperator } from '../types';
+import { Resolveable, ZombiSideEffectOperator } from '../types';
 import { resolveDataBuilder, resolveEjsDataBuilder } from '../utils/resolve-data';
 import { getContextualTemplateRootFromStream } from '../utils/resolve-template-root';
 import { sideEffect } from './side-effect';
@@ -23,7 +23,7 @@ export function copy<T>(
   data?: Resolveable<EjsData, T>,
   options?: Resolveable<FSOptions, T>,
 ): ZombiSideEffectOperator<T> {
-  return ((stream, context = { condition: true }) => {
+  return ((stream, context) => {
     const templateDir = getContextualTemplateRootFromStream(stream);
     return stream.pipe(
       sideEffect(
@@ -38,8 +38,8 @@ export function copy<T>(
 
           await fs.copy(fromPath, toPath, ejsData, opts);
         },
-        { condition: context.condition },
+        { condition: context?.condition },
       ),
     );
-  }) as ZombiSideEffectOperator<T, ConditionContext<T>>;
+  }) as ZombiSideEffectOperator<T>;
 }

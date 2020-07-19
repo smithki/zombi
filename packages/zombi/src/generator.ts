@@ -14,7 +14,7 @@ import {
 } from './types';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
 import { resolveTemplateRoot } from './utils/resolve-template-root';
-import { runGenerator } from './run-generator';
+import { runGenerator } from './run';
 
 /**
  * A class representing the `zombi` interface.

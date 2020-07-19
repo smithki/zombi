@@ -41,16 +41,9 @@ export interface ZombiOperatorFunction<Props, Context = any> {
 }
 
 /**
- * A condition context provided to any operator function.
- */
-export interface ConditionContext<Props> {
-  condition: Resolveable<boolean, Props>;
-}
-
-/**
  * An operator which registers a side-effect into the `Zombi` instance.
  */
-export interface ZombiSideEffectOperator<Props, Context = any>
+export interface ZombiSideEffectOperator<Props, Context extends SideEffectContext<any> = SideEffectContext<Props>>
   extends Nominal<ZombiOperatorFunction<Props, Context>, 'ZombiSideEffectOperator'> {}
 
 /**
@@ -74,6 +67,15 @@ export type ZombiOperator<Props> =
   | ZombiParallelismOperator<Props>;
 
 /**
+ * Utilities made available to a `SideEffect` callback.
+ */
+export interface SideEffectUtils<Props> {
+  ask: <T = any>(questions: Question<Props> | Question<Props>[]) => Promise<T>;
+  statusIO: NodeJS.WritableStream;
+  fs: FileSystem<Props>;
+}
+
+/**
  *
  */
 export type SideEffectCallback<Props> = (
@@ -82,14 +84,9 @@ export type SideEffectCallback<Props> = (
 ) => Promise<void>;
 
 /**
- * A effectful callback with attached context.
- */
-export type SideEffect<Props> = SideEffectCallback<Props> & SideEffectOperatorOptions<Props>;
-
-/**
  * Options given to the core `sideEffect(...)` operator.
  */
-export interface SideEffectOperatorOptions<Props> {
+export interface SideEffectContext<Props> {
   /**
    * Whether to prepend this side-effect to the `Zombi` instance's list of
    * tasks.
@@ -99,13 +96,9 @@ export interface SideEffectOperatorOptions<Props> {
 }
 
 /**
- * Utilities made available to a `SideEffect` callback.
+ * A effectful callback with attached context.
  */
-export interface SideEffectUtils<Props> {
-  ask: <T = any>(questions: Question<Props> | Question<Props>[]) => Promise<T>;
-  statusIO: NodeJS.WritableStream;
-  fs: FileSystem<Props>;
-}
+export type SideEffect<Props> = SideEffectCallback<Props> & SideEffectContext<Props>;
 
 /**
  * Object describing the shape of an `Enquirer` prompt.
