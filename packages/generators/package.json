@@ -1,6 +1,6 @@
 {
   "name": "@zombi/generators",
-  "version": "0.18.0",
+  "version": "1.0.0",
   "description": "Core generator scaffolds built using Zombi.",
   "author": "Ian K Smith <smithki707@gmail.com>",
   "license": "MIT",
@@ -14,6 +14,6 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
-    "zombi": "^0.18.0"
+    "zombi": "^1.0.0"
   }
 }
