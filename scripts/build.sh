@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 echo
-echo "+------------------------------------------------------------------------------+"
-echo "  Building TypeScripts..."
+boxen --border-color cyan --dim-border --padding 1 "Building TypeScripts..."
 echo
 
 tsconfig_paths=$(echo -e $(yarn --silent paths tsconfig.json))
