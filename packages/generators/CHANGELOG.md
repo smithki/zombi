@@ -1,3 +1,16 @@
+# v1.1.1 (Tue Nov 17 2020)
+
+#### 🐛 Bug Fix
+
+- Add contributing guide, changelog, and PR/issue templates [#25](https://github.com/smithki/zombi/pull/25) ([@smithki](https://github.com/smithki))
+- Add contributing guide, changelog, and PR/issue templates ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v1.1.0 (Tue Nov 17 2020)
 
 #### 🚀 Enhancement
