@@ -1,6 +1,9 @@
 {
   "private": true,
   "name": "zombi-ecosystem",
+  "version": "0.0.0",
+  "repository": "smithki/zombi",
+  "author": "Ian Smith <hello@iks.codes>",
   "scripts": {
     "bootstrap": "yarn install && lerna link",
     "wsrun": "wsrun --bin $INIT_CWD/scripts/wsrun/runner.sh -p $PKG",
@@ -52,9 +55,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "version": "0.0.0",
-  "repository": "smithki/zombi",
-  "author": "Ian Smith <hello@iks.codes>",
   "auto": {
     "plugins": [
       "npm"

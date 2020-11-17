@@ -2,6 +2,12 @@
 
 > Task runner and scaffolding tool for people with braaains.
 
+<p align="center">
+  <a href="https://github.com/smithki/zombi/blob/master/LICENSE">License</a> ·
+  <a href="https://github.com/smithki/zombi/blob/master/CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/smithki/zombi/blob/master/CONTRIBUTING.md">Contributing Guide</a>
+</p>
+
 ## 🔗 Installation
 
 Install via `npm`:
