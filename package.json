@@ -3,16 +3,13 @@
   "name": "zombi-ecosystem",
   "scripts": {
     "bootstrap": "yarn install && lerna link",
-    "wsrun": "wsrun --bin $INIT_CWD/scripts/runner.sh -p $PKG",
+    "wsrun": "wsrun --bin $INIT_CWD/scripts/wsrun/runner.sh -p $PKG",
     "dev": "$INIT_CWD/scripts/clean.sh && $INIT_CWD/scripts/dev.sh",
     "build": "$INIT_CWD/scripts/clean.sh && $INIT_CWD/scripts/build.sh",
     "clean": "$INIT_CWD/scripts/clean.sh",
     "lint": "$INIT_CWD/scripts/lint.sh",
-    "test": "echo No tests yet!",
-    "paths": "yarn --silent wsrun --parallel --no-prefix -r silent $INIT_CWD/scripts/cwd.ts",
-    "bump_version": "lerna version",
-    "release": "lerna publish from-package --yes",
-    "release_canary": "lerna publish from-package --canary --yes"
+    "test": "$INIT_CWD/scripts/test.sh",
+    "paths": "yarn --silent wsrun --parallel --no-prefix -r silent $INIT_CWD/scripts/wsrun/resolve-paths.ts"
   },
   "devDependencies": {
     "@ikscodes/eslint-config": "^7.0.0",
@@ -27,6 +24,8 @@
     "@types/node": "^9.4.6",
     "@types/pretty-time": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^3.4.0",
+    "auto": "^10.3.0",
+    "boxen-cli": "^1.0.0",
     "eslint": "^7.3.1",
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-import": "^2.18.2",
@@ -39,6 +38,7 @@
     "lint-staged": "~7.3.0",
     "npm-run-all": "~4.1.2",
     "prettier": "^2.0.5",
+    "replace-in-file": "^6.1.0",
     "rimraf": "^2.6.2",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7",
@@ -52,5 +52,12 @@
   "workspaces": [
     "packages/*"
   ],
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "repository": "smithki/zombi",
+  "author": "Ian Smith <hello@iks.codes>",
+  "auto": {
+    "plugins": [
+      "npm"
+    ]
+  }
 }
