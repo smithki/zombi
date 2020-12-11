@@ -1,3 +1,16 @@
+# v2.0.0 (Fri Dec 11 2020)
+
+#### 💥 Breaking Change
+
+- `zombi`
+  - Add 'mapEffects' operator [#26](https://github.com/smithki/zombi/pull/26) ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v1.1.1 (Tue Nov 17 2020)
 
 #### 🐛 Bug Fix
