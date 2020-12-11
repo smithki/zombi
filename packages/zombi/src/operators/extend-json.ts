@@ -1,4 +1,4 @@
-import { Resolveable, JsonData, ZombiSideEffectOperator } from '../types';
+import { Resolveable, JsonData, SideEffectOperator } from '../types';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
 
@@ -12,7 +12,7 @@ import { sideEffect } from './side-effect';
 export function extendJson<T>(
   file: Resolveable<string, T>,
   extensions?: Resolveable<JsonData, T>,
-): ZombiSideEffectOperator<T> {
+): SideEffectOperator<T> {
   return sideEffect(async (output, { fs }) => {
     const resolveData = resolveDataBuilder(output);
     const filePath = await resolveData(file);

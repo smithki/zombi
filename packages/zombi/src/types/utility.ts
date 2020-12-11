@@ -7,3 +7,6 @@ export type KnownKeys<T> = {
   : never;
 
 export type RequiredOnly<T extends Record<any, any>> = Pick<T, KnownKeys<T>>;
+
+export type Maybe<T> = T | false | null | undefined;
+export type Definitely<T> = Exclude<T, false | null | undefined>;

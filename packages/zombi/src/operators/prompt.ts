@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
-import { Resolveable, Question, RequiredOnly, ZombiPromptOperator } from '../types';
-import { ensureArray } from '../utils/ensure-array';
+import { Resolveable, Question, RequiredOnly, PromptOperator, Maybe } from '../types';
+import { cleanArray, ensureArray } from '../utils/array-helpers';
 import { resolveDataBuilder } from '../utils/resolve-data';
 
 /**
@@ -13,16 +13,16 @@ import { resolveDataBuilder } from '../utils/resolve-data';
  * @param questions - Array of Inquirer-compatible
  * [question](https://github.com/SBoudrias/Inquirer.js/#question) objects.
  */
-export function prompt<T, K extends T = T>(
-  questions: Resolveable<Question<RequiredOnly<K>> | Question<RequiredOnly<K>>[], T>,
-): ZombiPromptOperator<T> {
+export function prompt<T>(
+  questions: Resolveable<Maybe<Question<RequiredOnly<T>>> | Maybe<Question<RequiredOnly<T>>>[], T>,
+): PromptOperator<T> {
   return (stream => {
     return stream.pipe(
       map(ctx => {
         const result = merge({}, ctx);
 
         result.prompts.push(async (output, { ask }) => {
-          const q = ensureArray(await resolveDataBuilder(output)(questions));
+          const q = cleanArray(ensureArray(await resolveDataBuilder(output)(questions)));
           const answers = await ask(q);
           merge(output.props, answers);
         });
@@ -30,5 +30,5 @@ export function prompt<T, K extends T = T>(
         return result;
       }),
     );
-  }) as ZombiPromptOperator<T>;
+  }) as PromptOperator<T>;
 }

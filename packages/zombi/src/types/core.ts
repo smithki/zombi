@@ -24,11 +24,23 @@ export interface ZombiStream<Props> extends RxObservable<ZombiStreamOutput<Props
  * `zombi(...)` interface.
  */
 export interface Configuration<Props> extends Partial<Pick<Zombi<Props>, 'name' | 'destinationRoot'>> {
+  /**
+   * Initial props given to the Zombi instance.
+   */
   initialProps?: Props | Partial<Props>;
+
   /**
    * Whether to force overwrites on file conflicts.
    */
   clobber?: boolean;
+
+  /**
+   * The root directory where the generator can resolve template files. Relative
+   * paths for most effectful operators are considered relative to the value
+   * given here. If no `templateRoot` is specified, the closest `template`
+   * directory to the Zombi instance being executed is used. If templates are
+   * not required, set this to `false`.
+   */
   templateRoot?: string | boolean;
 }
 
@@ -36,35 +48,33 @@ export interface Configuration<Props> extends Partial<Pick<Zombi<Props>, 'name' 
  * The underlying operator function passed to `Zombi.sequence` or
  * `Zombi.parallelism`.
  */
-export interface ZombiOperatorFunction<Props, Context = any> {
+interface OperatorFunction<Props, Context = any> {
   (stream: ZombiStream<Props>, context?: Context): ZombiStream<Props>;
 }
 
 /**
  * An operator which registers a side-effect into the `Zombi` instance.
  */
-export interface ZombiSideEffectOperator<Props, Context extends SideEffectContext<any> = SideEffectContext<Props>>
-  extends Nominal<ZombiOperatorFunction<Props, Context>, 'ZombiSideEffectOperator'> {}
+export interface SideEffectOperator<Props, Context extends SideEffectContext<any> = SideEffectContext<Props>>
+  extends Nominal<OperatorFunction<Props, Context>, 'SideEffectOperator'> {}
 
 /**
  * An operator which registers a prompt into the `Zombi` instance.
  */
-export interface ZombiPromptOperator<Props, Context = any>
-  extends Nominal<ZombiOperatorFunction<Props, Context>, 'ZombiPromptOperator'> {}
+export interface PromptOperator<Props, Context = any>
+  extends Nominal<OperatorFunction<Props, Context>, 'PromptOperator'> {}
 
 /**
  * Internal operator for handling parallelism.
+ * @internal
  */
-export interface ZombiParallelismOperator<Props, Context = any>
-  extends Nominal<ZombiOperatorFunction<Props, Context>, 'ZombiParallelismOperator'> {}
+export interface ParallelismOperator<Props, Context = any>
+  extends Nominal<OperatorFunction<Props, Context>, 'ParallelismOperator'> {}
 
 /**
  * A `Zombi`-compatible operator.
  */
-export type ZombiOperator<Props> =
-  | ZombiSideEffectOperator<Props>
-  | ZombiPromptOperator<Props>
-  | ZombiParallelismOperator<Props>;
+export type Operator<Props> = SideEffectOperator<Props> | PromptOperator<Props> | ParallelismOperator<Props>;
 
 /**
  * Utilities made available to a `SideEffect` callback.
@@ -76,12 +86,12 @@ export interface SideEffectUtils<Props> {
 }
 
 /**
- *
+ * A effectful callback.
  */
 export type SideEffectCallback<Props> = (
   generator: ZombiStreamOutput<Props>,
   utils: SideEffectUtils<Props>,
-) => Promise<void>;
+) => void | Promise<void>;
 
 /**
  * Options given to the core `sideEffect(...)` operator.
@@ -92,6 +102,10 @@ export interface SideEffectContext<Props> {
    * tasks.
    */
   enforcePre?: boolean;
+
+  /**
+   * Whether to execute this side-effect.
+   */
   condition?: Resolveable<boolean, Props>;
 }
 
