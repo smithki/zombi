@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import { Resolveable, SideEffectOperator, ZombiStream } from '../types';
+import { Resolveable, SideEffectOperator, ZombiStream } from '../types/core';
 import { applyOperatorContext } from '../utils/apply-operator-context';
 import { resolveDataBuilder } from '../utils/resolve-data';
 

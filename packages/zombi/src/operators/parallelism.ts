@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
-import { SideEffect, ParallelismOperator } from '../types';
+import { SideEffect, ParallelismOperator } from '../types/core';
 
 let savedSet: (SideEffect<any> | SideEffect<any>[])[] | undefined;
 

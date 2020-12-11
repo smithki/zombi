@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
-import { SideEffect, SideEffectContext, SideEffectOperator, SideEffectCallback } from '../types';
+import { SideEffect, SideEffectContext, SideEffectOperator, SideEffectCallback } from '../types/core';
 
 /**
  * Perform side-effects during the run process. Similar to RxJS

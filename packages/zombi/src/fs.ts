@@ -4,11 +4,11 @@ import * as fsExtra from 'fs-extra';
 import JSON5 from 'json5';
 import { isEmpty, isNil, merge } from 'lodash';
 import { isAbsolute, join } from 'path';
-import { ZombiStreamOutput, JsonData, SideEffectUtils } from './types';
+import { isBinary } from 'istextorbinary';
+import { ZombiStreamOutput, JsonData, SideEffectUtils } from './types/core';
 import { log } from './utils/log';
 import { Zombi } from './generator';
-
-const { red } = chalk;
+import { createPromise } from './utils/create-promise';
 
 /**
  * Options given to `FileSystem` methods that render _new_ files.
@@ -73,15 +73,12 @@ export class FileSystem<Props> {
   public async copyFile(from: string, to: string, data: EjsData, options?: FSOptions) {
     const ctx = this.getContextBuilder(options)(to, from);
 
-    const renderWithoutEjs = async () => {
-      const string = await fsExtra.readFile(ctx.from);
-      await this.effects.outputFile(ctx)(string);
-    };
+    await createPromise<void>(async (resolve, reject) => {
+      const buffer = await fsExtra.readFile(ctx.from);
 
-    await new Promise(async (resolve, reject) => {
-      if (isNil(data) || isEmpty(data) || !ctx.ejs) {
+      if (isBinary(ctx.from, buffer) || isBinary(ctx.to) || isNil(data) || isEmpty(data) || !ctx.ejs) {
         // Render file without EJS processing.
-        renderWithoutEjs().then(resolve).catch(reject);
+        this.effects.outputFile(ctx)(buffer).then(resolve).catch(reject);
       } else {
         // Render file with EJS processing.
         renderFile(ctx.from, data || {}, (err, string) => {
@@ -175,7 +172,7 @@ export class FileSystem<Props> {
         const { overwrite } = await this.utils.ask({
           type: 'Confirm',
           name: 'overwrite' as any,
-          message: `Conflict on \`${prettyTo}\` ${red('\n  Overwrite?')}`,
+          message: `Conflict on \`${prettyTo}\` ${chalk.red('\n  Overwrite?')}`,
           initial: false,
         });
 

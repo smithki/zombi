@@ -1,6 +1,6 @@
 import { Data as EjsData } from 'ejs';
 import { merge } from 'lodash';
-import { Resolveable, ZombiStreamOutput } from '../types';
+import { Resolveable, ZombiStreamOutput } from '../types/core';
 
 export function resolveEjsDataBuilder(output: ZombiStreamOutput<any>) {
   return async (data: Resolveable<EjsData, any>): Promise<EjsData> => {

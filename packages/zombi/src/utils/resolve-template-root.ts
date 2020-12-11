@@ -7,7 +7,7 @@ import {
   TemplateRootNonDirectoryError,
   TemplateRootPathNotFoundError,
 } from '../exceptions';
-import { ZombiStream } from '../types';
+import { ZombiStream } from '../types/core';
 
 export enum ResolveTemplateRootDepth {
   FromGenerator = 3,

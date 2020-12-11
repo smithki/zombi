@@ -1,4 +1,4 @@
-import { Resolveable, SideEffectOperator } from '../types';
+import { Resolveable, SideEffectOperator } from '../types/core';
 import { applyOperatorContext } from '../utils/apply-operator-context';
 import { ensureArray } from '../utils/array-helpers';
 import { resolveDataBuilder } from '../utils/resolve-data';

@@ -1,5 +1,5 @@
 import { isArray } from 'lodash';
-import { Definitely, Maybe } from '../types';
+import { Definitely, Maybe } from '../types/utility';
 
 function isArrayType<T>(value: T | T[]): value is T[] {
   return isArray(value);

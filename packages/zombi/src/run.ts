@@ -4,11 +4,12 @@ import Semaphore from 'semaphore-async-await';
 import { DefaultRenderer } from 'listr2/dist/renderer/default.renderer';
 import prettyTime from 'pretty-time';
 import { createTimer, HrTime, Timer } from './utils/timer';
-import { SideEffectUtils, SideEffect, ZombiStream, ZombiStreamOutput } from './types';
+import { SideEffectUtils, SideEffect, ZombiStream, ZombiStreamOutput } from './types/core';
 import { FileSystem } from './fs';
 import { log } from './utils/log';
 import { ensureArray } from './utils/array-helpers';
 import { resolveDataBuilder } from './utils/resolve-data';
+import { createPromise } from './utils/create-promise';
 
 /**
  * Builds contextual utility functions for the side-effect executor.
@@ -55,7 +56,7 @@ export async function runGenerator<Props>(name: string, stream: ZombiStream<Prop
   const timer = createTimer();
   let timeElapsed: HrTime;
 
-  const didGenerateFiles = await new Promise<boolean>((resolve, reject) => {
+  const didGenerateFiles = await createPromise<boolean>((resolve, reject) => {
     stream.subscribe(async generator => {
       const listr = new Listr([]);
 

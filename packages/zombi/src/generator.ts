@@ -5,16 +5,8 @@ import { resolve } from 'path';
 import { of } from 'rxjs';
 import { endParallelism, startParallelism } from './operators/parallelism';
 import { prompt } from './operators/prompt';
-import {
-  Configuration,
-  Resolveable,
-  ZombiStreamOutput,
-  ZombiStream,
-  Question,
-  RequiredOnly,
-  SideEffectOperator,
-  Maybe,
-} from './types';
+import { Configuration, Resolveable, ZombiStreamOutput, ZombiStream, Question, SideEffectOperator } from './types/core';
+import { RequiredOnly, Maybe } from './types/utility';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
 import { resolveTemplateRoot } from './utils/resolve-template-root';
 import { runGenerator } from './run';

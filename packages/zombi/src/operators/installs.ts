@@ -1,4 +1,4 @@
-import { SideEffectOperator } from '../types';
+import { SideEffectOperator } from '../types/core';
 import { exec } from './exec';
 
 /**
