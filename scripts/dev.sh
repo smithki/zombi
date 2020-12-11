@@ -13,4 +13,4 @@ echo
 
 sleep 3
 
-tsc-watch --onSuccess "$INIT_CWD/scripts/env.ts $pkg_paths" -b -w $tsconfig_paths
+tsc-watch -b -w $tsconfig_paths
