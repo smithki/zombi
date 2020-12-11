@@ -1,3 +1,16 @@
+# v2.1.0 (Fri Dec 11 2020)
+
+#### 🚀 Enhancement
+
+- `zombi`
+  - Skip EJS rendering for binary files [#27](https://github.com/smithki/zombi/pull/27) ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v2.0.0 (Fri Dec 11 2020)
 
 #### 💥 Breaking Change
