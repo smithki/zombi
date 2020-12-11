@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { ZombiError, ZombiErrorCode } from './zombi-exception-types';
+import { ZombiError, ZombiErrorCode } from './exception-types';
 
 const { cyan, gray, green } = chalk;
 
@@ -7,6 +7,7 @@ const { cyan, gray, green } = chalk;
 const templRoot = cyan('templateRoot');
 
 export class TemplateRootAbsolutePathError extends TypeError implements ZombiError {
+  readonly isZombiError = true;
   code = ZombiErrorCode.TemplateRootAbsolutePathError;
   name = 'TemplateRootAbsolutePathError';
 
@@ -16,6 +17,7 @@ export class TemplateRootAbsolutePathError extends TypeError implements ZombiErr
 }
 
 export class TemplateRootPathNotFoundError extends TypeError implements ZombiError {
+  readonly isZombiError = true;
   code = ZombiErrorCode.TemplateRootPathNotFoundError;
   name = 'TemplateRootPathNotFoundError';
 
@@ -33,6 +35,7 @@ export class TemplateRootPathNotFoundError extends TypeError implements ZombiErr
 }
 
 export class TemplateRootNonDirectoryError extends TypeError implements ZombiError {
+  readonly isZombiError = true;
   code = ZombiErrorCode.TemplateRootNonDirectoryError;
   name = 'TemplateRootNonDirectoryError';
 

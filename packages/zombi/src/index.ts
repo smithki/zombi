@@ -1,5 +1,5 @@
 import { Zombi } from './generator';
-import { Configuration } from './types';
+import { Configuration } from './types/core';
 
 /**
  * Create a new `zombi` generator.
@@ -12,4 +12,4 @@ export function zombi<Props>(options: Configuration<Props> = {}) {
 
 export * from './types/core';
 export * from './operators';
-export { ZombiErrorCode } from './exceptions';
+export * from './exceptions';

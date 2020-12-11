@@ -4,4 +4,4 @@ export {
   TemplateRootNonDirectoryError,
 } from './template-root-exceptions';
 
-export * from './zombi-exception-types';
+export * from './exception-types';

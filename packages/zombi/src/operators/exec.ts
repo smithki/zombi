@@ -1,6 +1,6 @@
 import { SpawnOptions } from 'child_process';
 import execa from 'execa';
-import { SideEffectOperator } from '../types';
+import { SideEffectOperator } from '../types/core';
 import { sideEffect } from './side-effect';
 
 /**

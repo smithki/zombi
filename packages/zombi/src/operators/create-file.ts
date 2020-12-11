@@ -1,4 +1,4 @@
-import { Resolveable, SideEffectOperator } from '../types';
+import { Resolveable, SideEffectOperator } from '../types/core';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
 import { FSOptions } from '../fs';

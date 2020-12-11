@@ -1,4 +1,4 @@
-import { Operator, ZombiStream } from '../types';
+import { Operator, ZombiStream } from '../types/core';
 
 /**
  * Applies contextual values to an operator function.

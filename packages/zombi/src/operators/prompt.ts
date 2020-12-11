@@ -1,6 +1,7 @@
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
-import { Resolveable, Question, RequiredOnly, PromptOperator, Maybe } from '../types';
+import { Resolveable, Question, PromptOperator } from '../types/core';
+import { RequiredOnly, Maybe } from '../types/utility';
 import { cleanArray, ensureArray } from '../utils/array-helpers';
 import { resolveDataBuilder } from '../utils/resolve-data';
 

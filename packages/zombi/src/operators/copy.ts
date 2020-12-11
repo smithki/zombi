@@ -1,6 +1,6 @@
 import { Data as EjsData } from 'ejs';
 import { isAbsolute, join } from 'path';
-import { Resolveable, SideEffectOperator } from '../types';
+import { Resolveable, SideEffectOperator } from '../types/core';
 import { resolveDataBuilder, resolveEjsDataBuilder } from '../utils/resolve-data';
 import { getContextualTemplateRootFromStream } from '../utils/resolve-template-root';
 import { sideEffect } from './side-effect';
