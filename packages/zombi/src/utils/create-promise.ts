@@ -11,7 +11,7 @@ export type AsyncPromiseExecutor<TResult> = (
  * errors occurring within the executor.
  */
 export function createPromise<TResult>(executor: AsyncPromiseExecutor<TResult>) {
-  return createPromise<TResult>((resolve, reject) => {
+  return new Promise<TResult>((resolve, reject) => {
     const result = executor(resolve, reject);
     Promise.resolve(result).catch(reject);
   });

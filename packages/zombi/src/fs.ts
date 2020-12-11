@@ -71,7 +71,7 @@ export class FileSystem<Props> {
   }
 
   public async copyFile(from: string, to: string, data: EjsData, options?: FSOptions) {
-    const ctx = this.getContextBuilder(options)(from, to);
+    const ctx = this.getContextBuilder(options)(to, from);
 
     await createPromise<void>(async (resolve, reject) => {
       const buffer = await fsExtra.readFile(ctx.from);
