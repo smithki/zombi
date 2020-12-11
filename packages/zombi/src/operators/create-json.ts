@@ -1,4 +1,4 @@
-import { Resolveable, JsonData, ZombiSideEffectOperator } from '../types';
+import { Resolveable, JsonData, SideEffectOperator } from '../types';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
 import { FSOptions } from '../fs';
@@ -15,7 +15,7 @@ export function createJson<T>(
   file: Resolveable<string, T>,
   data?: Resolveable<JsonData, T>,
   options?: Resolveable<Pick<FSOptions, 'ejs' | 'clobber'>, T>,
-): ZombiSideEffectOperator<T> {
+): SideEffectOperator<T> {
   return sideEffect(async (output, { fs }) => {
     const resolveData = resolveDataBuilder(output);
     const filePath = await resolveData(file);

@@ -1,6 +1,6 @@
-import { Resolveable, ZombiSideEffectOperator } from '../types';
+import { Resolveable, SideEffectOperator } from '../types';
 import { applyOperatorContext } from '../utils/apply-operator-context';
-import { ensureArray } from '../utils/ensure-array';
+import { ensureArray } from '../utils/array-helpers';
 import { resolveDataBuilder } from '../utils/resolve-data';
 
 /**
@@ -12,9 +12,9 @@ import { resolveDataBuilder } from '../utils/resolve-data';
  */
 export function ifElse<T>(
   condition: Resolveable<boolean, T>,
-  truthyOperators: ZombiSideEffectOperator<T>[],
-  falseyOperators: ZombiSideEffectOperator<T>[] = [],
-): ZombiSideEffectOperator<T> {
+  truthyOperators: SideEffectOperator<T>[],
+  falseyOperators: SideEffectOperator<T>[] = [],
+): SideEffectOperator<T> {
   return (stream => {
     const truthyOperatorsArray = ensureArray(truthyOperators).map(op => applyOperatorContext(op, { condition }));
 
@@ -28,5 +28,5 @@ export function ifElse<T>(
     );
 
     return (stream.pipe as any)(...truthyOperatorsArray, ...falseyOperatorsArray);
-  }) as ZombiSideEffectOperator<T>;
+  }) as SideEffectOperator<T>;
 }

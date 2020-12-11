@@ -7,7 +7,7 @@ import { createTimer, HrTime, Timer } from './utils/timer';
 import { SideEffectUtils, SideEffect, ZombiStream, ZombiStreamOutput } from './types';
 import { FileSystem } from './fs';
 import { log } from './utils/log';
-import { ensureArray } from './utils/ensure-array';
+import { ensureArray } from './utils/array-helpers';
 import { resolveDataBuilder } from './utils/resolve-data';
 
 /**
@@ -90,7 +90,7 @@ export async function runGenerator<Props>(name: string, stream: ZombiStream<Prop
         },
       });
 
-      // Execute all side-effect tasks
+      // Execute all effectful tasks
       listr.add({
         title: 'Scaffolding',
         task: async (_, executor) => {

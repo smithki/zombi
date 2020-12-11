@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import { map } from 'rxjs/operators';
-import { SideEffect, SideEffectContext, ZombiSideEffectOperator, SideEffectCallback } from '../types';
+import { SideEffect, SideEffectContext, SideEffectOperator, SideEffectCallback } from '../types';
 
 /**
  * Perform side-effects during the run process. Similar to RxJS
@@ -14,7 +14,7 @@ import { SideEffect, SideEffectContext, ZombiSideEffectOperator, SideEffectCallb
 export function sideEffect<T>(
   callback: SideEffectCallback<T>,
   options: SideEffectContext<T> = {},
-): ZombiSideEffectOperator<T> {
+): SideEffectOperator<T> {
   return ((stream, context) => {
     return stream.pipe(
       map(output => {
@@ -38,5 +38,5 @@ export function sideEffect<T>(
         return result;
       }),
     );
-  }) as ZombiSideEffectOperator<T>;
+  }) as SideEffectOperator<T>;
 }

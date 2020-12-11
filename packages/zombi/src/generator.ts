@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 import { merge, uniq } from 'lodash';
 import { resolve } from 'path';
 import { of } from 'rxjs';
@@ -10,7 +12,8 @@ import {
   ZombiStream,
   Question,
   RequiredOnly,
-  ZombiSideEffectOperator,
+  SideEffectOperator,
+  Maybe,
 } from './types';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
 import { resolveTemplateRoot } from './utils/resolve-template-root';
@@ -59,19 +62,19 @@ export class Zombi<Props> {
   }
 
   /**
-   * A wrapper for [Inquirer's prompt API](https://github.com/SBoudrias/Inquirer.js/#methods).
+   * A wrapper for [Enquirer's prompt API](https://github.com/enquirer/enquirer#-prompts).
    * Prompts for user input and saves the resulting data into props.
    *
-   * @param questions - Array of Inquirer-compatible
-   * [question](https://github.com/SBoudrias/Inquirer.js/#question) objects.
+   * @param questions - Array of Enquirer-compatible
+   * [question](https://github.com/enquirer/enquirer#prompt-options) objects.
    */
-  public prompt<PropsExtensions = unknown>(
+  public prompt<PropsExtensions = {}>(
     questions: Resolveable<
-      Question<RequiredOnly<Props & PropsExtensions>> | Question<RequiredOnly<Props & PropsExtensions>>[],
-      Props
+      Maybe<Question<RequiredOnly<Props & PropsExtensions>>> | Maybe<Question<RequiredOnly<Props & PropsExtensions>>>[],
+      Props & PropsExtensions
     >,
   ): Zombi<Props & PropsExtensions> {
-    const result = (this.zombi$.pipe as any)(prompt(questions));
+    const result = ((this as unknown) as Zombi<Props & PropsExtensions>).zombi$.pipe(prompt(questions));
     return (merge({}, this, { zombi$: result }) as unknown) as Zombi<Props & PropsExtensions>;
   }
 
@@ -80,7 +83,7 @@ export class Zombi<Props> {
    *
    * @param operators - Operators that will run _in sequence_.
    */
-  public sequence(...operators: ZombiSideEffectOperator<Props>[]): Zombi<Props> {
+  public sequence(...operators: SideEffectOperator<Props>[]): Zombi<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
     return merge({}, this, { zombi$: result });
   }
@@ -90,7 +93,7 @@ export class Zombi<Props> {
    *
    * @param operators - Operators that will run _in parallel_.
    */
-  public parallel(...operators: ZombiSideEffectOperator<Props>[]): Zombi<Props> {
+  public parallel(...operators: SideEffectOperator<Props>[]): Zombi<Props> {
     const result = (this.zombi$.pipe as any)(startParallelism(), ...operators, endParallelism());
     // delete Generator[parallelismId];
     return merge({}, this, { zombi$: result });
