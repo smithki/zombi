@@ -1,3 +1,24 @@
+# v2.2.0 (Tue Dec 22 2020)
+
+#### 🚀 Enhancement
+
+- Return props from `generator.run` [#30](https://github.com/smithki/zombi/pull/30) ([@smithki](https://github.com/smithki))
+
+#### 🐛 Bug Fix
+
+- Add 'GeneratorProps' helper type ([@smithki](https://github.com/smithki))
+- Return props from 'generator.run' and fix' generator.prompt' typings ([@smithki](https://github.com/smithki))
+
+#### ⚠️ Pushed to `master`
+
+- Rename 'GeneratorProps' to 'PropsFromZombi' ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v2.1.0 (Fri Dec 11 2020)
 
 #### 🚀 Enhancement

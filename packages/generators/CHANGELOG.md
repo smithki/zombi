@@ -1,3 +1,19 @@
+# v2.2.0 (Tue Dec 22 2020)
+
+#### 🚀 Enhancement
+
+- Return props from `generator.run` [#30](https://github.com/smithki/zombi/pull/30) ([@smithki](https://github.com/smithki))
+
+#### 🐛 Bug Fix
+
+- Return props from 'generator.run' and fix' generator.prompt' typings ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v2.0.0 (Fri Dec 11 2020)
 
 #### 💥 Breaking Change
