@@ -15,8 +15,8 @@ export const promptAuthor = zombi<AuthorshipProps>({
   templateRoot: false,
 }).prompt(async ({ props }) => [
   /* eslint-disable prettier/prettier */
-  { type: 'Input', name: 'authorName', message: `Author's name`, initial: getNpmConfig('init-author-name'), when: !props.authorName, },
-  { type: 'Input', name: 'authorEmail', message: `Author's email`, initial: getNpmConfig('init-author-email'), when: !props.authorEmail },
-  { type: 'Input', name: 'authorUrl', message: `Author's URL`, initial: getNpmConfig('init-author-url'), when: !props.authorUrl },
+  !props.authorName && { type: 'Input', name: 'authorName', message: `Author's name`, initial: getNpmConfig('init-author-name') },
+  !props.authorEmail && { type: 'Input', name: 'authorEmail', message: `Author's email`, initial: getNpmConfig('init-author-email') },
+  !props.authorUrl && { type: 'Input', name: 'authorUrl', message: `Author's URL`, initial: getNpmConfig('init-author-url') },
   /* eslint-enable prettier/prettier */
 ]);

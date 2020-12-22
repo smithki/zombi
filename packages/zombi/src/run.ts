@@ -56,63 +56,67 @@ export async function runGenerator<Props>(name: string, stream: ZombiStream<Prop
   const timer = createTimer();
   let timeElapsed: HrTime;
 
-  const didGenerateFiles = await createPromise<boolean>((resolve, reject) => {
-    stream.subscribe(async generator => {
-      const listr = new Listr([]);
+  const { didGenerateFiles, props } = await createPromise<{ didGenerateFiles: boolean; props: Props }>(
+    (resolve, reject) => {
+      stream.subscribe(async generator => {
+        const listr = new Listr([]);
 
-      if (!generator.prompts.length && !generator.sequence.length) {
-        log.nothingToDoMessage();
-        resolve(false);
-        return;
-      }
-
-      const promptLock = new Semaphore(1);
-
-      /**
-       * Executes a side-effect task if the configured conditional is truthy.
-       */
-      const executeSideEffect = async (
-        sideEffect: SideEffect<Props>,
-        executor: ListrTaskWrapper<any, typeof DefaultRenderer>,
-      ) => {
-        const condition = await resolveDataBuilder(generator)(sideEffect.condition);
-        if (isBoolean(condition) && condition) {
-          await sideEffect(generator, utils(generator, timer, promptLock, executor));
+        if (!generator.prompts.length && !generator.sequence.length) {
+          log.nothingToDoMessage();
+          resolve({ didGenerateFiles: false, props: { ...generator.props } });
+          return;
         }
-      };
 
-      // Execute all prompting tasks
-      listr.add({
-        title: 'Setup',
-        task: async (_, executor) => {
-          for (const sideEffect of generator.prompts) {
+        const promptLock = new Semaphore(1);
+
+        /**
+         * Executes a side-effect task if the configured conditional is truthy.
+         */
+        const executeSideEffect = async (
+          sideEffect: SideEffect<Props>,
+          executor: ListrTaskWrapper<any, typeof DefaultRenderer>,
+        ) => {
+          const condition = await resolveDataBuilder(generator)(sideEffect.condition);
+          if (isBoolean(condition) && condition) {
             await sideEffect(generator, utils(generator, timer, promptLock, executor));
           }
-        },
+        };
+
+        // Execute all prompting tasks
+        listr.add({
+          title: 'Setup',
+          task: async (_, executor) => {
+            for (const sideEffect of generator.prompts) {
+              await sideEffect(generator, utils(generator, timer, promptLock, executor));
+            }
+          },
+        });
+
+        // Execute all effectful tasks
+        listr.add({
+          title: 'Scaffolding',
+          task: async (_, executor) => {
+            for (const sideEffect of generator.sequence) {
+              if (isArray(sideEffect)) {
+                await Promise.all(sideEffect.map(se => executeSideEffect(se, executor)));
+              } else await executeSideEffect(sideEffect, executor);
+            }
+          },
+        });
+
+        timer.start();
+        await listr.run().catch(reject);
+        timeElapsed = timer.stop();
+
+        resolve({ didGenerateFiles: true, props: { ...generator.props } });
       });
-
-      // Execute all effectful tasks
-      listr.add({
-        title: 'Scaffolding',
-        task: async (_, executor) => {
-          for (const sideEffect of generator.sequence) {
-            if (isArray(sideEffect)) {
-              await Promise.all(sideEffect.map(se => executeSideEffect(se, executor)));
-            } else await executeSideEffect(sideEffect, executor);
-          }
-        },
-      });
-
-      timer.start();
-      await listr.run().catch(reject);
-      timeElapsed = timer.stop();
-
-      resolve(true);
-    });
-  });
+    },
+  );
 
   if (didGenerateFiles) {
     const prettyTimeElapsed = prettyTime(timeElapsed);
     log.completedMessage(prettyTimeElapsed);
   }
+
+  return props;
 }
