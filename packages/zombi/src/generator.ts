@@ -61,12 +61,15 @@ export class Zombi<Props> {
    * [question](https://github.com/enquirer/enquirer#prompt-options) objects.
    */
   public prompt<PropsExtensions = {}>(
-    questions: Resolveable<
-      Maybe<Question<RequiredOnly<Props & PropsExtensions>>> | Maybe<Question<RequiredOnly<Props & PropsExtensions>>>[],
-      Props & PropsExtensions
-    >,
+    questions:
+      | Resolveable<Maybe<Question<Props & PropsExtensions>>, Props>
+      | Resolveable<Maybe<Question<Props & PropsExtensions>>[], Props>,
   ): Zombi<Props & PropsExtensions> {
-    const result = ((this as unknown) as Zombi<Props & PropsExtensions>).zombi$.pipe(prompt(questions));
+    const result = this.zombi$.pipe(
+      // Purposely reduce the type to ignore `PropsExtensions`, as they would
+      // only be applicable to follow-up prompts
+      prompt(questions as Resolveable<Maybe<Question<Props>>, Props> | Resolveable<Maybe<Question<Props>>[], Props>),
+    );
     return (merge({}, this, { zombi$: result }) as unknown) as Zombi<Props & PropsExtensions>;
   }
 

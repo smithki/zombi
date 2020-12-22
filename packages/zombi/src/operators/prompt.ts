@@ -15,7 +15,7 @@ import { resolveDataBuilder } from '../utils/resolve-data';
  * [question](https://github.com/SBoudrias/Inquirer.js/#question) objects.
  */
 export function prompt<T>(
-  questions: Resolveable<Maybe<Question<RequiredOnly<T>>> | Maybe<Question<RequiredOnly<T>>>[], T>,
+  questions: Resolveable<Maybe<Question<T>>, T> | Resolveable<Maybe<Question<T>>[], T>,
 ): PromptOperator<T> {
   return (stream => {
     return stream.pipe(

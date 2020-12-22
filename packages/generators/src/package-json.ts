@@ -10,7 +10,7 @@ export interface PackageJsonProps {
   pkgName: string;
   pkgVersion: string;
   pkgDescription: string;
-  pkgLicense: 'MIT' | 'BSD-3';
+  pkgLicense: 'MIT' | 'BSD-3-Clause' | 'BSD-2-Clause' | 'Apache-2.0';
 }
 
 /**
@@ -20,12 +20,12 @@ export const packageJson = zombi<PackageJsonProps>({
   name: 'zombi-package-json',
   templateRoot: false,
 })
-  .prompt(({ props }) => [
+  .prompt(({ props, context }) => [
     /* eslint-disable prettier/prettier */
-    { type: 'Input', name: 'npmOrg', message: 'NPM organization', when: !props.npmOrg },
-    { type: 'Input', name: 'pkgName', message: 'Package name', initial: basename(process.cwd()), when: !props.pkgName },
-    { type: 'Input', name: 'pkgVersion', message: 'Package version', initial: getNpmConfig('init-version') || '0.1.0', when: !props.pkgVersion },
-    { type: 'Input', name: 'pkgDescription', message: 'Package description', when: !props.pkgDescription },
+    !props.npmOrg && { type: 'Input', name: 'npmOrg', message: 'NPM organization' },
+    !props.pkgName && { type: 'Input', name: 'pkgName', message: 'Package name', initial: basename(context.destination()) },
+    !props.pkgVersion && { type: 'Input', name: 'pkgVersion', message: 'Package version', initial: getNpmConfig('init-version') || '0.1.0' },
+    !props.pkgDescription && { type: 'Input', name: 'pkgDescription', message: 'Package description' },
     /* eslint-enable prettier/prettier */
   ])
   // Prompt for license information.
