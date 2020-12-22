@@ -133,9 +133,9 @@ export type Question<Props> = Unionize<
 export type Resolveable<R, Props> = R | ((generator: ZombiStreamOutput<Props>) => R | Promise<R>);
 
 /**
- * From the generator type given by `T`, infer the typing of its props.
+ * From the Zombi instance given by `T`, infer the typing of its props.
  */
-export type GeneratorProps<T extends Zombi<any>> = T extends Zombi<infer R> ? R : never;
+export type PropsFromZombi<T extends Zombi<any>> = T extends Zombi<infer R> ? R : never;
 
 /**
  * A placeholder type for arbitrary JSON data.
