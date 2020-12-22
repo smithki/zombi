@@ -5,9 +5,8 @@ import JSON5 from 'json5';
 import { isEmpty, isNil, merge } from 'lodash';
 import { isAbsolute, join } from 'path';
 import { isBinary } from 'istextorbinary';
-import { ZombiStreamOutput, JsonData, SideEffectUtils } from './types/core';
+import { ZombiStreamOutput, JsonData, SideEffectUtils, ZombiStreamContext } from './types/core';
 import { log } from './utils/log';
-import { Zombi } from './generator';
 import { createPromise } from './utils/create-promise';
 
 /**
@@ -35,8 +34,7 @@ export interface FSOptions {
  * Values provided to the stream picked from the executing `Generator` instance
  * (referring to the instance that invoked `Generator.run()`).
  */
-export interface FSContext<Props>
-  extends Pick<Zombi<Props>, 'name' | 'templateRoot' | 'destinationRoot' | 'template' | 'destination' | 'clobber'> {
+export interface FSContext<Props> extends ZombiStreamContext<Props> {
   to?: string;
   from?: string;
 }
@@ -155,8 +153,8 @@ export class FileSystem<Props> {
       };
 
       const defaultToFrom: Partial<FSContext<Props>> = {
-        to: isAbsolute(to) ? to : context.destination(to),
-        from: from && (isAbsolute(from) ? from : context.template(from)),
+        to: isAbsolute(to) ? to : context.resolveDestination(to),
+        from: from && (isAbsolute(from) ? from : context.resolveTemplate(from)),
       };
 
       return merge(defaultToFrom, context, { ...defaultFsOptions, ...options });

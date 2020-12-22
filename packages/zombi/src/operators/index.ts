@@ -7,3 +7,4 @@ export { ifElse } from './if-else';
 export { npmInstall, yarnInstall } from './installs';
 export { mapEffects } from './map-effects';
 export { exec } from './exec';
+export { withContext } from './with-context';

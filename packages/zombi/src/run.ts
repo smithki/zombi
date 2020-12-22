@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+
 import { isBoolean, isArray } from 'lodash';
 import { Listr, ListrTaskWrapper } from 'listr2';
 import Semaphore from 'semaphore-async-await';
@@ -77,28 +79,43 @@ export async function runGenerator<Props>(name: string, stream: ZombiStream<Prop
           executor: ListrTaskWrapper<any, typeof DefaultRenderer>,
         ) => {
           const condition = await resolveDataBuilder(generator)(sideEffect.condition);
+
           if (isBoolean(condition) && condition) {
+            const originalTitle = executor.title;
+            if (sideEffect.label) executor.title = sideEffect.label;
             await sideEffect(generator, utils(generator, timer, promptLock, executor));
+            executor.title = originalTitle;
           }
         };
 
-        // Execute all prompting tasks
+        /**
+         * Resolve the order or side effects based on
+         * the `SideEffect.sort` property.
+         */
+        const sortEffects = <T extends Array<SideEffect<Props> | SideEffect<Props>[]>>(effects: T) => {
+          return effects.sort((a, b) => {
+            if (Array.isArray(a) || Array.isArray(b)) return 0;
+            return (b.sort ?? 0) - (a.sort ?? 0);
+          });
+        };
+
+        // Execute prompting tasks
         listr.add({
           title: 'Setup',
           task: async (_, executor) => {
-            for (const sideEffect of generator.prompts) {
-              await sideEffect(generator, utils(generator, timer, promptLock, executor));
+            for (const prompt of sortEffects(generator.prompts)) {
+              await executeSideEffect(prompt, executor);
             }
           },
         });
 
-        // Execute all effectful tasks
+        // Execute effectful tasks
         listr.add({
           title: 'Scaffolding',
           task: async (_, executor) => {
-            for (const sideEffect of generator.sequence) {
+            for (const sideEffect of sortEffects(generator.sequence)) {
               if (isArray(sideEffect)) {
-                await Promise.all(sideEffect.map(se => executeSideEffect(se, executor)));
+                await Promise.all(sortEffects(sideEffect).map(se => executeSideEffect(se, executor)));
               } else await executeSideEffect(sideEffect, executor);
             }
           },

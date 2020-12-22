@@ -1,27 +1,33 @@
-import { Resolveable, JsonData, SideEffectOperator } from '../types/core';
+import { Resolveable, JsonData } from '../types/core';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
 import { FSOptions } from '../fs';
 
+interface CreateJsonOptions {
+  /**
+   *  The destination path. A relative path will be automatically
+   * resolved to the executing generator's `destinationRoot`.
+   */
+  file: string;
+
+  /**
+   * JSON data with which to fill the new file.
+   */
+  data?: JsonData;
+
+  /**
+   * Options for customizing file system and side-effect behavior.
+   */
+  fsOptions?: Pick<FSOptions, 'ejs' | 'clobber'>;
+}
+
 /**
  * Create a JSON-formatted file.
- *
- * @param file - The destination path. A relative path will be automatically
- * resolved to the executing generator's `destinationRoot`.
- * @param data - JSON data with which to fill the new file.
- * @param options - Options for customizing file system and side-effect behavior.
  */
-export function createJson<T>(
-  file: Resolveable<string, T>,
-  data?: Resolveable<JsonData, T>,
-  options?: Resolveable<Pick<FSOptions, 'ejs' | 'clobber'>, T>,
-): SideEffectOperator<T> {
-  return sideEffect(async (output, { fs }) => {
+export function createJson<T>(options: Resolveable<CreateJsonOptions, T>) {
+  return sideEffect<T>(async (output, { fs }) => {
     const resolveData = resolveDataBuilder(output);
-    const filePath = await resolveData(file);
-    const json = await resolveData(data);
-    const opts = await resolveData(options);
-
-    await fs.createJson(filePath, json, opts);
+    const { file, data, fsOptions } = await resolveData(options);
+    await fs.createJson(file, data, fsOptions);
   });
 }

@@ -8,20 +8,17 @@ import { SideEffect, SideEffectContext, SideEffectOperator, SideEffectCallback }
  * or [`tap`](http://reactivex.io/rxjs/function/index.html#static-function-tap).
  *
  * @param callback - A function to be executed during the run process.
- * @param options - Customize the flow of tasks by providing an options object
- * with `enforcePre` set to true.
+ * @param options - Customize the flow of tasks by providing an additional
+ * context object.
  */
-export function sideEffect<T>(
-  callback: SideEffectCallback<T>,
-  options: SideEffectContext<T> = {},
-): SideEffectOperator<T> {
+export function sideEffect<T>(callback: SideEffectCallback<T>, options: SideEffectContext<T> = {}) {
   return ((stream, context) => {
     return stream.pipe(
       map(output => {
         const result = merge({}, output);
 
         const defaultOptions: SideEffectContext<T> = {
-          enforcePre: false,
+          sort: 0,
           condition: true,
         };
 
@@ -32,8 +29,7 @@ export function sideEffect<T>(
           options, // Given options take precedence.
         );
 
-        if (options.enforcePre) result.sequence.unshift(sideEffectCallback);
-        else result.sequence.push(sideEffectCallback);
+        result.sequence.push(sideEffectCallback);
 
         return result;
       }),

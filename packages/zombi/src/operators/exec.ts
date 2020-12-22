@@ -1,6 +1,6 @@
 import { SpawnOptions } from 'child_process';
 import execa from 'execa';
-import { Resolveable, SideEffectOperator } from '../types/core';
+import { Resolveable } from '../types/core';
 import { resolveDataBuilder } from '../utils/resolve-data';
 import { sideEffect } from './side-effect';
 
@@ -10,9 +10,9 @@ import { sideEffect } from './side-effect';
  * @param command - A string representation of the shell command to execute.
  * @param options - Same options that would be passed to Node's `child_process.spawn` or `child_process.spawnSync`.
  */
-export function exec<T>(command: string, options?: Resolveable<SpawnOptions, T>): SideEffectOperator<T> {
-  return sideEffect(async (output, { statusIO }) => {
-    const resolvedOptions = resolveDataBuilder(output)(options);
+export function exec<T>(command: string, spawnOptions?: Resolveable<SpawnOptions, T>) {
+  return sideEffect<T>(async (output, { statusIO }) => {
+    const resolvedOptions = resolveDataBuilder(output)(spawnOptions);
     const cp = execa.command(command, { stdio: 'pipe', ...resolvedOptions });
     cp.stdout.pipe(statusIO);
     await cp;

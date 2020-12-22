@@ -9,4 +9,4 @@ import { packageJson } from './package-json';
 export const nodeModule = zombi({
   name: 'zombi-node-module',
   templateRoot: false,
-}).compose(packageJson, licenseFile);
+}).compose([packageJson, licenseFile]);

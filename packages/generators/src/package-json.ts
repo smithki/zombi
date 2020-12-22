@@ -23,19 +23,18 @@ export const packageJson = zombi<PackageJsonProps>({
   .prompt(({ props, context }) => [
     /* eslint-disable prettier/prettier */
     !props.npmOrg && { type: 'Input', name: 'npmOrg', message: 'NPM organization' },
-    !props.pkgName && { type: 'Input', name: 'pkgName', message: 'Package name', initial: basename(context.destination()) },
+    !props.pkgName && { type: 'Input', name: 'pkgName', message: 'Package name', initial: basename(context.resolveDestination()) },
     !props.pkgVersion && { type: 'Input', name: 'pkgVersion', message: 'Package version', initial: getNpmConfig('init-version') || '0.1.0' },
     !props.pkgDescription && { type: 'Input', name: 'pkgDescription', message: 'Package description' },
     /* eslint-enable prettier/prettier */
   ])
-  // Prompt for license information.
-  .compose(promptLicense)
-  // Prompt for authorship information.
-  .compose(promptAuthor)
-  .sequence(
+  // Prompt for license and authorship information.
+  .compose([promptLicense, promptAuthor])
+  .pipe(
     // Ouput the generated `package.json`
-    createJson('./package.json', ({ props }) =>
-      refineDeep(
+    createJson(({ props }) => ({
+      file: './package.json',
+      data: refineDeep(
         {
           name: `${props.npmOrg ? `@${props.npmOrg}/` : ''}${props.pkgName}`,
           version: props.pkgVersion,
@@ -49,5 +48,5 @@ export const packageJson = zombi<PackageJsonProps>({
         },
         { ignoreEmptyStrings: true },
       ),
-    ),
+    })),
   );

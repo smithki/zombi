@@ -15,8 +15,10 @@ export function ifElse<T>(
   truthyOperators: SideEffectOperator<T>[],
   falseyOperators: SideEffectOperator<T>[] = [],
 ): SideEffectOperator<T> {
-  return (stream => {
-    const truthyOperatorsArray = ensureArray(truthyOperators).map(op => applyOperatorContext(op, { condition }));
+  return ((stream, context) => {
+    const truthyOperatorsArray = ensureArray(truthyOperators).map(op =>
+      applyOperatorContext(op, { ...context, condition }),
+    );
 
     const reversedCondition: Resolveable<boolean, T> = async ctx => {
       const originalCondition = await resolveDataBuilder(ctx)(condition);
@@ -24,7 +26,7 @@ export function ifElse<T>(
     };
 
     const falseyOperatorsArray = ensureArray(falseyOperators).map(op =>
-      applyOperatorContext(op, { condition: reversedCondition }),
+      applyOperatorContext(op, { ...context, condition: reversedCondition }),
     );
 
     return (stream.pipe as any)(...truthyOperatorsArray, ...falseyOperatorsArray);

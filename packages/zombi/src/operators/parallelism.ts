@@ -10,7 +10,7 @@ let savedSet: (SideEffect<any> | SideEffect<any>[])[] | undefined;
  * Start piping a set of parallel tasks into the generator.
  * @internal
  */
-export function startParallelism<T>(): ParallelismOperator<T> {
+export function startParallelism<T>() {
   return map(output => {
     const result = merge({}, output);
     // Copy the current sequence by value.
@@ -26,7 +26,7 @@ export function startParallelism<T>(): ParallelismOperator<T> {
  * Finish piping a set of parallel tasks into the generator.
  * @internal
  */
-export function endParallelism<T>(): ParallelismOperator<T> {
+export function endParallelism<T>() {
   return map(output => {
     const result = merge({}, output);
     const parallelSet = [...result.sequence];

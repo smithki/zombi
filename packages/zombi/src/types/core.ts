@@ -8,11 +8,17 @@ import { Nominal, RequiredOnly } from './utility';
  * Object type emitted by a `Zombi` instance's underlying RxJS stream.
  */
 export interface ZombiStreamOutput<Props> {
-  context: FSContext<Props>;
+  context: ZombiStreamContext<Props>;
   props: Props;
   prompts: SideEffect<Props>[];
   sequence: (SideEffect<Props> | SideEffect<Props>[])[];
 }
+
+export interface ZombiStreamContext<Props>
+  extends Pick<
+    Zombi<Props>,
+    'name' | 'templateRoot' | 'destinationRoot' | 'resolveTemplate' | 'resolveDestination' | 'clobber'
+  > {}
 
 /**
  * The RxJS observable stream underlying a `Zombi` instance.
@@ -101,12 +107,17 @@ export interface SideEffectContext<Props> {
    * Whether to prepend this side-effect to the `Zombi` instance's list of
    * tasks.
    */
-  enforcePre?: boolean;
+  sort?: number;
 
   /**
    * Whether to execute this side-effect.
    */
   condition?: Resolveable<boolean, Props>;
+
+  /**
+   * An optional label to show when the side effect is being processed.
+   */
+  label?: string;
 }
 
 /**

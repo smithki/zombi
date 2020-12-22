@@ -1,15 +1,26 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import { merge, uniq } from 'lodash';
+import { isBoolean, isFunction, merge, uniq } from 'lodash';
 import { resolve } from 'path';
 import { of } from 'rxjs';
 import { endParallelism, startParallelism } from './operators/parallelism';
 import { prompt } from './operators/prompt';
-import { Configuration, Resolveable, ZombiStreamOutput, ZombiStream, Question, SideEffectOperator } from './types/core';
-import { RequiredOnly, Maybe } from './types/utility';
+import {
+  Configuration,
+  Resolveable,
+  ZombiStreamOutput,
+  ZombiStream,
+  Question,
+  SideEffectOperator,
+  SideEffectContext,
+  SideEffect,
+} from './types/core';
+import { Maybe } from './types/utility';
 import { normalizeGeneratorName } from './utils/normalize-generator-name';
 import { resolveTemplateRoot } from './utils/resolve-template-root';
 import { runGenerator } from './run';
+import { ensureArray } from './utils/array-helpers';
+import { resolveDataBuilder } from './utils/resolve-data';
 
 /**
  * A class representing the `zombi` interface.
@@ -40,8 +51,8 @@ export class Zombi<Props> {
         name: this.name,
         templateRoot: this.templateRoot,
         destinationRoot: this.destinationRoot,
-        template: this.template,
-        destination: this.destination,
+        resolveTemplate: this.resolveTemplate,
+        resolveDestination: this.resolveDestination,
         clobber: this.clobber,
       },
 
@@ -78,43 +89,59 @@ export class Zombi<Props> {
    *
    * @param operators - Operators that will run _in sequence_.
    */
-  public sequence(...operators: SideEffectOperator<Props>[]): Zombi<Props> {
+  public pipe(...operators: SideEffectOperator<Props>[]): Zombi<Props> {
     const result = (this.zombi$.pipe as any)(...operators);
     return merge({}, this, { zombi$: result });
   }
 
   /**
-   * Create a _parallel_ sequence of tasks by chaining operators together.
+   * Create a _parallel_ task from the given operators.
    *
    * @param operators - Operators that will run _in parallel_.
    */
-  public parallel(...operators: SideEffectOperator<Props>[]): Zombi<Props> {
+  public parallelPipe(...operators: SideEffectOperator<Props>[]): Zombi<Props> {
     const result = (this.zombi$.pipe as any)(startParallelism(), ...operators, endParallelism());
-    // delete Generator[parallelismId];
     return merge({}, this, { zombi$: result });
   }
 
   /* eslint-disable prettier/prettier */
-  public compose(): Zombi<Props>;
-  public compose<Z1>(z1: Zombi<Z1>): Zombi<Props & Z1>;
-  public compose<Z1, Z2>(z1: Zombi<Z1>, z2: Zombi<Z2>): Zombi<Props & Z1 & Z2>;
-  public compose<Z1, Z2, Z3>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>): Zombi<Props & Z1 & Z2 & Z3>;
-  public compose<Z1, Z2, Z3, Z4>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>): Zombi<Props & Z1 & Z2 & Z3 & Z4>;
-  public compose<Z1, Z2, Z3, Z4, Z5>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z5>, z5: Zombi<Z5>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>, z5: Zombi<Z5>, z6: Zombi<Z6>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>, z5: Zombi<Z5>, z6: Zombi<Z6>, z7: Zombi<Z7>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>, z5: Zombi<Z5>, z6: Zombi<Z6>, z7: Zombi<Z7>, z8: Zombi<Z8>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
-  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(z1: Zombi<Z1>, z2: Zombi<Z2>, z3: Zombi<Z3>, z4: Zombi<Z4>, z5: Zombi<Z5>, z6: Zombi<Z6>, z7: Zombi<Z7>, z8: Zombi<Z8>, z9: Zombi<Z9>): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
+  public compose<Z1>(zombis: Zombi<Z1> | [Zombi<Z1>]): Zombi<Props & Z1>;
+  public compose<Z1, Z2>(zombis: [Zombi<Z1>, Zombi<Z2>]): Zombi<Props & Z1 & Z2>;
+  public compose<Z1, Z2, Z3>(zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>]): Zombi<Props & Z1 & Z2 & Z3>;
+  public compose<Z1, Z2, Z3, Z4>(zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>]): Zombi<Props & Z1 & Z2 & Z3 & Z4>;
+  public compose<Z1, Z2, Z3, Z4, Z5>(zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z5>, Zombi<Z5>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6>(zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>, Zombi<Z5>, Zombi<Z6>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>, Zombi<Z5>, Zombi<Z6>, Zombi<Z7>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>, Zombi<Z5>, Zombi<Z6>, Zombi<Z7>, Zombi<Z8>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>, Zombi<Z5>, Zombi<Z6>, Zombi<Z7>, Zombi<Z8>, Zombi<Z9>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
+
+  public compose<Z1>(condition: Resolveable<boolean, Props>, zombis: Zombi<Z1> | [Zombi<Z1>]): Zombi<Props & Z1>;
+  public compose<Z1, Z2>(condition: Resolveable<boolean, Props>, zombis: [Zombi<Z1>, Zombi<Z2>]): Zombi<Props & Z1 & Z2>;
+  public compose<Z1, Z2, Z3>(condition: Resolveable<boolean, Props>, zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>]): Zombi<Props & Z1 & Z2 & Z3>;
+  public compose<Z1, Z2, Z3, Z4>(condition: Resolveable<boolean, Props>, zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>]): Zombi<Props & Z1 & Z2 & Z3 & Z4>;
+  public compose<Z1, Z2, Z3, Z4, Z5>(condition: Resolveable<boolean, Props>, zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z5>, Zombi<Z5>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6>(condition: Resolveable<boolean, Props>, zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>, Zombi<Z5>, Zombi<Z6>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7>(condition: Resolveable<boolean, Props>, zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>, Zombi<Z5>, Zombi<Z6>, Zombi<Z7>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8>(condition: Resolveable<boolean, Props>, zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>, Zombi<Z5>, Zombi<Z6>, Zombi<Z7>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8>;
+  public compose<Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9>(condition: Resolveable<boolean, Props>, zombis: [Zombi<Z1>, Zombi<Z2>, Zombi<Z3>, Zombi<Z4>, Zombi<Z5>, Zombi<Z6>, Zombi<Z7>, Zombi<Z8>, Zombi<Z9>]): Zombi<Props & Z1 & Z2 & Z3 & Z4 & Z5 & Z6 & Z7 & Z8 & Z9>;
   /* eslint-enable prettier/prettier */
 
   /**
    * Create a new Zombi generator that composes other generators.
    *
-   * @param {...Zombi<any>[]} zombis - The other generators to compose.
-   * @returns {Zombi<any>}
+   * @param condition - A resolveable condition that
+   * determines whether the composition should take effect.
+   * @param zombis - The other generators to compose.
    */
-  public compose(...zombis: Zombi<any>[]): Zombi<any> {
-    if (!zombis.length) return this;
+  public compose(
+    conditionOrZombis: Resolveable<boolean, Props> | (Zombi<any> | Zombi<any>[]),
+    moreZombis?: Zombi<any> | Zombi<any>[],
+  ): Zombi<any> {
+    const condition = isBoolean(conditionOrZombis) || isFunction(conditionOrZombis) ? conditionOrZombis : undefined;
+    const zombis =
+      isBoolean(conditionOrZombis) || isFunction(conditionOrZombis)
+        ? ensureArray(moreZombis)
+        : ensureArray(conditionOrZombis);
 
     let result: ZombiStreamOutput<any>;
 
@@ -123,11 +150,39 @@ export class Zombi<Props> {
       result = g;
     });
 
+    /**
+     * Applies a condition to the underlying operators being composed. This
+     * enables advanced use-cases where composition is optional depending on
+     * user prompts.
+     */
+    const applyCondition = (se: SideEffect<any>): SideEffect<any> => {
+      const effectCondition = se.condition;
+
+      return merge(se, {
+        condition: async generator => {
+          if (Array.isArray(se)) return se.map(applyCondition);
+
+          // First, we respect the given compose condition...
+          if (condition) {
+            const composeCondition = await resolveDataBuilder(generator)(condition);
+            if (isBoolean(composeCondition) && !composeCondition) return false;
+          }
+
+          // If the compose condition is truthy, we move on to check the
+          // underlying effect condition...
+          return resolveDataBuilder(generator)(effectCondition);
+        },
+      } as SideEffectContext<any>);
+    };
+
+    /**
+     * Apply the composed operators from the given source.
+     */
     const doCompose = (z: Zombi<any>) => {
       const source = merge({}, z.zombi$);
       source.subscribe((g: ZombiStreamOutput<any>) => {
-        result.prompts.push(...g.prompts);
-        result.sequence.push(...g.sequence);
+        result.prompts.push(...g.prompts.map(applyCondition));
+        result.sequence.push(...g.sequence.map(applyCondition));
       });
     };
 
@@ -158,22 +213,22 @@ export class Zombi<Props> {
   }
 
   /**
-   * Resolves a path to the generator's `templateRoot`.
+   * Resolves a path to the Zombi instance's `templateRoot`.
    *
    * @param {...string[]} pathSegments - Strings from which to resolve a path.
    */
-  public template(...pathSegments: string[]) {
+  public resolveTemplate(...pathSegments: string[]) {
     if (this.templateRoot) {
       return resolve(this.templateRoot, ...pathSegments);
     }
   }
 
   /**
-   * Resolves a path to the generator's `destinationRoot`.
+   * Resolves a path to the Zombi instance's `destinationRoot`.
    *
    * @param {...string[]} pathSegments - Strings from which to resolve a path.
    */
-  public destination(...pathSegments: string[]) {
+  public resolveDestination(...pathSegments: string[]) {
     return resolve(this.destinationRoot, ...pathSegments);
   }
 }

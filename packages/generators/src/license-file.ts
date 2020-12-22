@@ -29,6 +29,9 @@ export const promptLicense = generator.prompt(({ props }) => [
 /**
  * Generates a LICENSE file.
  */
-export const licenseFile = generator
-  .compose(promptLicense, promptAuthor)
-  .sequence(copy(({ props }) => `${kebabCase(`${props.pkgLicense}-license`)}.txt`, 'LICENSE'));
+export const licenseFile = generator.compose([promptLicense, promptAuthor]).pipe(
+  copy(({ props }) => ({
+    from: `${kebabCase(`${props.pkgLicense}-license`)}.txt`,
+    to: 'LICENSE',
+  })),
+);
