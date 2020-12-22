@@ -1,3 +1,24 @@
+# v2.3.0 (Tue Dec 22 2020)
+
+#### 🚀 Enhancement
+
+- Make 'exec' operator options resolveable [#31](https://github.com/smithki/zombi/pull/31) ([@smithki](https://github.com/smithki))
+
+#### 🐛 Bug Fix
+
+- Make 'exec' operator options resolveable ([@smithki](https://github.com/smithki))
+
+#### 🔩 Dependency Updates
+
+- Bump ini from 1.3.5 to 1.3.6 [#28](https://github.com/smithki/zombi/pull/28) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v2.2.0 (Tue Dec 22 2020)
 
 #### 🚀 Enhancement
