@@ -1,14 +1,20 @@
 import fsExtra from 'fs-extra';
-import { prompt } from 'inquirer';
 import { renderFile } from 'ejs';
-import path from 'path';
+import { isAbsolute, join, resolve as pathResolve } from 'path';
 import { isBinary } from 'istextorbinary';
 import { isNil, isEmpty } from 'lodash';
 import chalk from 'chalk';
 import { createPromise } from './utils/create-promise';
 import { Zombi } from './components/zombi';
+import { logger } from './utils/logger';
+import { Question } from './types';
 
-export async function copy(from: string, to: string, options: Zombi) {
+export interface FSOptions extends Zombi {
+  stdout: NodeJS.WritableStream;
+  prompt: <T = any>(questions: Question | Question[]) => Promise<T>;
+}
+
+export async function copy(from: string, to: string, options: FSOptions) {
   if (await isFile(from)) {
     await copyFile(from, to, options);
   } else if (isDirectory(from)) {
@@ -16,17 +22,7 @@ export async function copy(from: string, to: string, options: Zombi) {
   }
 }
 
-async function isFile(testPath: string) {
-  const stats = await fsExtra.stat(testPath);
-  return stats.isFile();
-}
-
-async function isDirectory(testPath: string) {
-  const stats = await fsExtra.stat(testPath);
-  return stats.isDirectory();
-}
-
-async function copyFile(from: string, to: string, options: Zombi) {
+async function copyFile(from: string, to: string, options: FSOptions) {
   const paths = resolvePaths(from, to, options);
 
   await createPromise<void>(async (resolve, reject) => {
@@ -42,7 +38,7 @@ async function copyFile(from: string, to: string, options: Zombi) {
     if (shouldRenderEJS) {
       // Render file with EJS processing.
       renderFile(paths.from, options.data || {}, (err, string) => {
-        if (err) reject(new Error(paths.to));
+        if (err) reject(err);
         outputFile(string, to, options).then(resolve).catch(reject);
       });
     } else {
@@ -52,13 +48,13 @@ async function copyFile(from: string, to: string, options: Zombi) {
   });
 }
 
-async function copyDirectory(from: string, to: string, options: Zombi) {
+async function copyDirectory(from: string, to: string, options: FSOptions) {
   const paths = resolvePaths(from, to, options);
 
   const listing = await fsExtra.readdir(paths.from);
 
   for (const item of listing) {
-    await copy(path.join(paths.from, item), path.join(paths.to, item), options);
+    await copy(join(paths.from, item), join(paths.to, item), options);
   }
 
   if (options.replaceDirectories) {
@@ -66,32 +62,32 @@ async function copyDirectory(from: string, to: string, options: Zombi) {
 
     for (const destItem of destListing) {
       if (!listing.includes(destItem)) {
-        await fsExtra.remove(path.join(paths.to, destItem));
+        await fsExtra.remove(join(paths.to, destItem));
       }
     }
   }
 }
 
-async function outputFile(data: any, to: string, options: Zombi) {
+async function outputFile(data: any, to: string, options: FSOptions) {
   const prettyTo = prettifyPath(to);
   const doesExist = await fsExtra.pathExists(to);
 
   if (!options.clobber) {
     if (doesExist) {
-      const { overwrite } = await prompt([
+      const { overwrite } = await options.prompt<{ overwrite: boolean }>([
         {
-          type: 'confirm',
+          type: 'Confirm',
           name: 'overwrite',
           message: `Conflict on \`${prettyTo}\` ${chalk.red('\n  Overwrite?')}`,
-          default: false,
+          initial: false,
         },
       ]);
 
       if (overwrite) {
         await fsExtra.outputFile(to, data);
-        // this.fsLog.fileOverwrite(prettyTo);
+        logger.fsMessages(options.stdout).fileOverwrite(prettyTo);
       } else {
-        // this.fsLog.fileSkip(prettyTo);
+        logger.fsMessages(options.stdout).fileSkip(prettyTo);
       }
 
       return;
@@ -101,14 +97,24 @@ async function outputFile(data: any, to: string, options: Zombi) {
   // Write the file to its destination
   await fsExtra.outputFile(to, data);
 
-  // if (doesExist) this.fsLog.fileOverwrite(prettyTo);
-  // else this.fsLog.fileAdd(prettyTo);
+  if (doesExist) logger.fsMessages(options.stdout).fileOverwrite(prettyTo);
+  else logger.fsMessages(options.stdout).fileAdd(prettyTo);
 }
 
-function resolvePaths(from: string, to: string, options: Zombi) {
+async function isFile(path: string) {
+  const stats = await fsExtra.stat(path);
+  return stats.isFile();
+}
+
+async function isDirectory(path: string) {
+  const stats = await fsExtra.stat(path);
+  return stats.isDirectory();
+}
+
+function resolvePaths(from: string, to: string, options: FSOptions) {
   return {
-    from: path.isAbsolute(from) ? from : path.resolve(options.templateRoot, from),
-    to: path.isAbsolute(to) ? to : path.resolve(options.destinationRoot, to),
+    from: isAbsolute(from) ? from : pathResolve(options.templateRoot, from),
+    to: isAbsolute(to) ? to : pathResolve(options.destinationRoot, to),
   };
 }
 

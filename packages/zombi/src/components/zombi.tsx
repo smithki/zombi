@@ -31,12 +31,6 @@ export interface Zombi extends ZombiFsOptions {
 }
 
 export const Zombi: React.FC<Zombi> = props => {
-  const { children, templateRoot, destinationRoot } = props;
-
-  const ctx = {
-    templateRoot,
-    destinationRoot,
-  };
-
+  const { children, ...ctx } = props;
   return <ZombiContext.Provider value={ctx}>{children}</ZombiContext.Provider>;
 };

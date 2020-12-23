@@ -2,22 +2,18 @@ import chalk from 'chalk';
 
 const { gray, cyan, green, red, yellow } = chalk;
 
-export function fsMessages(io: NodeJS.WritableStream) {
+export function fsMessages(stdout: NodeJS.WritableStream) {
   return {
     fileAdd(name: string) {
-      io.write(`${green.bold('Add')} ${name}`);
-    },
-
-    fileExtend(name: string) {
-      io.write(`${green.bold('Extend')} ${name}`);
+      stdout.write(`${green.bold('Add')} ${name}`);
     },
 
     fileOverwrite(name: string) {
-      io.write(`${red.bold('Overwrite')} ${name}`);
+      stdout.write(`${red.bold('Overwrite')} ${name}`);
     },
 
     fileSkip(name: string) {
-      io.write(`${yellow.bold('Skip')} ${name}`);
+      stdout.write(`${yellow.bold('Skip')} ${name}`);
     },
   };
 }
@@ -34,7 +30,7 @@ function completedMessage(timeElapsed: string) {
   console.log(gray(`Generated in ${cyan.bold(timeElapsed)}`));
 }
 
-export const log = {
+export const logger = {
   fsMessages,
   startMessage,
   nothingToDoMessage,

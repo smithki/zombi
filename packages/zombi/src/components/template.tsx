@@ -6,11 +6,11 @@ import { Effect } from './effect';
 
 export interface Template extends ZombiFsOptions {
   name?: string;
-  template: string;
+  source: string;
 }
 
 export const Template: React.FC<Template> = props => {
-  const { name, clobber, data, replaceDirectories, template } = props;
+  const { name, clobber, data, replaceDirectories, source } = props;
 
   const ctx = useZombiContext();
   const pathCtx = usePathContext();
@@ -24,8 +24,8 @@ export const Template: React.FC<Template> = props => {
 
   return (
     <Effect
-      from={path.resolve(ctx.templateRoot, template)}
-      to={path.resolve(ctx.destinationRoot, ...pathCtx, name ?? path.basename(template))}
+      from={path.resolve(ctx.templateRoot, source)}
+      to={path.resolve(ctx.destinationRoot, ...pathCtx, name ?? path.basename(source))}
       options={optionsWithOverrides}
     />
   );
