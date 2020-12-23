@@ -1,203 +1,117 @@
-import chalk from 'chalk';
-import { Data as EjsData, renderFile } from 'ejs';
-import * as fsExtra from 'fs-extra';
-import JSON5 from 'json5';
-import { isEmpty, isNil, merge } from 'lodash';
-import { isAbsolute, join } from 'path';
+import fsExtra from 'fs-extra';
+import { prompt } from 'inquirer';
+import { renderFile } from 'ejs';
+import path from 'path';
 import { isBinary } from 'istextorbinary';
-import { ZombiStreamOutput, JsonData, SideEffectUtils, ZombiStreamContext } from './types/core';
-import { log } from './utils/log';
+import { isNil, isEmpty } from 'lodash';
+import chalk from 'chalk';
 import { createPromise } from './utils/create-promise';
+import { Zombi } from './components/zombi';
 
-/**
- * Options given to `FileSystem` methods that render _new_ files.
- */
-export interface FSOptions {
-  /**
-   * Whether to force overwrites on file conflicts.
-   */
-  clobber?: boolean;
-
-  /**
-   * Whether to render a file with EJS data.
-   */
-  ejs?: boolean;
-
-  /**
-   * When copying directories with this option enabled, files living at the
-   * supplied location will be deleted, even if they produce no conflicts.
-   */
-  replaceDirectories?: boolean;
+export async function copy(from: string, to: string, options: Zombi) {
+  if (await isFile(from)) {
+    await copyFile(from, to, options);
+  } else if (isDirectory(from)) {
+    await copyDirectory(from, to, options);
+  }
 }
 
-/**
- * Values provided to the stream picked from the executing `Generator` instance
- * (referring to the instance that invoked `Generator.run()`).
- */
-export interface FSContext<Props> extends ZombiStreamContext<Props> {
-  to?: string;
-  from?: string;
+async function isFile(testPath: string) {
+  const stats = await fsExtra.stat(testPath);
+  return stats.isFile();
 }
 
-export class FileSystem<Props> {
-  public static conflictCount = 0;
-  private fsLog: ReturnType<typeof log['fsMessages']>;
+async function isDirectory(testPath: string) {
+  const stats = await fsExtra.stat(testPath);
+  return stats.isDirectory();
+}
 
-  constructor(private readonly generator: ZombiStreamOutput<Props>, private readonly utils: SideEffectUtils<Props>) {
-    this.generator = generator;
-    this.fsLog = log.fsMessages(this.utils.statusIO);
-  }
+async function copyFile(from: string, to: string, options: Zombi) {
+  const paths = resolvePaths(from, to, options);
 
-  public async isFile(path: string) {
-    const stats = await fsExtra.stat(path);
-    return stats.isFile();
-  }
+  await createPromise<void>(async (resolve, reject) => {
+    const buffer = await fsExtra.readFile(paths.from);
 
-  public async isDirectory(path: string) {
-    const stats = await fsExtra.stat(path);
-    return stats.isDirectory();
-  }
+    const shouldRenderEJS =
+      !isBinary(paths.from, buffer) ||
+      !isBinary(paths.to) ||
+      options.data ||
+      !isNil(options.data) ||
+      !isEmpty(options.data);
 
-  public async copy(from: string, to: string, data: EjsData, options?: FSOptions) {
-    const ctx = this.getContextBuilder(options)(to, from);
-
-    if (await this.isFile(from)) {
-      await this.copyFile(ctx.from, ctx.to, data, options);
-    } else if (this.isDirectory(from)) {
-      await this.copyDirectory(ctx.from, ctx.to, data, options);
+    if (shouldRenderEJS) {
+      // Render file with EJS processing.
+      renderFile(paths.from, options.data || {}, (err, string) => {
+        if (err) reject(new Error(paths.to));
+        outputFile(string, to, options).then(resolve).catch(reject);
+      });
+    } else {
+      // Render file without EJS processing.
+      outputFile(buffer, to, options).then(resolve).catch(reject);
     }
+  });
+}
+
+async function copyDirectory(from: string, to: string, options: Zombi) {
+  const paths = resolvePaths(from, to, options);
+
+  const listing = await fsExtra.readdir(paths.from);
+
+  for (const item of listing) {
+    await copy(path.join(paths.from, item), path.join(paths.to, item), options);
   }
 
-  public async copyFile(from: string, to: string, data: EjsData, options?: FSOptions) {
-    const ctx = this.getContextBuilder(options)(to, from);
+  if (options.replaceDirectories) {
+    const destListing = await fsExtra.readdir(paths.to);
 
-    await createPromise<void>(async (resolve, reject) => {
-      const buffer = await fsExtra.readFile(ctx.from);
-
-      if (isBinary(ctx.from, buffer) || isBinary(ctx.to) || isNil(data) || isEmpty(data) || !ctx.ejs) {
-        // Render file without EJS processing.
-        this.effects.outputFile(ctx)(buffer).then(resolve).catch(reject);
-      } else {
-        // Render file with EJS processing.
-        renderFile(ctx.from, data || {}, (err, string) => {
-          if (err) reject(new Error(ctx.to));
-          this.effects.outputFile(ctx)(string).then(resolve).catch(reject);
-        });
-      }
-    });
-  }
-
-  public async copyDirectory(from: string, to: string, data: EjsData, options?: FSOptions) {
-    const ctx = this.getContextBuilder(options)(to, from);
-
-    const listing = await fsExtra.readdir(from);
-    for (const item of listing) {
-      await this.copy(join(from, item), join(to, item), data, options);
-    }
-
-    if (ctx.replaceDirectories) {
-      const destListing = await fsExtra.readdir(to);
-      for (const destItem of destListing) {
-        if (!listing.includes(destItem)) await fsExtra.remove(join(to, destItem));
+    for (const destItem of destListing) {
+      if (!listing.includes(destItem)) {
+        await fsExtra.remove(path.join(paths.to, destItem));
       }
     }
   }
+}
 
-  public async createFile(filePath: string, content?: any, options?: FSOptions) {
-    const ctx = this.getContextBuilder(options)(filePath);
-    await this.effects.outputFile(ctx)(content || '');
-  }
+async function outputFile(data: any, to: string, options: Zombi) {
+  const prettyTo = prettifyPath(to);
+  const doesExist = await fsExtra.pathExists(to);
 
-  public async createJson(filePath: string, data?: JsonData, options?: FSOptions) {
-    const ctx = this.getContextBuilder(options)(filePath);
-    await this.effects.outputJson(ctx)(data || {});
-  }
-
-  public async extendJson(filePath: string, extensions: JsonData) {
-    // Get context and JSON data
-    const ctx = this.getContextBuilder()(filePath);
-    const jsonString = await fsExtra.readFile(ctx.to, 'utf8');
-    const json = JSON5.parse(jsonString);
-
-    merge(json, extensions || {});
-
-    // Write to JSON file
-    await this.effects.extendJson(ctx)(json);
-  }
-
-  private get effects() {
-    return {
-      // Outputs a text file to the destination.
-      outputFile: (ctx: FSContext<Props>) => async (data: any) =>
-        this.checkForConflicts(ctx, async () => fsExtra.outputFile(ctx.to, data)),
-
-      // Outputs a JSON file to the destination.
-      outputJson: (ctx: FSContext<Props>) => async (data: any) =>
-        this.checkForConflicts(ctx, async () => fsExtra.outputJson(ctx.to, data, { spaces: 2 })),
-
-      // Outputs a modified/extended JSON file to the destination.
-      extendJson: (ctx: FSContext<Props>) => async (data: any) => {
-        await fsExtra.outputJson(ctx.to, data, { spaces: 2 });
-        this.fsLog.fileExtend(this.prettifyPath(ctx).to);
-      },
-    };
-  }
-
-  private getContextBuilder(options: FSOptions = {}): (to: string, from?: string) => FSContext<Props> & FSOptions {
-    return (to, from) => {
-      const context = { ...this.generator.context };
-
-      const defaultFsOptions: Partial<FSOptions> = {
-        ejs: true,
-        replaceDirectories: true,
-      };
-
-      const defaultToFrom: Partial<FSContext<Props>> = {
-        to: isAbsolute(to) ? to : context.resolveDestination(to),
-        from: from && (isAbsolute(from) ? from : context.resolveTemplate(from)),
-      };
-
-      return merge(defaultToFrom, context, { ...defaultFsOptions, ...options });
-    };
-  }
-
-  private async checkForConflicts(ctx: FSContext<Props>, write: () => Promise<void>) {
-    const prettyTo = this.prettifyPath(ctx).to;
-    const doesExist = await fsExtra.pathExists(ctx.to);
-
-    if (!ctx.clobber) {
-      if (doesExist) {
-        const { overwrite } = await this.utils.ask({
-          type: 'Confirm',
-          name: 'overwrite' as any,
+  if (!options.clobber) {
+    if (doesExist) {
+      const { overwrite } = await prompt([
+        {
+          type: 'confirm',
+          name: 'overwrite',
           message: `Conflict on \`${prettyTo}\` ${chalk.red('\n  Overwrite?')}`,
-          initial: false,
-        });
+          default: false,
+        },
+      ]);
 
-        if (overwrite) {
-          await write();
-          this.fsLog.fileOverwrite(prettyTo);
-        } else {
-          this.fsLog.fileSkip(prettyTo);
-        }
-
-        // Count the number of conflicts.
-        ++FileSystem.conflictCount;
-
-        return;
+      if (overwrite) {
+        await fsExtra.outputFile(to, data);
+        // this.fsLog.fileOverwrite(prettyTo);
+      } else {
+        // this.fsLog.fileSkip(prettyTo);
       }
+
+      return;
     }
-
-    await write();
-
-    if (doesExist) this.fsLog.fileOverwrite(prettyTo);
-    else this.fsLog.fileAdd(prettyTo);
   }
 
-  private prettifyPath(ctx: FSContext<Props>) {
-    return {
-      to: ctx.to ? ctx.to.replace(process.cwd(), '.') : undefined,
-      from: ctx.from ? ctx.from.replace(process.cwd(), '.') : undefined,
-    };
-  }
+  // Write the file to its destination
+  await fsExtra.outputFile(to, data);
+
+  // if (doesExist) this.fsLog.fileOverwrite(prettyTo);
+  // else this.fsLog.fileAdd(prettyTo);
+}
+
+function resolvePaths(from: string, to: string, options: Zombi) {
+  return {
+    from: path.isAbsolute(from) ? from : path.resolve(options.templateRoot, from),
+    to: path.isAbsolute(to) ? to : path.resolve(options.destinationRoot, to),
+  };
+}
+
+function prettifyPath(uglyPath: string) {
+  return uglyPath.replace(process.cwd(), '.');
 }

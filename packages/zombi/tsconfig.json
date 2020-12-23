@@ -4,8 +4,9 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
+    "jsx": "react",
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
   },
 
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts", "./src/**/*.tsx"]
 }
