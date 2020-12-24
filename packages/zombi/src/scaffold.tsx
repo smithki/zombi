@@ -10,15 +10,28 @@ import { copy, FSOptions } from './fs';
 import { createTimer, HrTime } from './utils/timer';
 import { logger } from './utils/logger';
 import { ensureArray } from './utils/array-helpers';
+import { Zombi } from './components/zombi';
 
 const promptLock = new Semaphore(1);
 
 export async function scaffold<Props>(tree: ReactElement<Props>) {
+  const scaffoldNames: string[] = [];
   const effects: Effect[] = [];
 
-  await treeWalker(tree, (element, instance) => {
-    if (isValidElement(element) && element.type === Effect) {
-      effects.push(element.props as Effect);
+  await treeWalker(tree, element => {
+    if (isValidElement(element)) {
+      switch (element.type) {
+        case Effect:
+          effects.push(element.props as Effect);
+          break;
+
+        case Zombi:
+          scaffoldNames.push((element.props as Zombi).name);
+          break;
+
+        default:
+          break;
+      }
     }
   });
 
@@ -62,6 +75,7 @@ export async function scaffold<Props>(tree: ReactElement<Props>) {
   ]);
 
   timer.start();
+  logger.startMessage(scaffoldNames[0]);
   await taskRunner.run();
   timeElapsed = timer.stop();
 

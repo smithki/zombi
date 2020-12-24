@@ -3,6 +3,7 @@
     "lib": ["es2018", "dom"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,

@@ -10,7 +10,7 @@ import { parse } from 'ini';
  * docs](https://docs.npmjs.com/misc/config) for available keys. If left
  * `undefined`, all config values will be returned in a plain object.
  */
-export function getNpmConfig(key?: string) {
+export function getNpmConfig<T = any>(key?: string): T {
   const result = execSync(`npm config get ${key}`, {
     stdio: ['ignore', 'pipe', 'pipe'], // Prevent writing output to the console
   })
@@ -18,9 +18,9 @@ export function getNpmConfig(key?: string) {
     .replace(/\n$/, ''); // Remove any newline characters
 
   if (result && !key) {
-    return parse(result);
+    return parse(result) as T;
   }
 
   // If our search results in e
-  return !result ? undefined : result;
+  return (!result ? undefined : result) as any;
 }
