@@ -7,6 +7,10 @@ export interface Effect {
   options: Zombi;
 }
 
-export const Effect: React.FC<Effect> = props => {
+/**
+ * A static representation of "side effects" that are executed by the
+ * scaffolding template. Each `Effect` maps to a template file being rendered.
+ */
+export const Effect: React.FC<Effect> = () => {
   return null;
 };

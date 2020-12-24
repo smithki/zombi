@@ -1,0 +1,1 @@
+export const SUSPENDED_ANSWERS = Symbol('SUSPENDED_ANSWERS');

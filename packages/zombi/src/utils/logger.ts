@@ -18,8 +18,8 @@ export function fsMessages(stdout: NodeJS.WritableStream) {
   };
 }
 
-function startMessage(name: string) {
-  console.log(gray('Running generator ') + cyan.bold(name));
+function startMessage(name?: string) {
+  console.log(gray('Running generator') + (name ? ` ${cyan.bold(name)}` : ''));
 }
 
 function nothingToDoMessage() {

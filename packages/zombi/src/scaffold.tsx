@@ -1,69 +1,73 @@
-/* eslint-disable prefer-const */
+/* eslint-disable prefer-const, no-param-reassign, symbol-description */
 
 import { isValidElement, ReactElement } from 'react';
 import treeWalker from 'react-ssr-prepass';
 import { Listr } from 'listr2';
 import prettyTime from 'pretty-time';
 import Semaphore from 'semaphore-async-await';
+import { merge, assign, isBoolean } from 'lodash';
 import { Effect } from './components/effect';
 import { copy, FSOptions } from './fs';
-import { createTimer, HrTime } from './utils/timer';
+import { createTimer, HrTime, Timer } from './utils/timer';
 import { logger } from './utils/logger';
-import { ensureArray } from './utils/array-helpers';
+import { ensureArray, cleanArray } from './utils/array-helpers';
 import { Zombi } from './components/zombi';
+import { PromptWrapper } from './types';
+import { SUSPENDED_ANSWERS } from './symbols';
+import { createPromise } from './utils/create-promise';
 
-const promptLock = new Semaphore(1);
+interface ScaffoldContext {
+  effects: Effect[];
+  data: any;
+}
 
+/**
+ * Renders the given scaffolding template.
+ *
+ * @param tree - The React tree describing the scaffold.
+ */
 export async function scaffold<Props>(tree: ReactElement<Props>) {
-  const scaffoldNames: string[] = [];
-  const effects: Effect[] = [];
-
-  await treeWalker(tree, element => {
-    if (isValidElement(element)) {
-      switch (element.type) {
-        case Effect:
-          effects.push(element.props as Effect);
-          break;
-
-        case Zombi:
-          scaffoldNames.push((element.props as Zombi).name);
-          break;
-
-        default:
-          break;
-      }
-    }
-  });
-
   const timer = createTimer();
   let timeElapsed: HrTime;
 
-  const taskRunner = new Listr([
+  const taskRunner = new Listr<ScaffoldContext>([
+    {
+      title: 'Setup',
+      task: async (ctx, executor) => {
+        const prompt = createPromptWrapper(executor.prompt.bind(executor), timer);
+
+        await treeWalker(tree, async element => {
+          if (isValidElement(element)) {
+            switch (element.type) {
+              case Effect:
+                ctx.effects.push(element.props as Effect);
+                break;
+
+              case Zombi:
+                if ((element.props as Zombi).prompts) {
+                  const answers = await prompt((element.props as Zombi).prompts);
+                  ctx.data = merge({}, ctx.data, answers);
+                  (element.props as any).children[SUSPENDED_ANSWERS] = answers;
+                }
+                break;
+
+              default:
+                break;
+            }
+          }
+        });
+      },
+    },
+
     {
       title: 'Scaffolding',
       task: async (ctx, executor) => {
-        const effectPromises = effects.map(e => {
+        const effectPromises = ctx.effects.map(e => {
           const options: FSOptions = {
             ...e.options,
-
+            data: !isBoolean(e.options.data) && assign({}, ctx.data, e.options.data),
             stdout: executor.stdout(),
-
-            prompt: async questions => {
-              await promptLock.acquire();
-              timer.pause();
-
-              const questionsArr = ensureArray(questions);
-              const defaultAnswerName = questionsArr[0].name;
-
-              if (!questionsArr.length) return Promise.resolve();
-
-              return (executor.prompt as any)(questionsArr).then((answers: any) => {
-                const answersFormatted = questionsArr.length === 1 ? { [defaultAnswerName]: answers } : answers;
-                timer.resume();
-                promptLock.signal();
-                return answersFormatted;
-              });
-            },
+            prompt: createPromptWrapper(executor.prompt.bind(executor), timer),
           };
 
           return copy(e.from, e.to, options);
@@ -75,8 +79,8 @@ export async function scaffold<Props>(tree: ReactElement<Props>) {
   ]);
 
   timer.start();
-  logger.startMessage(scaffoldNames[0]);
-  await taskRunner.run();
+  logger.startMessage(await getScaffoldName(tree));
+  const { effects } = await taskRunner.run({ effects: [], data: {} });
   timeElapsed = timer.stop();
 
   if (effects.length) {
@@ -86,3 +90,50 @@ export async function scaffold<Props>(tree: ReactElement<Props>) {
     logger.nothingToDoMessage();
   }
 }
+
+/**
+ * Walks the given `tree` until we reach a `Zombi` element,
+ * from which we can infer the scaffold's name.
+ */
+function getScaffoldName(tree: ReactElement<any>) {
+  return createPromise<string | undefined>(async resolve => {
+    await treeWalker(tree, element => {
+      if (isValidElement(element) && element.type === Zombi) {
+        resolve((element.props as Zombi).name);
+
+        // Bail out of `treeWalker`, we have what we came for!
+        throw new Error();
+      }
+    }).finally(() => {
+      // If no `Zombi` element was found, we'll just resolve `undefined`...
+      resolve(undefined);
+    });
+  });
+}
+
+const promptLock = new Semaphore(1);
+
+/**
+ * We use `listr2` to run the scaffold, which wraps `enquirer` for prompting
+ * user input. We have to wrap the prompt function once more, though, to format
+ * the answers and provide better TypeScript support.
+ */
+const createPromptWrapper = (
+  promptFn: (...args: any[]) => Promise<any>,
+  timer: Timer,
+): PromptWrapper => async questions => {
+  await promptLock.acquire();
+  timer.pause();
+
+  const questionsArr = cleanArray(ensureArray(questions));
+  const defaultAnswerName = questionsArr[0].name;
+
+  if (!questionsArr.length) return Promise.resolve();
+
+  return promptFn(questionsArr).then((answers: any) => {
+    const answersFormatted = questionsArr.length === 1 ? { [defaultAnswerName]: answers } : answers;
+    timer.resume();
+    promptLock.signal();
+    return answersFormatted;
+  });
+};

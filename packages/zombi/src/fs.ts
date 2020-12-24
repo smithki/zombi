@@ -7,11 +7,11 @@ import { isNil, isEmpty } from 'lodash';
 import { createPromise } from './utils/create-promise';
 import { Zombi } from './components/zombi';
 import { logger } from './utils/logger';
-import EnquirerWrapper from './types/enquirer';
+import { PromptWrapper } from './types';
 
 export interface FSOptions extends Zombi {
   stdout: NodeJS.WritableStream;
-  prompt: <T = any>(questions: EnquirerWrapper.prompt.Question | EnquirerWrapper.prompt.Question[]) => Promise<T>;
+  prompt: PromptWrapper;
 }
 
 export async function copy(from: string, to: string, options: FSOptions) {
