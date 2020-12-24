@@ -57,7 +57,7 @@ export async function scaffold<Props>(tree: ReactElement<Props>) {
 
               if (!questionsArr.length) return Promise.resolve();
 
-              return executor.prompt(questionsArr).then(answers => {
+              return (executor.prompt as any)(questionsArr).then((answers: any) => {
                 const answersFormatted = questionsArr.length === 1 ? { [defaultAnswerName]: answers } : answers;
                 timer.resume();
                 promptLock.signal();

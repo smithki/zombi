@@ -1,5 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { Data as EjsData } from 'ejs';
+import { Maybe } from '../types';
+import EnquirerWrapper from '../types/enquirer';
 
 export const ZombiContext = createContext<Zombi>(undefined);
 export const useZombiContext = () => useContext(ZombiContext);
@@ -22,6 +24,14 @@ export interface ZombiFsOptions {
    * supplied location will be deleted, even if they produce no conflicts.
    */
   replaceDirectories?: boolean;
+
+  /**
+   * A wrapper for [Enquirer's prompt API](https://github.com/enquirer/enquirer#-prompts).
+   * Prompts for user input and saves the resulting data for EJS rendering.
+   */
+  prompts?:
+    | Maybe<EnquirerWrapper.prompt.Question | EnquirerWrapper.prompt.Question[]>
+    | Maybe<EnquirerWrapper.prompt.Question | EnquirerWrapper.prompt.Question[]>[];
 }
 
 export interface Zombi extends ZombiFsOptions {

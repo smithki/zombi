@@ -2,16 +2,16 @@ import fsExtra from 'fs-extra';
 import { renderFile } from 'ejs';
 import { isAbsolute, join, resolve as pathResolve } from 'path';
 import { isBinary } from 'istextorbinary';
-import { isNil, isEmpty } from 'lodash';
 import chalk from 'chalk';
+import { isNil, isEmpty } from 'lodash';
 import { createPromise } from './utils/create-promise';
 import { Zombi } from './components/zombi';
 import { logger } from './utils/logger';
-import { Question } from './types';
+import EnquirerWrapper from './types/enquirer';
 
 export interface FSOptions extends Zombi {
   stdout: NodeJS.WritableStream;
-  prompt: <T = any>(questions: Question | Question[]) => Promise<T>;
+  prompt: <T = any>(questions: EnquirerWrapper.prompt.Question | EnquirerWrapper.prompt.Question[]) => Promise<T>;
 }
 
 export async function copy(from: string, to: string, options: FSOptions) {
@@ -74,14 +74,12 @@ async function outputFile(data: any, to: string, options: FSOptions) {
 
   if (!options.clobber) {
     if (doesExist) {
-      const { overwrite } = await options.prompt<{ overwrite: boolean }>([
-        {
-          type: 'Confirm',
-          name: 'overwrite',
-          message: `Conflict on \`${prettyTo}\` ${chalk.red('\n  Overwrite?')}`,
-          initial: false,
-        },
-      ]);
+      const { overwrite } = await options.prompt<{ overwrite: boolean }>({
+        type: 'confirm',
+        name: 'overwrite',
+        message: `Conflict on \`${prettyTo}\` ${chalk.red('\n  Overwrite?')}`,
+        initial: false,
+      });
 
       if (overwrite) {
         await fsExtra.outputFile(to, data);
