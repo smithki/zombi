@@ -1,10 +1,10 @@
 import React from 'react';
-import { Zombi } from './zombi';
+import { ZombiContext } from './zombi';
 
 export interface Effect {
   from: string;
   to: string;
-  options: Zombi;
+  options: ZombiContext;
 }
 
 /**

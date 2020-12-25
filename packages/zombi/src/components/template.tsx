@@ -2,32 +2,36 @@ import React from 'react';
 import path from 'path';
 import { assign, isBoolean } from 'lodash';
 import { usePathContext } from './directory';
-import { useZombiContext, Zombi, ZombiFsOptions } from './zombi';
+import { useZombiContext, ZombiFsOptions, ZombiContext } from './zombi';
 import { Effect } from './effect';
+import { Resolveable } from '../types';
+import { resolveData } from '../utils/resolve-data';
 
 export interface Template extends ZombiFsOptions {
-  name?: string;
-  source: string;
+  name?: Resolveable<string>;
+  source: Resolveable<string>;
 }
 
 export const Template: React.FC<Template> = props => {
-  const { name, source, clobber, data, replaceDirectories, prompts = [] } = props;
+  const { name, source, clobber, data, replaceDirectories } = props;
 
-  const ctx = useZombiContext();
+  const ctx = useZombiContext()!;
   const pathCtx = usePathContext();
 
-  const optionsWithOverrides: Zombi = {
+  const optionsWithOverrides: ZombiContext = {
     ...ctx,
-    clobber: clobber ?? ctx.clobber,
-    data: !isBoolean(data) && assign({}, ctx.data, data),
-    replaceDirectories: replaceDirectories ?? ctx.replaceDirectories,
-    prompts: ctx.prompts ? [...ctx.prompts, ...prompts] : [...prompts],
+    clobber: clobber ?? ctx?.clobber,
+    data: !isBoolean(data) && assign({}, ctx?.data, data),
+    replaceDirectories: replaceDirectories ?? ctx?.replaceDirectories,
   };
+
+  const resolvedSource = resolveData(source, optionsWithOverrides.data);
+  const resolvedName = resolveData(name, optionsWithOverrides.data);
 
   return (
     <Effect
-      from={path.resolve(ctx.templateRoot, source)}
-      to={path.resolve(ctx.destinationRoot, ...pathCtx, name ?? path.basename(source))}
+      from={path.resolve(ctx.templateRoot, resolvedSource)}
+      to={path.resolve(ctx.destinationRoot, ...pathCtx, resolvedName ?? resolvedSource)}
       options={optionsWithOverrides}
     />
   );

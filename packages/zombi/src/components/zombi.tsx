@@ -1,13 +1,14 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, ReactElement, WeakValidationMap, ValidationMap } from 'react';
 import { Data as EjsData } from 'ejs';
-import { isFunction } from 'lodash';
-import { Questions } from '../types';
+import { isBoolean, assign } from 'lodash';
+import { Questions, Maybe } from '../types';
 import { Suspended } from './suspended';
 
-export const ZombiContext = createContext<Zombi>(undefined);
+export type ZombiContext<T extends EjsData = EjsData> = Zombi<T> & { templateRoot: string; destinationRoot: string };
+export const ZombiContext = createContext<ZombiContext | undefined>(undefined);
 export const useZombiContext = () => useContext(ZombiContext);
 
-export interface ZombiFsOptions {
+export interface ZombiFsOptions<T extends EjsData = EjsData> {
   /**
    * Whether to force overwrites on file conflicts.
    */
@@ -18,25 +19,33 @@ export interface ZombiFsOptions {
    *
    * If `false`, no EJS syntax is rendered.
    */
-  data?: false | EjsData;
+  data?: Maybe<T>;
 
   /**
    * When copying directories with this option enabled, files living at the
    * supplied location will be deleted, even if they produce no conflicts.
    */
   replaceDirectories?: boolean;
+}
+
+export interface Zombi<T extends EjsData = EjsData> extends ZombiFsOptions<T> {
+  name?: string;
+  templateRoot: Maybe<string>;
+  destinationRoot?: string;
 
   /**
    * A wrapper for [Enquirer's prompt API](https://github.com/enquirer/enquirer#-prompts).
    * Prompts for user input and saves the resulting data for EJS rendering.
    */
-  prompts?: Questions;
+  prompts?: Questions<Exclude<keyof T, number | symbol>>;
 }
 
-export interface Zombi extends ZombiFsOptions {
-  name?: string;
-  templateRoot: string;
-  destinationRoot?: string;
+interface ZombiComponent {
+  <T extends EjsData>(props: Zombi<T> & { children?: ReactNode | ((data: T) => ReactNode) }): ReactElement | null;
+  propTypes?: WeakValidationMap<Zombi>;
+  contextTypes?: ValidationMap<any>;
+  defaultProps?: Partial<Zombi>;
+  displayName?: string;
 }
 
 /**
@@ -44,20 +53,21 @@ export interface Zombi extends ZombiFsOptions {
  * components can be nested as deeply as you like and each one can reference a
  * different template source.
  */
-export const Zombi: React.FC<Zombi & { children?: ReactNode | (() => ReactNode) }> = props => {
+export const Zombi: ZombiComponent = props => {
   const { children, ...ctx } = props;
 
   const prevCtx = useZombiContext();
 
-  const finalCtx = {
+  const finalCtx: ZombiContext = {
     ...ctx,
+    data: !isBoolean(ctx.data) && assign({}, ctx?.data, prevCtx?.data),
+    templateRoot: ctx.templateRoot || process.cwd(),
     destinationRoot: prevCtx?.destinationRoot ?? ctx.destinationRoot ?? process.cwd(),
-    wrappedChildren: () => {},
   };
 
   return (
     <ZombiContext.Provider value={finalCtx}>
-      {isFunction(children) ? <Suspended>{children}</Suspended> : children}
+      <Suspended>{children}</Suspended>
     </ZombiContext.Provider>
   );
 };

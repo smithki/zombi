@@ -1,22 +1,6 @@
 import chalk from 'chalk';
 
-const { gray, cyan, green, red, yellow } = chalk;
-
-export function fsMessages(stdout: NodeJS.WritableStream) {
-  return {
-    fileAdd(name: string) {
-      stdout.write(`${green.bold('Add')} ${name}`);
-    },
-
-    fileOverwrite(name: string) {
-      stdout.write(`${red.bold('Overwrite')} ${name}`);
-    },
-
-    fileSkip(name: string) {
-      stdout.write(`${yellow.bold('Skip')} ${name}`);
-    },
-  };
-}
+const { gray, cyan, yellow } = chalk;
 
 function startMessage(name?: string) {
   console.log(gray('Running generator') + (name ? ` ${cyan.bold(name)}` : ''));
@@ -31,7 +15,6 @@ function completedMessage(timeElapsed: string) {
 }
 
 export const logger = {
-  fsMessages,
   startMessage,
   nothingToDoMessage,
   completedMessage,

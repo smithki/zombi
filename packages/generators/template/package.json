@@ -2,6 +2,6 @@
   "name": "<%= name %>",
   "version": "<%= version %>",
   "description": "<%= description %>",
-  "author": "<%= author %>",
+  "author": "<%- author %>",
   "license": "<%= license %>"
 }

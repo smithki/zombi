@@ -1,4 +1,6 @@
 import React, { createContext, useContext } from 'react';
+import { Resolveable } from '../types';
+import { resolveData } from '../utils/resolve-data';
 
 const PathContext = createContext<string[]>([]);
 
@@ -7,11 +9,12 @@ export function usePathContext() {
 }
 
 export interface Directory {
-  name: string;
+  name: Resolveable<string>;
 }
 
-export const Directory: React.FC<Directory> = ({ name, children }) => {
+export const Directory: React.FC<Directory> = props => {
+  const { name, children } = props;
   const ctx = useContext(PathContext);
-
-  return <PathContext.Provider value={[...ctx, name]}>{children}</PathContext.Provider>;
+  const resolvedName = resolveData(name);
+  return <PathContext.Provider value={[...ctx, resolvedName]}>{children}</PathContext.Provider>;
 };

@@ -1,11 +1,11 @@
-/* eslint-disable prefer-const, no-param-reassign, symbol-description */
+/* eslint-disable prefer-const, no-param-reassign */
 
 import { isValidElement, ReactElement } from 'react';
 import treeWalker from 'react-ssr-prepass';
 import { Listr } from 'listr2';
 import prettyTime from 'pretty-time';
 import Semaphore from 'semaphore-async-await';
-import { merge, assign, isBoolean } from 'lodash';
+import { assign, isBoolean } from 'lodash';
 import { Effect } from './components/effect';
 import { copy, FSOptions } from './fs';
 import { createTimer, HrTime, Timer } from './utils/timer';
@@ -13,12 +13,11 @@ import { logger } from './utils/logger';
 import { ensureArray, cleanArray } from './utils/array-helpers';
 import { Zombi } from './components/zombi';
 import { PromptWrapper } from './types';
-import { SUSPENDED_ANSWERS } from './symbols';
 import { createPromise } from './utils/create-promise';
+import { Suspended } from './components/suspended';
 
 interface ScaffoldContext {
   effects: Effect[];
-  data: any;
 }
 
 /**
@@ -31,6 +30,10 @@ export async function scaffold<Props>(tree: ReactElement<Props>) {
   let timeElapsed: HrTime;
 
   const taskRunner = new Listr<ScaffoldContext>([
+    /**
+     * The "Setup" task parses the template and prepares
+     * for rendering by capturing user inputs.
+     */
     {
       title: 'Setup',
       task: async (ctx, executor) => {
@@ -45,9 +48,9 @@ export async function scaffold<Props>(tree: ReactElement<Props>) {
 
               case Zombi:
                 if ((element.props as Zombi).prompts) {
-                  const answers = await prompt((element.props as Zombi).prompts);
-                  ctx.data = merge({}, ctx.data, answers);
-                  (element.props as any).children[SUSPENDED_ANSWERS] = answers;
+                  const questions = (element.props as Zombi).prompts;
+                  const answers = await prompt(questions);
+                  Suspended.answers.set((element.props as any).children, answers);
                 }
                 break;
 
@@ -59,14 +62,17 @@ export async function scaffold<Props>(tree: ReactElement<Props>) {
       },
     },
 
+    /**
+     * The "Scaffolding" task outputs any side-effects
+     * described by the scaffold template.
+     */
     {
       title: 'Scaffolding',
       task: async (ctx, executor) => {
         const effectPromises = ctx.effects.map(e => {
           const options: FSOptions = {
             ...e.options,
-            data: !isBoolean(e.options.data) && assign({}, ctx.data, e.options.data),
-            stdout: executor.stdout(),
+            data: !isBoolean(e.options.data) && assign({}, e.options.data),
             prompt: createPromptWrapper(executor.prompt.bind(executor), timer),
           };
 
@@ -80,7 +86,7 @@ export async function scaffold<Props>(tree: ReactElement<Props>) {
 
   timer.start();
   logger.startMessage(await getScaffoldName(tree));
-  const { effects } = await taskRunner.run({ effects: [], data: {} });
+  const { effects } = await taskRunner.run({ effects: [] });
   timeElapsed = timer.stop();
 
   if (effects.length) {
@@ -99,6 +105,7 @@ function getScaffoldName(tree: ReactElement<any>) {
   return createPromise<string | undefined>(async resolve => {
     await treeWalker(tree, element => {
       if (isValidElement(element) && element.type === Zombi) {
+        // Resolve with the top-level scaffold name.
         resolve((element.props as Zombi).name);
 
         // Bail out of `treeWalker`, we have what we came for!
@@ -114,9 +121,9 @@ function getScaffoldName(tree: ReactElement<any>) {
 const promptLock = new Semaphore(1);
 
 /**
- * We use `listr2` to run the scaffold, which wraps `enquirer` for prompting
- * user input. We have to wrap the prompt function once more, though, to format
- * the answers and provide better TypeScript support.
+ * We use `listr2` to run the scaffold, which wraps `enquirer` under-the-hood
+ * for prompting user input. We have to wrap the prompt function once more,
+ * though, to format the answers and provide better TypeScript support.
  */
 const createPromptWrapper = (
   promptFn: (...args: any[]) => Promise<any>,
@@ -131,7 +138,7 @@ const createPromptWrapper = (
   if (!questionsArr.length) return Promise.resolve();
 
   return promptFn(questionsArr).then((answers: any) => {
-    const answersFormatted = questionsArr.length === 1 ? { [defaultAnswerName]: answers } : answers;
+    const answersFormatted = questionsArr.length === 1 ? { [defaultAnswerName ?? 'default']: answers } : answers;
     timer.resume();
     promptLock.signal();
     return answersFormatted;

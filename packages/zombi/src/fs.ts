@@ -5,12 +5,10 @@ import { isBinary } from 'istextorbinary';
 import chalk from 'chalk';
 import { isNil, isEmpty } from 'lodash';
 import { createPromise } from './utils/create-promise';
-import { Zombi } from './components/zombi';
-import { logger } from './utils/logger';
+import { ZombiContext } from './components/zombi';
 import { PromptWrapper } from './types';
 
-export interface FSOptions extends Zombi {
-  stdout: NodeJS.WritableStream;
+export interface FSOptions extends ZombiContext {
   prompt: PromptWrapper;
 }
 
@@ -83,20 +81,12 @@ async function outputFile(data: any, to: string, options: FSOptions) {
 
       if (overwrite) {
         await fsExtra.outputFile(to, data);
-        logger.fsMessages(options.stdout).fileOverwrite(prettyTo);
-      } else {
-        logger.fsMessages(options.stdout).fileSkip(prettyTo);
       }
-
-      return;
     }
   }
 
   // Write the file to its destination
   await fsExtra.outputFile(to, data);
-
-  if (doesExist) logger.fsMessages(options.stdout).fileOverwrite(prettyTo);
-  else logger.fsMessages(options.stdout).fileAdd(prettyTo);
 }
 
 async function isFile(path: string) {

@@ -22,7 +22,7 @@ export const PackageJson: React.FC<PackageJson> = props => {
 
   const {
     npmOrg,
-    packageName = path.basename(ctx.destinationRoot),
+    packageName = ctx?.destinationRoot && path.basename(ctx.destinationRoot),
     version,
     description,
     license,
