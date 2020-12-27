@@ -1,3 +1,3 @@
-export { nodeModule } from './node-module';
-export { packageJson } from './package-json';
-export { licenseFile } from './license-file';
+export { LicenseFile } from './license-file';
+export { PackageJson } from './package-json';
+export { NodeModule } from './node-module';
