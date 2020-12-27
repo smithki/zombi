@@ -4,9 +4,16 @@ import { isBoolean, assign } from 'lodash';
 import { Questions, Maybe } from '../types';
 import { Suspended } from './suspended';
 
-export type ZombiContext<T extends EjsData = EjsData> = Zombi<T> & { templateRoot: string; destinationRoot: string };
+export type ZombiContext<T extends EjsData = EjsData> = Zombi<T> & {
+  templateRoot: string;
+  destinationRoot: string;
+};
+
 export const ZombiContext = createContext<ZombiContext | undefined>(undefined);
-export const useZombiContext = () => useContext(ZombiContext);
+
+export function useZombiContext<T extends EjsData = EjsData>() {
+  return useContext(ZombiContext) as ZombiContext<T>;
+}
 
 export interface ZombiFsOptions<T extends EjsData = EjsData> {
   /**
@@ -29,7 +36,7 @@ export interface ZombiFsOptions<T extends EjsData = EjsData> {
 }
 
 export interface Zombi<T extends EjsData = EjsData> extends ZombiFsOptions<T> {
-  name?: string;
+  name: string;
   templateRoot: Maybe<string>;
   destinationRoot?: string;
 
@@ -37,15 +44,13 @@ export interface Zombi<T extends EjsData = EjsData> extends ZombiFsOptions<T> {
    * A wrapper for [Enquirer's prompt API](https://github.com/enquirer/enquirer#-prompts).
    * Prompts for user input and saves the resulting data for EJS rendering.
    */
-  prompts?: Questions<Exclude<keyof T, number | symbol>>;
+  prompts?: Questions<T>;
+
+  onPromptResponse?: (data: T) => void | Promise<void>;
 }
 
-interface ZombiComponent {
+export interface ZombiComponent {
   <T extends EjsData>(props: Zombi<T> & { children?: ReactNode | ((data: T) => ReactNode) }): ReactElement | null;
-  propTypes?: WeakValidationMap<Zombi>;
-  contextTypes?: ValidationMap<any>;
-  defaultProps?: Partial<Zombi>;
-  displayName?: string;
 }
 
 /**
@@ -58,7 +63,7 @@ export const Zombi: ZombiComponent = props => {
 
   const prevCtx = useZombiContext();
 
-  const finalCtx: ZombiContext = {
+  const finalCtx: ZombiContext<any> = {
     ...ctx,
     data: !isBoolean(ctx.data) && assign({}, ctx?.data, prevCtx?.data),
     templateRoot: ctx.templateRoot || process.cwd(),

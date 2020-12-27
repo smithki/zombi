@@ -1,10 +1,11 @@
 import React from 'react';
+import { Data as EjsData } from 'ejs';
 import { ZombiContext } from './zombi';
 
-export interface Effect {
+export interface Effect<T extends EjsData = EjsData> {
   from: string;
   to: string;
-  options: ZombiContext;
+  options: ZombiContext<T>;
 }
 
 /**

@@ -4,12 +4,22 @@ import EnquirerWrapper from './enquirer';
 export type Maybe<T> = T | false | null | undefined;
 export type Definitely<T> = Exclude<T, false | null | undefined>;
 
-export type Questions<T extends string = string> =
-  | Maybe<Exclude<EnquirerWrapper.prompt.Question, 'name'> & { name: T }>
-  | Maybe<Exclude<EnquirerWrapper.prompt.Question, 'name'> & { name: T }>[];
+type StringKeys<T extends EjsData> = Exclude<keyof T, number | symbol>;
+
+export type EnquirerQuestionWrapper<T extends string = string> = Maybe<
+  Exclude<EnquirerWrapper.prompt.Question, 'name'> & { name: T }
+>;
+
+export interface QuestionsFactory<T extends EjsData = EjsData> {
+  (data: T): EnquirerQuestionWrapper<StringKeys<T>> | Array<EnquirerQuestionWrapper<StringKeys<T>>>;
+}
+
+export type Questions<T extends EjsData = EjsData> =
+  | EnquirerQuestionWrapper<StringKeys<T>>
+  | Array<EnquirerQuestionWrapper<StringKeys<T>> | QuestionsFactory<T>>;
 
 export interface PromptWrapper {
-  <T = any>(questions: Questions): Promise<T>;
+  <T extends EjsData>(questions: Questions<T>): Promise<T>;
 }
 
 export type Resolveable<T> = T | ((data: EjsData) => T);

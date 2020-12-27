@@ -27,10 +27,10 @@ async function copyFile(from: string, to: string, options: FSOptions) {
     const buffer = await fsExtra.readFile(paths.from);
 
     const shouldRenderEJS =
-      !isBinary(paths.from, buffer) ||
-      !isBinary(paths.to) ||
-      options.data ||
-      !isNil(options.data) ||
+      !isBinary(paths.from, buffer) &&
+      !isBinary(paths.to) &&
+      options.data &&
+      !isNil(options.data) &&
       !isEmpty(options.data);
 
     if (shouldRenderEJS) {

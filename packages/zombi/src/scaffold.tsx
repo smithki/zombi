@@ -5,9 +5,10 @@ import treeWalker from 'react-ssr-prepass';
 import { prompt as enquirer } from 'enquirer';
 import prettyTime from 'pretty-time';
 import Semaphore from 'semaphore-async-await';
-import { assign, isBoolean } from 'lodash';
 import ora, { Ora } from 'ora';
 import chalk from 'chalk';
+import { isFunction, merge } from 'lodash';
+import { Data as EjsData } from 'ejs';
 import { Effect } from './components/effect';
 import { copy, FSOptions } from './fs';
 import { createTimer, HrTime, Timer } from './utils/timer';
@@ -22,14 +23,14 @@ const { gray, cyan, yellow, red } = chalk;
 /**
  * Metadata for a successfully rendered side-effect.
  */
-export interface EffectRenderSuccess extends Effect {
+export interface EffectRenderSuccess<T extends EjsData = EjsData> extends Effect<T & EjsData> {
   status: 'fulfilled';
 }
 
 /**
  * Metadata for an unsuccessfully rendered side-effect.
  */
-export interface EffectRenderFailed extends Effect {
+export interface EffectRenderFailed<T extends EjsData = EjsData> extends Effect<T & EjsData> {
   status: 'rejected';
   reason: any;
 }
@@ -38,11 +39,19 @@ export interface EffectRenderFailed extends Effect {
  * A response containing metadata about the `scaffold`
  * operation that has completed.
  */
-export interface ScaffoldResponse {
-  effects: Array<EffectRenderSuccess | EffectRenderFailed>;
+export interface ScaffoldResponse<T extends EjsData = EjsData> {
+  effects: Array<EffectRenderSuccess<T> | EffectRenderFailed<T>>;
+  data: Record<string, T & EjsData>;
 }
 
+/**
+ * Options provided to the `scaffold` function.
+ */
 export interface ScaffoldOptions {
+  /**
+   * If `true`, all logging output from the `scaffold`
+   * function will be suppressed.
+   */
   quiet?: boolean;
 }
 
@@ -51,7 +60,10 @@ export interface ScaffoldOptions {
  *
  * @param tree - The React tree describing the scaffold.
  */
-export async function scaffold<Props>(tree: ReactElement<Props>, options?: ScaffoldOptions): Promise<ScaffoldResponse> {
+export async function scaffold<Data>(
+  tree: ReactElement<Data>,
+  options?: ScaffoldOptions,
+): Promise<ScaffoldResponse<Data>> {
   const shouldLog = !options?.quiet;
 
   const timer = createTimer();
@@ -65,20 +77,29 @@ export async function scaffold<Props>(tree: ReactElement<Props>, options?: Scaff
   const spinner = ora('Scaffolding');
   const prompt = createPromptWrapper(timer, spinner, options);
 
-  if (shouldLog) spinner.start();
+  if (shouldLog) {
+    console.log(); // Aesthetics!
+    spinner.start();
+  }
 
-  const effects = await getScaffoldEffects(tree, prompt);
+  const { effects, globalData } = await getScaffoldEffects(tree, prompt);
 
   return renderScaffold(effects, prompt).then(response => {
     timeElapsed = timer.stop();
     const prettyTimeElapsed = prettyTime(timeElapsed);
 
-    const errors = response.filter(x => x.status === 'rejected') as PromiseRejectedResult[];
+    const effectsResults: ScaffoldResponse['effects'] = response.map((x, i) => {
+      if (x.status === 'fulfilled') return { status: x.status, ...effects[i] };
+      return { status: x.status, reason: x.reason, ...effects[i] };
+    });
+
+    const errors = effectsResults.filter(x => x.status === 'rejected') as EffectRenderFailed[];
 
     if (shouldLog) {
       const logErrors = () => {
         console.error(red.underline.bold('\nEncountered the following errors:\n'));
-        errors.forEach(({ reason }) => {
+        errors.forEach(({ reason, from }) => {
+          console.error(`Affected request: ${from}`);
           console.error(reason);
           console.error(); // Line break between errors for aesthetics
         });
@@ -105,7 +126,7 @@ export async function scaffold<Props>(tree: ReactElement<Props>, options?: Scaff
       return { status: x.status, reason: x.reason, ...effects[i] };
     });
 
-    return { effects: effectsResult };
+    return { effects: effectsResult, data: globalData } as any;
   });
 }
 
@@ -135,7 +156,8 @@ function getScaffoldName(tree: ReactElement<any>) {
  * prepares effects for  rendering by capturing user inputs.
  */
 async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper) {
-  let effects: Effect[] = [];
+  const effects: Effect[] = [];
+  const globalData: any = {};
 
   await treeWalker(tree, async element => {
     if (isValidElement(element)) {
@@ -148,7 +170,11 @@ async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper
           if ((element.props as Zombi).prompts) {
             const questions = (element.props as Zombi).prompts;
             const answers = await prompt(questions);
+            await (element.props as Zombi).onPromptResponse?.(merge({}, answers, (element.props as Zombi).data));
+            merge(globalData, { [(element.props as Zombi).name]: { ...answers, ...(element.props as Zombi).data } });
             Suspended.answers.set((element.props as any).children, answers);
+          } else {
+            merge(globalData, { [(element.props as Zombi).name]: { ...(element.props as Zombi).data } });
           }
           break;
 
@@ -158,7 +184,7 @@ async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper
     }
   });
 
-  return effects;
+  return { effects, globalData };
 }
 
 /**
@@ -168,7 +194,6 @@ async function renderScaffold(effects: Effect[], prompt: PromptWrapper) {
   const effectPromises = effects.map(async e => {
     const options: FSOptions = {
       ...e.options,
-      data: !isBoolean(e.options.data) && assign({}, e.options.data),
       prompt,
     };
 
@@ -184,27 +209,34 @@ const promptLock = new Semaphore(1);
 /**
  * We wrap `enquirer` under-the-hood for prompting user input.
  */
-const createPromptWrapper = (
-  timer: Timer,
-  spinner: Ora,
-  options?: ScaffoldOptions,
-): PromptWrapper => async questions => {
-  await promptLock.acquire();
-  if (spinner.isSpinning && !options?.quiet) spinner.stop();
-  timer.pause();
+function createPromptWrapper(timer: Timer, spinner: Ora, options?: ScaffoldOptions): PromptWrapper {
+  return async questions => {
+    const doPrompt = async (theQuestions: any[]) => {
+      await promptLock.acquire();
+      if (spinner.isSpinning && !options?.quiet) spinner.stop();
+      timer.pause();
 
-  const questionsArr = cleanArray(ensureArray(questions));
-  const defaultAnswerName = questionsArr[0].name;
+      return enquirer(theQuestions).then((answers: any) => {
+        timer.resume();
+        if (!spinner.isSpinning && !options?.quiet) spinner.start();
+        promptLock.signal();
+        return answers;
+      });
+    };
 
-  if (!questionsArr.length) return Promise.resolve();
+    const answers: any = {};
 
-  if (!options?.quiet) console.log(); // Aesthetics!
+    for (const questionOrFactory of cleanArray(ensureArray(questions))) {
+      if (isFunction(questionOrFactory)) {
+        const questionsFromFactory = questionOrFactory(answers);
+        const res = await doPrompt(cleanArray(ensureArray(questionsFromFactory)));
+        merge(answers, res);
+      } else {
+        const res = await doPrompt([questionOrFactory]);
+        merge(answers, res);
+      }
+    }
 
-  return enquirer(questionsArr as any).then((answers: any) => {
-    const answersFormatted = questionsArr.length === 1 ? { [defaultAnswerName ?? 'default']: answers } : answers;
-    timer.resume();
-    if (!spinner.isSpinning && !options?.quiet) spinner.start();
-    promptLock.signal();
-    return answersFormatted;
-  });
-};
+    return answers;
+  };
+}

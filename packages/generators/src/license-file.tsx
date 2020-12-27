@@ -16,7 +16,7 @@ export const LicenseFile: React.FC<LicenseFile> = props => {
   } = props;
 
   return (
-    <Zombi name="license-file-prompts" templateRoot={path.resolve(__dirname, '../template')}>
+    <Zombi name="license-file" templateRoot={path.resolve(__dirname, '../template')}>
       <Template source={`${kebabCase(`${type}-license`)}.txt`} data={{ authorName }} />
     </Zombi>
   );
