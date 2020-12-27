@@ -1,3 +1,21 @@
+# v3.0.0 (Sun Dec 27 2020)
+
+#### 💥 Breaking Change
+
+- `@zombi/generators`, `zombi`
+  - Breaking changes for `v3.0` [#32](https://github.com/smithki/zombi/pull/32) ([@smithki](https://github.com/smithki))
+
+#### 🐛 Bug Fix
+
+- `@zombi/generators`, `zombi`
+  - Add Experimental API using React/JSX [#33](https://github.com/smithki/zombi/pull/33) ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v2.3.0 (Tue Dec 22 2020)
 
 #### 🚀 Enhancement
