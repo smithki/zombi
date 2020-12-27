@@ -7,7 +7,7 @@
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
   },
 
-  "include": ["./src/**/*.ts"],
+  "include": ["./src/**/*.ts", "src/**/*.tsx"],
 
   "references": [
     { "path": "../zombi" }

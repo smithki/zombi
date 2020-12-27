@@ -4,7 +4,10 @@ export type HrTime = [number, number];
  * Calculate the difference between two Node hrtime (`[second, nanosecond]`)
  * tuples.
  *
- * Based on: https://github.com/firefoxes/diff-hrtime/blob/master/index.js
+ * Based on the `diff-hrtime` NPM package.
+ *
+ * @see the `package.json#license` field at the root of this source tree:
+ *   https://github.com/firefoxes/diff-hrtime/blob/master/index.js
  */
 function subtractTime(a: HrTime, b: HrTime): HrTime {
   // Capture seconds and nanoseconds

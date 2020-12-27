@@ -1,17 +1,19 @@
 {
   "compilerOptions": {
-    "lib": ["es2018", "dom"],
+    "lib": ["esnext"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,
+    "strict": true,
     "noImplicitThis": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
     "declaration": true,
     "sourceMap": true,
-    "target": "es5",
+    "target": "es6",
     "composite": true,
     "skipLibCheck": true,
     "typeRoots": ["node_modules/@types"]
