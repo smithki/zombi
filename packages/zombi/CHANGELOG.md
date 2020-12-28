@@ -1,3 +1,17 @@
+# v3.0.1 (Mon Dec 28 2020)
+
+#### 🐛 Bug Fix
+
+- Cleanup README files [#34](https://github.com/smithki/zombi/pull/34) ([@smithki](https://github.com/smithki))
+- Merge branch 'master' into smithki-cleanup-readme ([@smithki](https://github.com/smithki))
+- Cleanup README files ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.0.0 (Sun Dec 27 2020)
 
 #### 💥 Breaking Change
