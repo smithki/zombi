@@ -1,7 +1,7 @@
 {
   "name": "zombi",
   "version": "2.3.0",
-  "description": "Task runner and scaffolding tool for people with braaains.",
+  "description": "Easy-to-use, declarative scaffolding tools.",
   "author": "Ian K Smith <smithki707@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -14,7 +14,6 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
-    "caller": "^1.0.1",
     "chalk": "^2.4.1",
     "ejs": "^2.5.7",
     "enquirer": "^2.3.6",
