@@ -1,3 +1,24 @@
+# v3.0.0 (Sun Dec 27 2020)
+
+#### 💥 Breaking Change
+
+- Breaking changes for `v3.0` [#32](https://github.com/smithki/zombi/pull/32) ([@smithki](https://github.com/smithki))
+
+#### 🐛 Bug Fix
+
+- Add Experimental API using React/JSX [#33](https://github.com/smithki/zombi/pull/33) ([@smithki](https://github.com/smithki))
+- Final touches on new API ([@smithki](https://github.com/smithki))
+- Port canonical generators over to JSX-based API ([@smithki](https://github.com/smithki))
+- Add 'license-file' and 'package-json' scaffolds using new API ([@smithki](https://github.com/smithki))
+- Experimental approach using declarative JSX syntax ([@smithki](https://github.com/smithki))
+- Add breaking changes for v3.0 ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v2.3.0 (Tue Dec 22 2020)
 
 #### 🚀 Enhancement
