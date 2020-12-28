@@ -72,7 +72,7 @@ export async function scaffold<Data>(
   timer.start();
 
   const name = await getScaffoldName(tree);
-  console.log(gray('Running generator') + (name ? ` ${cyan.bold(name)}` : ''));
+  console.log(gray('Running scaffold') + (name ? ` ${cyan.bold(name)}` : ''));
 
   const spinner = ora('Scaffolding');
   const prompt = createPromptWrapper(timer, spinner, options);
@@ -121,12 +121,7 @@ export async function scaffold<Data>(
       }
     }
 
-    const effectsResult: ScaffoldResponse['effects'] = response.map((x, i) => {
-      if (x.status === 'fulfilled') return { status: x.status, ...effects[i] };
-      return { status: x.status, reason: x.reason, ...effects[i] };
-    });
-
-    return { effects: effectsResult, data: globalData } as any;
+    return { effects: effectsResults, data: globalData } as any;
   });
 }
 

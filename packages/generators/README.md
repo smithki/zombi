@@ -1,6 +1,6 @@
 # 🧟‍♂️ @zombi/generators
 
-> Core generator scaffolds built using Zombi.
+> Core scaffolds built using Zombi.
 
 <p align="center">
   <a href="https://github.com/smithki/zombi/blob/master/LICENSE">License</a> ·

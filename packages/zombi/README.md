@@ -1,6 +1,6 @@
 # 🧟‍♂️ zombi
 
-> Task runner and scaffolding tool for people with braaains.
+> Easy-to-use, declarative scaffolding tools.
 
 <p align="center">
   <a href="https://github.com/smithki/zombi/blob/master/LICENSE">License</a> ·
