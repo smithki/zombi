@@ -1,3 +1,15 @@
+# v3.0.2 (Fri Jan 29 2021)
+
+#### ⚠️ Pushed to `master`
+
+- Move React to peer dependencies ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.0.1 (Mon Dec 28 2020)
 
 #### 🐛 Bug Fix
