@@ -23,13 +23,17 @@
     "lodash": "^4.17.19",
     "ora": "^5.1.0",
     "pretty-time": "~1.1.0",
-    "react": "^17.0.1",
-    "react-is": "^17.0.1",
     "react-ssr-prepass": "^1.2.1",
     "semaphore-async-await": "^1.5.1"
   },
+  "peerDependencies": {
+    "react": "^17.0.1",
+    "react-is": "^17.0.1"
+  },
   "devDependencies": {
     "@types/ejs": "^3.0.5",
-    "@types/react": "^17.0.0"
+    "@types/react": "^17.0.0",
+    "react": "^17.0.1",
+    "react-is": "^17.0.1"
   }
 }
