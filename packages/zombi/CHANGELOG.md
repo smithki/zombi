@@ -1,3 +1,16 @@
+# v3.0.4 (Sat Jan 30 2021)
+
+#### ⚠️ Pushed to `master`
+
+- Merge branch 'master' of github.com:smithki/zombi ([@smithki](https://github.com/smithki))
+- Add initial 'Zombi' data to suspended answers before rendering next child ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.0.3 (Sat Jan 30 2021)
 
 #### ⚠️ Pushed to `master`
