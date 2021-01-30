@@ -1,6 +1,6 @@
 {
   "name": "@zombi/generators",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Core generator scaffolds built using Zombi.",
   "repository": {
     "type": "git",
@@ -21,6 +21,6 @@
   "dependencies": {
     "@types/ini": "^1.3.30",
     "ini": "^2.0.0",
-    "zombi": "^3.0.4"
+    "zombi": "^3.0.5"
   }
 }
