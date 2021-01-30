@@ -7,7 +7,7 @@ import prettyTime from 'pretty-time';
 import Semaphore from 'semaphore-async-await';
 import ora, { Ora } from 'ora';
 import chalk from 'chalk';
-import { isFunction, merge } from 'lodash';
+import { assign, isFunction, merge } from 'lodash';
 import { Data as EjsData } from 'ejs';
 import { Effect } from './components/effect';
 import { copy, FSOptions } from './fs';
@@ -165,11 +165,11 @@ async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper
           if ((element.props as Zombi).prompts) {
             const questions = (element.props as Zombi).prompts;
             const answers = await prompt(questions);
-            await (element.props as Zombi).onPromptResponse?.(merge({}, answers, (element.props as Zombi).data));
-            merge(globalData, { [(element.props as Zombi).name]: { ...answers, ...(element.props as Zombi).data } });
-            Suspended.answers.set((element.props as any).children, { ...answers, ...(element.props as Zombi).data });
+            await (element.props as Zombi).onPromptResponse?.(assign({}, answers, (element.props as Zombi).data));
+            assign(globalData, { [(element.props as Zombi).name]: assign({}, answers, (element.props as Zombi).data) });
+            Suspended.answers.set((element.props as any).children, assign({}, answers, (element.props as Zombi).data));
           } else {
-            merge(globalData, { [(element.props as Zombi).name]: { ...(element.props as Zombi).data } });
+            assign(globalData, { [(element.props as Zombi).name]: { ...(element.props as Zombi).data } });
           }
           break;
 
