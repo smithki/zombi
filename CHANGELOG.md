@@ -1,3 +1,16 @@
+# v3.0.3 (Sat Jan 30 2021)
+
+#### ⚠️ Pushed to `master`
+
+- `zombi`
+  - Pin an earlier version of 'istextorbinary' dependency ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.0.2 (Fri Jan 29 2021)
 
 #### ⚠️ Pushed to `master`
