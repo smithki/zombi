@@ -2,14 +2,19 @@
   "name": "@zombi/generators",
   "version": "3.0.2",
   "description": "Core generator scaffolds built using Zombi.",
-  "author": "Ian K Smith <smithki707@gmail.com>",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/smithki/zombi"
   },
+  "license": "MIT",
+  "author": "Ian K Smith <smithki707@gmail.com>",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.map",
+    "dist/**/*.d.ts"
+  ],
   "scripts": {
     "precommit": "lint-staged"
   },

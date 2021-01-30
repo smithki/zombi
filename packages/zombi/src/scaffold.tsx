@@ -167,7 +167,7 @@ async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper
             const answers = await prompt(questions);
             await (element.props as Zombi).onPromptResponse?.(merge({}, answers, (element.props as Zombi).data));
             merge(globalData, { [(element.props as Zombi).name]: { ...answers, ...(element.props as Zombi).data } });
-            Suspended.answers.set((element.props as any).children, answers);
+            Suspended.answers.set((element.props as any).children, { ...answers, ...(element.props as Zombi).data });
           } else {
             merge(globalData, { [(element.props as Zombi).name]: { ...(element.props as Zombi).data } });
           }

@@ -2,14 +2,19 @@
   "name": "zombi",
   "version": "3.0.2",
   "description": "Easy-to-use, declarative scaffolding tools.",
-  "author": "Ian K Smith <smithki707@gmail.com>",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/smithki/zombi"
   },
+  "license": "MIT",
+  "author": "Ian K Smith <smithki707@gmail.com>",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.map",
+    "dist/**/*.d.ts"
+  ],
   "scripts": {
     "precommit": "lint-staged"
   },
@@ -26,13 +31,13 @@
     "react-ssr-prepass": "^1.2.1",
     "semaphore-async-await": "^1.5.1"
   },
-  "peerDependencies": {
-    "react": "^17.0.1",
-    "react-is": "^17.0.1"
-  },
   "devDependencies": {
     "@types/ejs": "^3.0.5",
     "@types/react": "^17.0.0",
+    "react": "^17.0.1",
+    "react-is": "^17.0.1"
+  },
+  "peerDependencies": {
     "react": "^17.0.1",
     "react-is": "^17.0.1"
   }
