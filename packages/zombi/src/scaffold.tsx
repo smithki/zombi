@@ -39,9 +39,9 @@ export interface EffectRenderFailed<T extends EjsData = EjsData> extends Effect<
  * A response containing metadata about the `scaffold`
  * operation that has completed.
  */
-export interface ScaffoldResponse<T extends EjsData = EjsData> {
+export interface ScaffoldResponse<T extends Record<string, EjsData> = Record<string, EjsData>> {
   effects: Array<EffectRenderSuccess<T> | EffectRenderFailed<T>>;
-  data: Record<string, T & EjsData>;
+  data: T;
 }
 
 /**
@@ -60,10 +60,10 @@ export interface ScaffoldOptions {
  *
  * @param tree - The React tree describing the scaffold.
  */
-export async function scaffold<Data>(
-  tree: ReactElement<Data>,
+export async function scaffold<T extends Record<string, EjsData>>(
+  tree: ReactElement,
   options?: ScaffoldOptions,
-): Promise<ScaffoldResponse<Data>> {
+): Promise<ScaffoldResponse<T>> {
   const shouldLog = !options?.quiet;
 
   const timer = createTimer();
