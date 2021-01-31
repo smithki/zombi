@@ -7,7 +7,7 @@ import prettyTime from 'pretty-time';
 import Semaphore from 'semaphore-async-await';
 import ora, { Ora } from 'ora';
 import chalk from 'chalk';
-import { assign, isFunction, merge } from 'lodash';
+import { assign, isFunction } from 'lodash';
 import { Data as EjsData } from 'ejs';
 import { Effect } from './components/effect';
 import { copy, FSOptions } from './fs';
@@ -224,11 +224,11 @@ function createPromptWrapper(timer: Timer, spinner: Ora, options?: ScaffoldOptio
     for (const questionOrFactory of cleanArray(ensureArray(questions))) {
       if (isFunction(questionOrFactory)) {
         const questionsFromFactory = questionOrFactory(answers);
-        const res = await doPrompt(cleanArray(ensureArray(questionsFromFactory)));
-        merge(answers, res);
+        const res = await doPrompt(cleanArray(ensureArray(questionsFromFactory))).catch(() => ({}));
+        assign(answers, res);
       } else {
-        const res = await doPrompt([questionOrFactory]);
-        merge(answers, res);
+        const res = await doPrompt([questionOrFactory]).catch(() => ({}));
+        assign(answers, res);
       }
     }
 
