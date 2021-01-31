@@ -1,3 +1,16 @@
+# v3.0.6 (Sun Jan 31 2021)
+
+#### ⚠️ Pushed to `master`
+
+- `zombi`
+  - Better generic typing for 'scaffold' function ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.0.5 (Sat Jan 30 2021)
 
 #### ⚠️ Pushed to `master`
