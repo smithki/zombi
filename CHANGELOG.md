@@ -1,3 +1,18 @@
+# v3.0.7 (Sun Jan 31 2021)
+
+#### ⚠️ Pushed to `master`
+
+- `@zombi/generators`, `zombi`
+  - Merge branch 'master' of github.com:smithki/zombi ([@smithki](https://github.com/smithki))
+- `zombi`
+  - Add catch for prompts ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.0.6 (Sun Jan 31 2021)
 
 #### ⚠️ Pushed to `master`
