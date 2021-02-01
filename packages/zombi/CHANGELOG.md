@@ -1,3 +1,16 @@
+# v3.0.8 (Mon Feb 01 2021)
+
+#### ⚠️ Pushed to `master`
+
+- Merge branch 'master' of github.com:smithki/zombi ([@smithki](https://github.com/smithki))
+- Skip prompts where data has been provided via props ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.0.7 (Sun Jan 31 2021)
 
 #### ⚠️ Pushed to `master`
