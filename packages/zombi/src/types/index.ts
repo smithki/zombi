@@ -19,7 +19,7 @@ export type Questions<T extends EjsData = EjsData> =
   | Array<EnquirerQuestionWrapper<StringKeys<T>> | QuestionsFactory<T>>;
 
 export interface PromptWrapper {
-  <T extends EjsData>(questions: Questions<T>): Promise<T>;
+  <T extends EjsData>(questions: Questions<T>, initialData?: Maybe<T>): Promise<T>;
 }
 
 export type Resolveable<T> = T | ((data: EjsData) => T);

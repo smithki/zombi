@@ -164,10 +164,10 @@ async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper
         case Zombi:
           if ((element.props as Zombi).prompts) {
             const questions = (element.props as Zombi).prompts;
-            const answers = await prompt(questions);
-            await (element.props as Zombi).onPromptResponse?.(assign({}, answers, (element.props as Zombi).data));
-            assign(globalData, { [(element.props as Zombi).name]: assign({}, answers, (element.props as Zombi).data) });
-            Suspended.answers.set((element.props as any).children, assign({}, answers, (element.props as Zombi).data));
+            const answers = await prompt(questions, (element.props as Zombi).data);
+            await (element.props as Zombi).onPromptResponse?.(answers);
+            assign(globalData, { [(element.props as Zombi).name]: answers });
+            Suspended.answers.set((element.props as any).children, answers);
           } else {
             assign(globalData, { [(element.props as Zombi).name]: { ...(element.props as Zombi).data } });
           }
@@ -205,7 +205,7 @@ const promptLock = new Semaphore(1);
  * We wrap `enquirer` under-the-hood for prompting user input.
  */
 function createPromptWrapper(timer: Timer, spinner: Ora, options?: ScaffoldOptions): PromptWrapper {
-  return async questions => {
+  return async (questions, initialData) => {
     const doPrompt = async (theQuestions: any[]) => {
       await promptLock.acquire();
       if (spinner.isSpinning && !options?.quiet) spinner.stop();
@@ -219,14 +219,16 @@ function createPromptWrapper(timer: Timer, spinner: Ora, options?: ScaffoldOptio
       });
     };
 
-    const answers: any = {};
+    const answers: any = { ...initialData };
 
     for (const questionOrFactory of cleanArray(ensureArray(questions))) {
       if (isFunction(questionOrFactory)) {
         const questionsFromFactory = questionOrFactory(answers);
-        const res = await doPrompt(cleanArray(ensureArray(questionsFromFactory))).catch(() => ({}));
+        const res = await doPrompt(
+          cleanArray(ensureArray(questionsFromFactory)).filter(q => answers[q.name] == null),
+        ).catch(() => ({}));
         assign(answers, res);
-      } else {
+      } else if (answers[questionOrFactory.name] == null) {
         const res = await doPrompt([questionOrFactory]).catch(() => ({}));
         assign(answers, res);
       }
