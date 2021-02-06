@@ -1,3 +1,15 @@
+# v3.1.0 (Sat Feb 06 2021)
+
+#### 🚀 Enhancement
+
+- Support giving async children function to 'Zombi' [#35](https://github.com/smithki/zombi/pull/35) ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.0.8 (Mon Feb 01 2021)
 
 #### ⚠️ Pushed to `master`
