@@ -17,6 +17,7 @@ import { Zombi } from './components/zombi';
 import { PromptWrapper } from './types';
 import { createPromise } from './utils/create-promise';
 import { Suspended } from './components/suspended';
+import { UserCanceledPromptError } from './exceptions';
 
 const { gray, cyan, yellow, red } = chalk;
 
@@ -71,58 +72,72 @@ export async function scaffold<T extends Record<string, EjsData>>(
 
   timer.start();
 
-  const name = await getScaffoldName(tree);
-  console.log(gray('Running scaffold') + (name ? ` ${cyan.bold(name)}` : ''));
-
+  const name = await getScaffoldName(tree).catch(handleError());
   const spinner = ora('Scaffolding');
   const prompt = createPromptWrapper(timer, spinner, options);
 
   if (shouldLog) {
+    console.log(gray('Running scaffold') + (name ? ` ${cyan.bold(name)}` : ''));
     console.log(); // Aesthetics!
     spinner.start();
   }
 
-  const { effects, globalData } = await getScaffoldEffects(tree, prompt);
+  const { effects, globalData } = await getScaffoldEffects(tree, prompt).catch(handleError(spinner, options));
 
-  return renderScaffold(effects, prompt).then(response => {
-    timeElapsed = timer.stop();
-    const prettyTimeElapsed = prettyTime(timeElapsed);
+  return renderScaffold(effects, prompt)
+    .then(response => {
+      timeElapsed = timer.stop();
+      const prettyTimeElapsed = prettyTime(timeElapsed);
 
-    const effectsResults: ScaffoldResponse['effects'] = response.map((x, i) => {
-      if (x.status === 'fulfilled') return { status: x.status, ...effects[i] };
-      return { status: x.status, reason: x.reason, ...effects[i] };
-    });
+      const effectsResults: ScaffoldResponse['effects'] = response.map((x, i) => {
+        if (x.status === 'fulfilled') return { status: x.status, ...effects[i] };
+        return { status: x.status, reason: x.reason, ...effects[i] };
+      });
 
-    const errors = effectsResults.filter(x => x.status === 'rejected') as EffectRenderFailed[];
+      const errors = effectsResults.filter(x => x.status === 'rejected') as EffectRenderFailed[];
 
-    if (shouldLog) {
-      const logErrors = () => {
-        console.error(red.underline.bold('\nEncountered the following errors:\n'));
-        errors.forEach(({ reason, from }) => {
-          console.error(`Affected request: ${from}`);
-          console.error(reason);
-          console.error(); // Line break between errors for aesthetics
-        });
-      };
+      if (shouldLog) {
+        const logErrors = () => {
+          console.error(red.underline.bold('\nEncountered the following errors:\n'));
+          errors.forEach(({ reason, from }) => {
+            console.error(`Affected request: ${from}`);
+            console.error(reason);
+            console.error(); // Line break between errors for aesthetics
+          });
+        };
 
-      spinner.stop(); // Aesthetics!
-      console.log(); // Aesthetics!
+        spinner.stop(); // Aesthetics!
+        console.log(); // Aesthetics!
 
-      if (!errors.length) {
-        spinner.succeed(gray(`Generated in ${cyan.bold(prettyTimeElapsed)}`));
-      } else if (errors.length === response.length) {
-        spinner.fail(gray(`Something went wrong. ${chalk.bold('Nothing was generated.')}`));
-        logErrors();
-      } else if (errors.length) {
-        spinner.warn(gray(`Generated, ${yellow('with some issues')}, in ${cyan.bold(prettyTimeElapsed)}`));
-        logErrors();
-      } else if (!response.length) {
-        spinner.succeed(yellow(`🤷 There's nothing to generate...`));
+        if (!errors.length) {
+          spinner.succeed(gray(`Generated in ${cyan.bold(prettyTimeElapsed)}`));
+        } else if (errors.length === response.length) {
+          spinner.fail(gray(`Something went wrong. ${chalk.bold('Nothing was generated.')}`));
+          logErrors();
+        } else if (errors.length) {
+          spinner.warn(gray(`Generated, ${yellow('with some issues')}, in ${cyan.bold(prettyTimeElapsed)}`));
+          logErrors();
+        } else if (!response.length) {
+          spinner.succeed(yellow(`🤷 There's nothing to generate...`));
+        }
       }
-    }
 
-    return { effects: effectsResults, data: globalData } as any;
-  });
+      return { effects: effectsResults, data: globalData } as any;
+    })
+    .catch(handleError(spinner, options));
+}
+
+/**
+ * Close out the spinner before handling errors.
+ *
+ * NOTE: this excludes errors related to side effects,
+ * which are not actually raised and therefore don't `catch`.
+ */
+function handleError(spinner?: Ora, options?: ScaffoldOptions) {
+  return (reason?: any) => {
+    if (spinner?.isSpinning && !options?.quiet) spinner.stop();
+    return Promise.reject(reason);
+  };
 }
 
 /**
@@ -166,8 +181,8 @@ async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper
             const questions = (element.props as Zombi).prompts;
             const answers = await prompt(questions, (element.props as Zombi).data);
             await (element.props as Zombi).onPromptResponse?.(answers);
+            Suspended.nodes.set((element.props as any).children, await (element.props as any).children(answers));
             assign(globalData, { [(element.props as Zombi).name]: answers });
-            Suspended.answers.set((element.props as any).children, answers);
           } else {
             assign(globalData, { [(element.props as Zombi).name]: { ...(element.props as Zombi).data } });
           }
@@ -208,15 +223,18 @@ function createPromptWrapper(timer: Timer, spinner: Ora, options?: ScaffoldOptio
   return async (questions, initialData) => {
     const doPrompt = async (theQuestions: any[]) => {
       await promptLock.acquire();
+
       if (spinner.isSpinning && !options?.quiet) spinner.stop();
       timer.pause();
 
-      return enquirer(theQuestions).then((answers: any) => {
-        timer.resume();
-        if (!spinner.isSpinning && !options?.quiet) spinner.start();
-        promptLock.signal();
-        return answers;
-      });
+      return enquirer(theQuestions)
+        .then((answers: any) => {
+          timer.resume();
+          if (!spinner.isSpinning && !options?.quiet) spinner.start();
+          promptLock.signal();
+          return answers;
+        })
+        .catch(() => Promise.reject(UserCanceledPromptError));
     };
 
     const answers: any = { ...initialData };
@@ -224,12 +242,10 @@ function createPromptWrapper(timer: Timer, spinner: Ora, options?: ScaffoldOptio
     for (const questionOrFactory of cleanArray(ensureArray(questions))) {
       if (isFunction(questionOrFactory)) {
         const questionsFromFactory = questionOrFactory(answers);
-        const res = await doPrompt(
-          cleanArray(ensureArray(questionsFromFactory)).filter(q => answers[q.name] == null),
-        ).catch(() => ({}));
+        const res = await doPrompt(cleanArray(ensureArray(questionsFromFactory)).filter(q => answers[q.name] == null));
         assign(answers, res);
       } else if (answers[questionOrFactory.name] == null) {
-        const res = await doPrompt([questionOrFactory]).catch(() => ({}));
+        const res = await doPrompt([questionOrFactory]);
         assign(answers, res);
       }
     }
