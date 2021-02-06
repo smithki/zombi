@@ -1,3 +1,15 @@
+# v3.1.2 (Sat Feb 06 2021)
+
+#### ⚠️ Pushed to `master`
+
+- Merge branch 'master' of github.com:smithki/zombi ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.1.0 (Sat Feb 06 2021)
 
 #### 🚀 Enhancement

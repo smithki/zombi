@@ -1,3 +1,18 @@
+# v3.1.2 (Sat Feb 06 2021)
+
+#### ⚠️ Pushed to `master`
+
+- `@zombi/generators`, `zombi`
+  - Merge branch 'master' of github.com:smithki/zombi ([@smithki](https://github.com/smithki))
+- `zombi`
+  - Add previous 'Suspended.answers' implementation back in place ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.1.1 (Sat Feb 06 2021)
 
 #### ⚠️ Pushed to `master`
