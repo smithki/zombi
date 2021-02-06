@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, ReactElement, WeakValidationMap, ValidationMap } from 'react';
+import React, { createContext, useContext, ReactNode, ReactElement } from 'react';
 import { Data as EjsData } from 'ejs';
 import { isBoolean, assign } from 'lodash';
 import { Questions, Maybe } from '../types';
@@ -50,7 +50,9 @@ export interface Zombi<T extends EjsData = EjsData> extends ZombiFsOptions<T> {
 }
 
 export interface ZombiComponent {
-  <T extends EjsData>(props: Zombi<T> & { children?: ReactNode | ((data: T) => ReactNode) }): ReactElement | null;
+  <T extends EjsData>(
+    props: Zombi<T> & { children?: ReactNode | ((data: T) => ReactNode) | ((data: T) => Promise<ReactNode>) },
+  ): ReactElement | null;
 }
 
 /**

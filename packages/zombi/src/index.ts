@@ -3,3 +3,4 @@ export { Zombi, ZombiComponent, ZombiContext, useZombiContext } from './componen
 export { Directory } from './components/directory';
 export { Template } from './components/template';
 export { Questions } from './types';
+export { ZombiError, ZombiErrorCode } from './exceptions';
