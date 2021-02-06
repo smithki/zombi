@@ -20,7 +20,7 @@ const SuspendedImpl: React.FC<{
   // need to attach the answers to the current context...
   const ctxWithAnswers: ZombiContext = {
     ...ctx,
-    data: !isBoolean(ctx.data) && assign({}, ctx.data, Suspended.nodes.get(children)),
+    data: !isBoolean(ctx.data) && assign({}, ctx.data, Suspended.answers.get(children)),
   };
 
   return (
@@ -31,9 +31,6 @@ const SuspendedImpl: React.FC<{
 };
 
 export const Suspended = assign(SuspendedImpl, {
-  /**
-   * A cache of "suspended" answers keyed against
-   * the `children` factory that requires them.
-   */
+  answers: new Map<ReactNode | ((data: EjsData) => ReactNode) | ((data: EjsData) => Promise<ReactNode>), EjsData>(),
   nodes: new Map<ReactNode | ((data: EjsData) => ReactNode) | ((data: EjsData) => Promise<ReactNode>), ReactNode>(),
 });

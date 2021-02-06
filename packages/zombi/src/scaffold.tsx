@@ -185,6 +185,7 @@ async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper
               Suspended.nodes.set((element.props as any).children, await (element.props as any).children(answers));
             }
             assign(globalData, { [(element.props as Zombi).name]: answers });
+            Suspended.answers.set((element.props as any).children, answers);
           } else {
             assign(globalData, { [(element.props as Zombi).name]: { ...(element.props as Zombi).data } });
           }
