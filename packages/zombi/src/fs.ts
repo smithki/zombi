@@ -1,9 +1,9 @@
 import fsExtra from 'fs-extra';
 import { renderFile } from 'ejs';
 import { isAbsolute, join, resolve as pathResolve } from 'path';
-import { isBinary } from 'istextorbinary';
 import chalk from 'chalk';
 import { isNil, isEmpty } from 'lodash';
+import { isBinary } from './utils/is-binary';
 import { createPromise } from './utils/create-promise';
 import { ZombiContext } from './components/zombi';
 import { PromptWrapper } from './types';
