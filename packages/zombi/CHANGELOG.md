@@ -1,3 +1,16 @@
+# v3.1.3 (Thu Feb 11 2021)
+
+#### 🐛 Bug Fix
+
+- Remove 'istextorbinary' dependency [#36](https://github.com/smithki/zombi/pull/36) ([@smithki](https://github.com/smithki))
+- Remove 'istextorbinary' dependency ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.1.2 (Sat Feb 06 2021)
 
 #### ⚠️ Pushed to `master`
