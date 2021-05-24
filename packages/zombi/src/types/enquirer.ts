@@ -245,6 +245,7 @@ declare namespace EnquirerWrapper {
       maxSelected?: number;
     } & types.QuestionBase &
       types.Initializer<string | string[], string[]> &
+      types.Validator<string[], string[]> &
       types.Formatter<string[], string[]>;
 
     export type NumeralQuestionOptions = {
