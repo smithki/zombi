@@ -1,3 +1,16 @@
+# v3.1.4 (Mon May 24 2021)
+
+#### 🐛 Bug Fix
+
+- Fix `MultiSelect` typing [#43](https://github.com/smithki/zombi/pull/43) ([@smithki](https://github.com/smithki))
+- Add Validator typing to MultiSelect question typing ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.1.3 (Thu Feb 11 2021)
 
 #### 🐛 Bug Fix
