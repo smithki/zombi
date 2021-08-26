@@ -1,3 +1,24 @@
+# v3.2.0 (Thu Aug 26 2021)
+
+#### 🚀 Enhancement
+
+- Feature: Symlinks [#46](https://github.com/smithki/zombi/pull/46) ([@smithki](https://github.com/smithki))
+
+#### 🐛 Bug Fix
+
+- Add support for creating symlinks ([@smithki](https://github.com/smithki))
+
+#### 🔩 Dependency Updates
+
+- Bump ssri from 6.0.1 to 6.0.2 [#39](https://github.com/smithki/zombi/pull/39) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.1.4 (Mon May 24 2021)
 
 #### 🐛 Bug Fix

@@ -1,3 +1,15 @@
+# v3.2.0 (Thu Aug 26 2021)
+
+#### 🔩 Dependency Updates
+
+- Bump ssri from 6.0.1 to 6.0.2 [#39](https://github.com/smithki/zombi/pull/39) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 1
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+
+---
+
 # v3.1.2 (Sat Feb 06 2021)
 
 #### ⚠️ Pushed to `master`
