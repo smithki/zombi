@@ -5,7 +5,7 @@ import { ZombiContext } from './zombi';
 export interface Effect<T extends EjsData = EjsData> {
   from: string;
   to: string;
-  options: ZombiContext<T>;
+  options: ZombiContext<T> & { symlink: boolean };
 }
 
 /**

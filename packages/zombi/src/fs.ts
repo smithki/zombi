@@ -10,6 +10,7 @@ import { PromptWrapper } from './types';
 
 export interface FSOptions extends ZombiContext {
   prompt: PromptWrapper;
+  symlink?: boolean;
 }
 
 export async function copy(from: string, to: string, options: FSOptions) {
@@ -24,6 +25,10 @@ async function copyFile(from: string, to: string, options: FSOptions) {
   const paths = resolvePaths(from, to, options);
 
   await createPromise<void>(async (resolve, reject) => {
+    if (options.symlink) {
+      return outputSymlink(paths.from, paths.to, options);
+    }
+
     const buffer = await fsExtra.readFile(paths.from);
 
     const shouldRenderEJS =
@@ -49,6 +54,10 @@ async function copyFile(from: string, to: string, options: FSOptions) {
 async function copyDirectory(from: string, to: string, options: FSOptions) {
   const paths = resolvePaths(from, to, options);
 
+  if (options.symlink) {
+    return outputSymlink(paths.from, paths.to, options);
+  }
+
   const listing = await fsExtra.readdir(paths.from);
 
   for (const item of listing) {
@@ -67,6 +76,18 @@ async function copyDirectory(from: string, to: string, options: FSOptions) {
 }
 
 async function outputFile(data: any, to: string, options: FSOptions) {
+  if (await shouldWriteOutput(to, options)) {
+    await fsExtra.outputFile(to, data);
+  }
+}
+
+async function outputSymlink(from: string, to: string, options: FSOptions) {
+  if (await shouldWriteOutput(to, options)) {
+    await fsExtra.symlink(from, to);
+  }
+}
+
+async function shouldWriteOutput(to: string, options: FSOptions) {
   const prettyTo = prettifyPath(to);
   const doesExist = await fsExtra.pathExists(to);
 
@@ -79,14 +100,11 @@ async function outputFile(data: any, to: string, options: FSOptions) {
         initial: false,
       });
 
-      if (overwrite) {
-        await fsExtra.outputFile(to, data);
-      }
+      return overwrite;
     }
   }
 
-  // Write the file to its destination
-  await fsExtra.outputFile(to, data);
+  return true;
 }
 
 async function isFile(path: string) {
