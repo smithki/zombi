@@ -53,7 +53,8 @@
     }
   },
   "workspaces": [
-    "packages/*"
+    "packages/@zombi/*",
+    "packages/zombi"
   ],
   "auto": {
     "plugins": [

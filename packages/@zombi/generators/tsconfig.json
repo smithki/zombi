@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.settings.json",
+  "extends": "../../../tsconfig.settings.json",
 
   "compilerOptions": {
     "rootDir": "./src",
@@ -10,6 +10,6 @@
   "include": ["./src/**/*.ts", "src/**/*.tsx"],
 
   "references": [
-    { "path": "../zombi" }
+    { "path": "../../zombi" }
   ]
 }

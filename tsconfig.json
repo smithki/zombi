@@ -2,7 +2,7 @@
   "files": [],
 
   "references": [
-    { "path": "./packages/generators" },
+    { "path": "./packages/@zombi/generators" },
     { "path": "./packages/zombi" },
   ]
 }
