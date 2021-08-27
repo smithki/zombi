@@ -3,8 +3,8 @@
 > Core scaffolds built using Zombi.
 
 <p align="center">
-  <a href="https://github.com/smithki/zombi/blob/master/LICENSE">License</a> ·
-  <a href="https://github.com/smithki/zombi/blob/master/CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/smithki/zombi/blob/master/packages/@zombi/generators/LICENSE">License</a> ·
+  <a href="https://github.com/smithki/zombi/blob/master/packages/@zombi/generators/CHANGELOG.md">Changelog</a> ·
   <a href="https://github.com/smithki/zombi/blob/master/CONTRIBUTING.md">Contributing Guide</a>
 </p>
 
