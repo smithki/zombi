@@ -2,5 +2,6 @@ export { scaffold, ScaffoldOptions, ScaffoldResponse, EffectRenderFailed, Effect
 export { Zombi, ZombiComponent, ZombiContext, useZombiContext } from './components/zombi';
 export { Directory } from './components/directory';
 export { Template } from './components/template';
+export { mergePrompts } from './utils/merge-prompts';
 export { Questions } from './types';
 export { ZombiError, ZombiErrorCode } from './exceptions';
