@@ -10,10 +10,8 @@ export interface LicenseFile {
 }
 
 export const LicenseFile: React.FC<LicenseFile> = props => {
-  const {
-    type = getNpmConfig('init-license') || 'MIT',
-    authorName = getNpmConfig<string>('init-author-name') || '',
-  } = props;
+  const { type = getNpmConfig('init-license') || 'MIT', authorName = getNpmConfig<string>('init-author-name') || '' } =
+    props;
 
   return (
     <Zombi name="license-file" templateRoot={path.resolve(__dirname, '../template')}>
