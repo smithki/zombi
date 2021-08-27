@@ -1,3 +1,15 @@
+# v3.2.1 (Fri Aug 27 2021)
+
+#### ⚠️ Pushed to `master`
+
+- Fix symlinks ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.2.0 (Thu Aug 26 2021)
 
 #### 🚀 Enhancement
