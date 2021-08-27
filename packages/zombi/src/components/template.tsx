@@ -66,4 +66,4 @@ const TemplateSymlink: React.FC<TemplateSymlink> = props => {
   );
 };
 
-export const Template = Object.assign(TemplateImpl, { Symlink: TemplateSymlink });
+export const Template = assign(TemplateImpl, { Symlink: TemplateSymlink });

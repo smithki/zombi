@@ -24,11 +24,11 @@ export async function copy(from: string, to: string, options: FSOptions) {
 async function copyFile(from: string, to: string, options: FSOptions) {
   const paths = resolvePaths(from, to, options);
 
-  await createPromise<void>(async (resolve, reject) => {
-    if (options.symlink) {
-      return outputSymlink(paths.from, paths.to, options);
-    }
+  if (options.symlink) {
+    return outputSymlink(paths.from, paths.to, options);
+  }
 
+  await createPromise<void>(async (resolve, reject) => {
     const buffer = await fsExtra.readFile(paths.from);
 
     const shouldRenderEJS =

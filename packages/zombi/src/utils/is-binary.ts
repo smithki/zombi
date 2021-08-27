@@ -2,7 +2,7 @@
  * The utilities in this file are based on the NPM module `istextorbinary`.
  *
  * The implementation is copied here to reduce dependency overhead
- * and improve compatibliity with NodeJS compilers like `@vercel/ncc`.
+ * and improve compatibility with NodeJS compilers like `@vercel/ncc`.
  *
  * @see the `LICENSE` file at the root of this source tree:
  *   https://github.com/bevry/istextorbinary/blob/master/source/index.ts
