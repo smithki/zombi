@@ -1,3 +1,27 @@
+# v3.3.0 (Fri Aug 27 2021)
+
+#### 🚀 Enhancement
+
+- `zombi`
+  - Surface `mergePrompts` utility for combining prompt questions together with strong typing [#49](https://github.com/smithki/zombi/pull/49) ([@smithki](https://github.com/smithki))
+
+#### 🏠 Internal
+
+- `@zombi/generators`, `zombi`
+  - Re-organize repository workspaces [#48](https://github.com/smithki/zombi/pull/48) ([@smithki](https://github.com/smithki))
+
+#### 🔩 Dependency Updates
+
+- Bump path-parse from 1.0.6 to 1.0.7 [#45](https://github.com/smithki/zombi/pull/45) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- Bump tar from 4.4.13 to 4.4.19 [#47](https://github.com/smithki/zombi/pull/47) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### Authors: 2
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.2.1 (Fri Aug 27 2021)
 
 #### ⚠️ Pushed to `master`
