@@ -1,3 +1,19 @@
+# v4.0.0 (Sat Mar 19 2022)
+
+#### 💥 Breaking Change
+
+- V4 [#50](https://github.com/smithki/zombi/pull/50) ([@smithki](https://github.com/smithki))
+
+#### 🐛 Bug Fix
+
+- V4 changes ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.3.0 (Fri Aug 27 2021)
 
 #### 🚀 Enhancement
