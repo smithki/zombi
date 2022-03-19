@@ -1,97 +1,111 @@
-import fsExtra from 'fs-extra';
-import { renderFile } from 'ejs';
-import { isAbsolute, join, resolve as pathResolve } from 'path';
+/* eslint-disable @typescript-eslint/no-floating-promises */
+
+import fse from 'fs-extra';
+import path from 'path';
 import chalk from 'chalk';
-import { isNil, isEmpty } from 'lodash';
+import { renderFile } from 'ejs';
+import { isNil, isEmpty, isString } from 'lodash';
 import { isBinary } from './utils/is-binary';
 import { createPromise } from './utils/create-promise';
-import { ZombiContext } from './components/zombi';
 import { PromptWrapper } from './types';
+import { Effect } from './components/effect';
+import { ensureArray } from './utils/array-helpers';
 
-export interface FSOptions extends ZombiContext {
+type EffectOptions = Effect['options'];
+
+export interface FSOptions extends EffectOptions {
   prompt: PromptWrapper;
-  symlink?: boolean;
 }
 
 export async function copy(from: string, to: string, options: FSOptions) {
-  if (await isFile(from)) {
-    await copyFile(from, to, options);
-  } else if (isDirectory(from)) {
-    await copyDirectory(from, to, options);
+  const resolvedPaths = resolvePaths(from, to, options);
+
+  if (await isFile(resolvedPaths.from)) {
+    await copyFile(resolvedPaths.from, resolvedPaths.to, options);
+  } else if (await isDirectory(resolvedPaths.from)) {
+    await copyDirectory(resolvedPaths.from, resolvedPaths.to, options);
   }
 }
 
 async function copyFile(from: string, to: string, options: FSOptions) {
-  const paths = resolvePaths(from, to, options);
+  const modifier = await options.modifier(to, options.data || {});
+  const modifiedFilepath = modifier && !isString(modifier) ? modifier?.filepath : modifier;
+  const transformer = (modifier && !isString(modifier) && modifier?.transformer) || undefined;
+
+  if (!modifiedFilepath) return;
 
   if (options.symlink) {
-    return outputSymlink(paths.from, paths.to, options);
+    return outputSymlink(from, modifiedFilepath, options);
   }
 
   await createPromise<void>(async (resolve, reject) => {
-    const buffer = await fsExtra.readFile(paths.from);
+    const buffer = await fse.readFile(from);
 
     const shouldRenderEJS =
-      !isBinary(paths.from, buffer) &&
-      !isBinary(paths.to) &&
+      !isBinary(from, buffer) &&
+      !isBinary(modifiedFilepath) &&
       options.data &&
       !isNil(options.data) &&
       !isEmpty(options.data);
 
     if (shouldRenderEJS) {
       // Render file with EJS processing.
-      renderFile(paths.from, options.data || {}, (err, string) => {
+      renderFile(from, options.data || {}, async (err, str) => {
         if (err) reject(err);
-        outputFile(string, to, options).then(resolve).catch(reject);
+        try {
+          const transformedData = transformer ? await transformer(Buffer.from(str)) : str;
+          await outputFile(from, modifiedFilepath, transformedData, options).then(resolve).catch(reject);
+        } catch (transformErr: any) {
+          reject(transformErr);
+        }
       });
     } else {
       // Render file without EJS processing.
-      outputFile(buffer, to, options).then(resolve).catch(reject);
+      try {
+        const transformedData = transformer ? await transformer(buffer) : buffer;
+        await outputFile(from, modifiedFilepath, transformedData, options).then(resolve).catch(reject);
+      } catch (transformErr: any) {
+        reject(transformErr);
+      }
     }
   });
 }
 
-async function copyDirectory(from: string, to: string, options: FSOptions) {
-  const paths = resolvePaths(from, to, options);
-
-  if (options.symlink) {
-    return outputSymlink(paths.from, paths.to, options);
+async function copyDirectory(from: string, to: string, options: FSOptions): Promise<void> {
+  if (ensureArray(options.clobber).includes('directories')) {
+    await fse.remove(path.join(to));
+    return copyDirectory(from, to, {
+      ...options,
+      clobber: ensureArray(options.clobber)?.filter(i => i !== 'directories') as any,
+    });
   }
 
-  const listing = await fsExtra.readdir(paths.from);
-
-  for (const item of listing) {
-    await copy(join(paths.from, item), join(paths.to, item), options);
-  }
-
-  if (options.replaceDirectories) {
-    const destListing = await fsExtra.readdir(paths.to);
-
-    for (const destItem of destListing) {
-      if (!listing.includes(destItem)) {
-        await fsExtra.remove(join(paths.to, destItem));
-      }
-    }
-  }
+  const listing = await fse.readdir(from);
+  await Promise.all(
+    listing.map(async item => {
+      await copy(path.join(from, item), path.join(to, item), options);
+    }),
+  );
 }
 
-async function outputFile(data: any, to: string, options: FSOptions) {
+async function outputFile(from: string, to: string, data: any, options: FSOptions) {
   if (await shouldWriteOutput(to, options)) {
-    await fsExtra.outputFile(to, data);
+    await fse.outputFile(to, data, { mode: options.permission ?? (await fse.stat(from)).mode });
   }
 }
 
 async function outputSymlink(from: string, to: string, options: FSOptions) {
   if (await shouldWriteOutput(to, options)) {
-    await fsExtra.symlink(from, to);
+    await fse.ensureDir(path.dirname(to));
+    await fse.symlink(from, to);
   }
 }
 
 async function shouldWriteOutput(to: string, options: FSOptions) {
   const prettyTo = prettifyPath(to);
-  const doesExist = await fsExtra.pathExists(to);
+  const doesExist = await fse.pathExists(to);
 
-  if (!options.clobber) {
+  if (!ensureArray(options.clobber).includes('files')) {
     if (doesExist) {
       const { overwrite } = await options.prompt<{ overwrite: boolean }>({
         type: 'confirm',
@@ -107,20 +121,20 @@ async function shouldWriteOutput(to: string, options: FSOptions) {
   return true;
 }
 
-async function isFile(path: string) {
-  const stats = await fsExtra.stat(path);
+async function isFile(input: string) {
+  const stats = await fse.stat(input);
   return stats.isFile();
 }
 
-async function isDirectory(path: string) {
-  const stats = await fsExtra.stat(path);
+async function isDirectory(input: string) {
+  const stats = await fse.stat(input);
   return stats.isDirectory();
 }
 
 function resolvePaths(from: string, to: string, options: FSOptions) {
   return {
-    from: isAbsolute(from) ? from : pathResolve(options.templateRoot, from),
-    to: isAbsolute(to) ? to : pathResolve(options.destinationRoot, to),
+    from: path.isAbsolute(from) ? from : path.resolve(options.templateRoot, from),
+    to: path.isAbsolute(to) ? to : path.resolve(options.destinationRoot, to),
   };
 }
 

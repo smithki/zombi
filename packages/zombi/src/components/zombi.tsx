@@ -17,22 +17,19 @@ export function useZombiContext<T extends EjsData = EjsData>() {
 
 export interface ZombiFsOptions<T extends EjsData = EjsData> {
   /**
-   * Whether to force overwrites on file conflicts.
+   * Configure "clobbering" behavior for files & directories.
+   *
+   *  - `"files"`        -  Force overwrites upon file conflicts.
+   *  - `"directories"`  -  Files at the destination location will be removed,
+   *                        otherwise directories will be merged, recursively.
    */
-  clobber?: boolean;
+  clobber?: 'files' | 'directories' | Array<'files' | 'directories'>;
 
   /**
    * EJS data to render into the template.
-   *
-   * If `false`, no EJS syntax is rendered.
+   * If `false`, EJS rendering is skipped.
    */
   data?: Maybe<T>;
-
-  /**
-   * When copying directories with this option enabled, files living at the
-   * supplied location will be deleted, even if they produce no conflicts.
-   */
-  replaceDirectories?: boolean;
 }
 
 export interface Zombi<T extends EjsData = EjsData> extends ZombiFsOptions<T> {

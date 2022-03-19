@@ -20,6 +20,7 @@ export type Questions<T extends EjsData = EjsData> =
 
 export interface PromptWrapper {
   <T extends EjsData>(questions: Questions<T>, initialData?: Maybe<T>): Promise<T>;
+  count: number;
 }
 
-export type Resolveable<T> = T | ((data: EjsData) => T);
+export type Resolveable<T, D extends EjsData = EjsData> = T | ((data: D) => T);

@@ -14,7 +14,7 @@ import { copy, FSOptions } from './fs';
 import { createTimer, HrTime, Timer } from './utils/timer';
 import { ensureArray, cleanArray } from './utils/array-helpers';
 import { Zombi } from './components/zombi';
-import { PromptWrapper } from './types';
+import { Maybe, PromptWrapper, Questions } from './types';
 import { createPromise } from './utils/create-promise';
 import { Suspended } from './components/suspended';
 import { UserCanceledPromptError } from './exceptions';
@@ -78,7 +78,6 @@ export async function scaffold<T extends Record<string, EjsData>>(
 
   if (shouldLog) {
     console.log(gray('Running scaffold') + (name ? ` ${cyan.bold(name)}` : ''));
-    console.log(); // Aesthetics!
     spinner.start();
   }
 
@@ -107,7 +106,7 @@ export async function scaffold<T extends Record<string, EjsData>>(
         };
 
         spinner.stop(); // Aesthetics!
-        console.log(); // Aesthetics!
+        if (prompt.count > 0) console.log(); // Aesthetics!
 
         if (!errors.length) {
           spinner.succeed(gray(`Generated in ${cyan.bold(prettyTimeElapsed)}`));
@@ -223,36 +222,47 @@ const promptLock = new Semaphore(1);
  * We wrap `enquirer` under-the-hood for prompting user input.
  */
 function createPromptWrapper(timer: Timer, spinner: Ora, options?: ScaffoldOptions): PromptWrapper {
-  return async (questions, initialData) => {
-    const doPrompt = async (theQuestions: any[]) => {
-      await promptLock.acquire();
+  const wrappedPrompt: PromptWrapper = assign(
+    async <T extends EjsData>(questions: Questions<T>, initialData: Maybe<T>) => {
+      const doPrompt = async (theQuestions: any[]) => {
+        await promptLock.acquire();
 
-      if (spinner.isSpinning && !options?.quiet) spinner.stop();
-      timer.pause();
+        if (wrappedPrompt.count === 0) console.log(); // Aesthetics!
+        wrappedPrompt.count++;
 
-      return enquirer(theQuestions)
-        .then((answers: any) => {
-          timer.resume();
-          if (!spinner.isSpinning && !options?.quiet) spinner.start();
-          promptLock.signal();
-          return answers;
-        })
-        .catch(() => Promise.reject(UserCanceledPromptError));
-    };
+        if (spinner.isSpinning && !options?.quiet) spinner.stop();
+        timer.pause();
 
-    const answers: any = { ...initialData };
+        return enquirer(theQuestions)
+          .then((answers: any) => {
+            timer.resume();
+            if (!spinner.isSpinning && !options?.quiet) spinner.start();
+            promptLock.signal();
+            return answers;
+          })
+          .catch(() => Promise.reject(UserCanceledPromptError));
+      };
 
-    for (const questionOrFactory of cleanArray(ensureArray(questions))) {
-      if (isFunction(questionOrFactory)) {
-        const questionsFromFactory = questionOrFactory(answers);
-        const res = await doPrompt(cleanArray(ensureArray(questionsFromFactory)).filter(q => answers[q.name] == null));
-        assign(answers, res);
-      } else if (answers[questionOrFactory.name] == null) {
-        const res = await doPrompt([questionOrFactory]);
-        assign(answers, res);
+      const answers: any = { ...initialData };
+
+      for (const questionOrFactory of cleanArray(ensureArray(questions))) {
+        if (isFunction(questionOrFactory)) {
+          const questionsFromFactory = questionOrFactory(answers);
+          const res = await doPrompt(
+            cleanArray(ensureArray(questionsFromFactory)).filter(q => answers[q.name] == null),
+          );
+          assign(answers, res);
+        } else if (answers[questionOrFactory.name] == null) {
+          const res = await doPrompt([questionOrFactory]);
+          assign(answers, res);
+        }
       }
-    }
 
-    return answers;
-  };
+      return answers;
+    },
+
+    { count: 0 },
+  );
+
+  return wrappedPrompt;
 }
