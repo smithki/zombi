@@ -57,7 +57,7 @@ export interface ZombiComponent {
  * components can be nested as deeply as you like and each one can reference a
  * different template source.
  */
-export const Zombi: ZombiComponent = props => {
+export const Zombi: ZombiComponent = (props) => {
   const { children, ...ctx } = props;
 
   const prevCtx = useZombiContext();

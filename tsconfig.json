@@ -1,8 +1,0 @@
-{
-  "files": [],
-
-  "references": [
-    { "path": "./packages/@zombi/generators" },
-    { "path": "./packages/zombi" },
-  ]
-}

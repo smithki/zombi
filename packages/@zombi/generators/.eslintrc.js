@@ -1,7 +1,1 @@
-module.exports = {
-  extends: ['../../../.eslintrc.js'],
-  parserOptions: {
-    project: ['./tsconfig.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+module.exports = require('config/eslint/base')(__dirname);

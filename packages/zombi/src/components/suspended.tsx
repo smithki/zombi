@@ -11,7 +11,7 @@ import { useZombiContext, ZombiContext } from './zombi';
  */
 const SuspendedImpl: React.FC<{
   children: ReactNode | ((data: EjsData) => ReactNode) | ((data: EjsData) => Promise<ReactNode>);
-}> = props => {
+}> = (props) => {
   const { children } = props;
 
   const ctx = useZombiContext()!;

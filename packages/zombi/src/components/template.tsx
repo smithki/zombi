@@ -41,7 +41,7 @@ export interface Template<T extends EjsData = EjsData> extends ZombiFsOptions<T>
     | 'xa+';
 }
 
-const TemplateImpl: TemplateComponent = props => {
+const TemplateImpl: TemplateComponent = (props) => {
   const { name, source, clobber, data, permission, children } = props;
 
   const ctx = useZombiContext();
@@ -51,7 +51,7 @@ const TemplateImpl: TemplateComponent = props => {
     clobber: clobber ?? ctx?.clobber,
     data: !isBoolean(data) && assign({}, ctx?.data, data),
     symlink: false,
-    modifier: children ?? (filepath => filepath),
+    modifier: children ?? ((filepath) => filepath),
     permission: getPermissionsConstant(permission),
   };
 
@@ -68,7 +68,7 @@ export interface TemplateSymlinkComponent {
 
 export interface TemplateSymlink<T extends EjsData = EjsData> extends Omit<Template<T>, 'data'> {}
 
-const TemplateSymlink: TemplateSymlinkComponent = props => {
+const TemplateSymlink: TemplateSymlinkComponent = (props) => {
   const { name, source, clobber, permission, children } = props;
 
   const ctx = useZombiContext();
@@ -78,7 +78,7 @@ const TemplateSymlink: TemplateSymlinkComponent = props => {
     clobber: clobber ?? ctx?.clobber,
     data: assign({}, ctx?.data),
     symlink: true,
-    modifier: children ?? (filepath => filepath),
+    modifier: children ?? ((filepath) => filepath),
     permission: getPermissionsConstant(permission),
   };
 

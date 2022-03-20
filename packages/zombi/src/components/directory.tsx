@@ -19,7 +19,7 @@ export interface Directory<T extends EjsData = EjsData> {
   name: Resolveable<string, T>;
 }
 
-export const Directory: DirectoryComponent = props => {
+export const Directory: DirectoryComponent = (props) => {
   const { name, children } = props;
   const ctx = useZombiContext();
   const pathCtx = useContext(PathContext);

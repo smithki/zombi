@@ -1,4 +1,6 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Default",
   "compilerOptions": {
     "lib": ["esnext"],
     "module": "commonjs",
@@ -15,7 +17,6 @@
     "sourceMap": true,
     "target": "es6",
     "composite": true,
-    "skipLibCheck": true,
-    "typeRoots": ["node_modules/@types"]
+    "skipLibCheck": true
   }
 }

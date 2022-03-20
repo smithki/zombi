@@ -84,7 +84,7 @@ export async function scaffold<T extends Record<string, EjsData>>(
   const { effects, globalData } = await getScaffoldEffects(tree, prompt).catch(handleError(spinner, options));
 
   return renderScaffold(effects, prompt)
-    .then(response => {
+    .then((response) => {
       timeElapsed = timer.stop();
       const prettyTimeElapsed = prettyTime(timeElapsed);
 
@@ -93,7 +93,7 @@ export async function scaffold<T extends Record<string, EjsData>>(
         return { status: x.status, reason: x.reason, ...effects[i] };
       });
 
-      const errors = effectsResults.filter(x => x.status === 'rejected') as EffectRenderFailed[];
+      const errors = effectsResults.filter((x) => x.status === 'rejected') as EffectRenderFailed[];
 
       if (shouldLog) {
         const logErrors = () => {
@@ -144,8 +144,8 @@ function handleError(spinner?: Ora, options?: ScaffoldOptions) {
  * from which we can infer the scaffold's name.
  */
 function getScaffoldName(tree: ReactElement<any>) {
-  return createPromise<string | undefined>(async resolve => {
-    await treeWalker(tree, element => {
+  return createPromise<string | undefined>(async (resolve) => {
+    await treeWalker(tree, (element) => {
       if (isValidElement(element) && element.type === Zombi) {
         // Resolve with the top-level scaffold name.
         resolve((element.props as Zombi).name);
@@ -168,7 +168,7 @@ async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper
   const effects: Effect[] = [];
   const globalData: any = {};
 
-  await treeWalker(tree, async element => {
+  await treeWalker(tree, async (element) => {
     if (isValidElement(element)) {
       switch (element.type) {
         case Effect:
@@ -203,7 +203,7 @@ async function getScaffoldEffects(tree: ReactElement<any>, prompt: PromptWrapper
  * Renders the output for side-effects given by `effects`.
  */
 async function renderScaffold(effects: Effect[], prompt: PromptWrapper) {
-  const effectPromises = effects.map(async e => {
+  const effectPromises = effects.map(async (e) => {
     const options: FSOptions = {
       ...e.options,
       prompt,
@@ -249,7 +249,7 @@ function createPromptWrapper(timer: Timer, spinner: Ora, options?: ScaffoldOptio
         if (isFunction(questionOrFactory)) {
           const questionsFromFactory = questionOrFactory(answers);
           const res = await doPrompt(
-            cleanArray(ensureArray(questionsFromFactory)).filter(q => answers[q.name] == null),
+            cleanArray(ensureArray(questionsFromFactory)).filter((q) => answers[q.name] == null),
           );
           assign(answers, res);
         } else if (answers[questionOrFactory.name] == null) {
