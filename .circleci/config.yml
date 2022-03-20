@@ -121,7 +121,7 @@ jobs:
       - *attach-workspace
       - run:
           name: Publish to NPM
-          command: npm auto shipit
+          command: npx auto shipit
 
 # --- Workflow definitions --------------------------------------------------- #
 
