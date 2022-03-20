@@ -4,10 +4,13 @@
       "dependsOn": ["^build"],
       "outputs": [".melodist/**", "tsconfig.tsbuildinfo"]
     },
-    "lint": {
-      "outputs": []
+    "test": {
+      "cache": false
     },
     "dev": {
+      "cache": false
+    },
+    "lint": {
       "cache": false
     },
     "clean": {

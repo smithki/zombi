@@ -22,11 +22,20 @@ Please note we have a **code of conduct**, please follow it in all your interact
 
 | NPM Script | Usage | Description |
 | ---------- | ----- | ----------- |
-| `dev` | `npm run dev` | Start a hot-reloading development server for all packages, or scoped packages if `--scope` is defined.  |
-| `build` | `npm run build` | Build all packages for production, or scoped packages if `--scope` is defined. |
-| `lint` | `npm run lint` | Run the linter all packages, or scoped packages if `--scope` is defined. |
-| `clean` | `npm run clean` | Run cleaning scripts for all packages, or scoped packages if `--scope` is defined. |
-| `clean:node_modules` | `npm run clean:node_modules` | Remove all `node_modules` recursively. |
+| `dev` | `npm run dev` | Start a development server for all packages, or scoped packages only if `--scope` is defined.  |
+| `build` | `npm run build` | Build all packages for production, or scoped packages only if `--scope` is defined. |
+| `test` | `npm run test` | Run unit-tests for all packages, or scoped packages only if `--scope` is defined. |
+| `lint` | `npm run lint` | Run the linter all packages, or scoped packages only if `--scope` is defined. |
+| `clean` | `npm run clean` | Run cleaning scripts for all packages, or scoped packages only if `--scope` is defined. |
+| `clean:node_modules` | `npm run clean:node_modules` | Remove all `node_modules`, recursively. |
+
+#### Passing arguments to scripts
+
+CLI Arguments (like those for [`turbo`](https://turborepo.org/)), can be passed to `npm run *` using the dash-dash delimiter (`--`). For example:
+
+```zsh
+npm run build -- --scope=@zombi/generators
+```
 
 ## Opening a Pull Request
 
