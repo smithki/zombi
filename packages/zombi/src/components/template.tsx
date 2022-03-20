@@ -44,7 +44,7 @@ export interface Template<T extends EjsData = EjsData> extends ZombiFsOptions<T>
 const TemplateImpl: TemplateComponent = props => {
   const { name, source, clobber, data, permission, children } = props;
 
-  const ctx = useZombiContext()!;
+  const ctx = useZombiContext();
 
   const optionsWithOverrides: Effect<any>['options'] = {
     ...ctx,
@@ -71,7 +71,7 @@ export interface TemplateSymlink<T extends EjsData = EjsData> extends Omit<Templ
 const TemplateSymlink: TemplateSymlinkComponent = props => {
   const { name, source, clobber, permission, children } = props;
 
-  const ctx = useZombiContext()!;
+  const ctx = useZombiContext();
 
   const optionsWithOverrides: Effect<any>['options'] = {
     ...ctx,
@@ -105,8 +105,8 @@ function useFromToValues(
 /**
  * @see https://github.com/nodejs/node/blob/40366df885ec75c7eeee5e7e7626212ae1a6e770/lib/internal/fs.js#L30-L52
  */
-function getPermissionsConstant(permissions: Template['permission']) {
-  switch (permissions) {
+function getPermissionsConstant(permission: Template['permission']) {
+  switch (permission) {
     case 'r':
       return fs.constants.O_RDONLY;
 
