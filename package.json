@@ -6,7 +6,6 @@
   "author": "Ian Smith <hello@iks.codes>",
   "workspaces": [
     "packages/@zombi/*",
-    "packages/config",
     "packages/zombi"
   ],
   "scripts": {
