@@ -15,7 +15,7 @@
     "dev": "melodist dev --platform node --format cjs",
     "build": "melodist build --platform node --format cjs",
     "lint": "eslint --fix --ext .ts,.tsx .",
-    "clean": "rimraf .turbo .melodist"
+    "clean": "rimraf .turbo .melodist tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "ini": "^2.0.0",

@@ -49,7 +49,8 @@ const TemplateImpl: TemplateComponent = (props) => {
   const optionsWithOverrides: Effect<any>['options'] = {
     ...ctx,
     clobber: clobber ?? ctx?.clobber,
-    data: !isBoolean(data) && assign({}, ctx?.data, data),
+    data: assign({}, ctx?.data, data),
+    ejs: data !== false,
     symlink: false,
     modifier: children ?? ((filepath) => filepath),
     permission: getPermissionsConstant(permission),
@@ -77,6 +78,7 @@ const TemplateSymlink: TemplateSymlinkComponent = (props) => {
     ...ctx,
     clobber: clobber ?? ctx?.clobber,
     data: assign({}, ctx?.data),
+    ejs: false,
     symlink: true,
     modifier: children ?? ((filepath) => filepath),
     permission: getPermissionsConstant(permission),

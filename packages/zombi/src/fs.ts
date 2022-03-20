@@ -46,7 +46,8 @@ async function copyFile(from: string, to: string, options: FSOptions) {
       !isBinary(modifiedFilepath) &&
       options.data &&
       !isNil(options.data) &&
-      !isEmpty(options.data);
+      !isEmpty(options.data) &&
+      options.ejs;
 
     if (shouldRenderEJS) {
       // Render file with EJS processing.

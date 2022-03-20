@@ -22,6 +22,7 @@ export interface Effect<T extends EjsData = EjsData> {
   from: string;
   to: string;
   options: ZombiContext<T> & {
+    ejs: boolean;
     symlink: boolean;
     modifier: (filepath: string, data: T) => EffectModifier | Promise<EffectModifier>;
     permission?: number;
