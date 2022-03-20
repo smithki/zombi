@@ -17,7 +17,7 @@ export interface PackageJson {
   };
 }
 
-export const PackageJson: React.FC<PackageJson> = props => {
+export const PackageJson: React.FC<PackageJson> = (props) => {
   const ctx = useZombiContext();
 
   const {

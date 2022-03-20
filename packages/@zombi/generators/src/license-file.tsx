@@ -9,7 +9,7 @@ export interface LicenseFile {
   authorName?: string;
 }
 
-export const LicenseFile: React.FC<LicenseFile> = props => {
+export const LicenseFile: React.FC<LicenseFile> = (props) => {
   const { type = getNpmConfig('init-license') || 'MIT', authorName = getNpmConfig<string>('init-author-name') || '' } =
     props;
 

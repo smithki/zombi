@@ -14,6 +14,9 @@ module.exports = (__dirname) => ({
     'no-useless-constructor': 0,
     'no-async-promise-executor': 0,
 
+    // React
+    "react/require-default-props": 0,
+
     // Import rules
     'import/extensions': 0,
     'import/no-extraneous-dependencies': 0,

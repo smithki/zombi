@@ -23,6 +23,10 @@
   },
   "devDependencies": {
     "@types/ini": "^1.3.30",
-    "config": "*"
+    "config": "*",
+    "react": "^17.0.1"
+  },
+  "peerDependencies": {
+    "react": "^17.0.1"
   }
 }
