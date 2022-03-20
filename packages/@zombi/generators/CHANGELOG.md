@@ -1,3 +1,21 @@
+# v4.1.0 (Sun Mar 20 2022)
+
+#### 🚀 Enhancement
+
+- V4.1 [#52](https://github.com/smithki/zombi/pull/52) ([@smithki](https://github.com/smithki))
+
+#### 🐛 Bug Fix
+
+- Try a fix for CI ([@smithki](https://github.com/smithki))
+- Fix bug preventing 'data' from propagating ([@smithki](https://github.com/smithki))
+- Migrate to Turborepo ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v3.3.0 (Fri Aug 27 2021)
 
 #### 🐛 Bug Fix

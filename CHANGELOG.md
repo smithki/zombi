@@ -1,3 +1,16 @@
+# v4.1.0 (Sun Mar 20 2022)
+
+#### 🚀 Enhancement
+
+- `@zombi/generators`, `zombi`
+  - V4.1 [#52](https://github.com/smithki/zombi/pull/52) ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v4.0.0 (Sat Mar 19 2022)
 
 #### 💥 Breaking Change
