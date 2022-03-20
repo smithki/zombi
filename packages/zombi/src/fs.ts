@@ -46,7 +46,8 @@ async function copyFile(from: string, to: string, options: FSOptions) {
       !isBinary(modifiedFilepath) &&
       options.data &&
       !isNil(options.data) &&
-      !isEmpty(options.data);
+      !isEmpty(options.data) &&
+      options.ejs;
 
     if (shouldRenderEJS) {
       // Render file with EJS processing.
@@ -76,13 +77,13 @@ async function copyDirectory(from: string, to: string, options: FSOptions): Prom
     await fse.remove(path.join(to));
     return copyDirectory(from, to, {
       ...options,
-      clobber: ensureArray(options.clobber)?.filter(i => i !== 'directories') as any,
+      clobber: ensureArray(options.clobber)?.filter((i) => i !== 'directories') as any,
     });
   }
 
   const listing = await fse.readdir(from);
   await Promise.all(
-    listing.map(async item => {
+    listing.map(async (item) => {
       await copy(path.join(from, item), path.join(to, item), options);
     }),
   );

@@ -1,26 +1,23 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
 # Dependencies
-/node_modules
-/**/node_modules
+node_modules
+**/node_modules
 
 # Misc
-/.vscode
-/.idea
+.vscode
+.idea
 .DS_Store
 
 # Test artifacts
-/**/coverage
-/**/.nyc_output
+**/coverage
+**/.nyc_output
 
-# We use Yarn
-/package-lock.json
-/**/package-lock.json
-/**/yarn-error.log
+# Output
+**/.melodist
+**/tsconfig.tsbuildinfo
 
-# Output files
-/**/dist
-
-# ENV
-.env
+# Turborepo
+.turbo
+**/.turbo
 

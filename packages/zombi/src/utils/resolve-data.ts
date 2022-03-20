@@ -1,7 +1,12 @@
 import { isFunction } from 'lodash';
-import { Data as EjsData } from 'ejs';
 import { Resolveable, Maybe } from '../types';
 
-export function resolveData<T>(source: Resolveable<T>, data?: Maybe<EjsData>): T {
+type ValueFromResolveable<T extends Resolveable<any, any>> = T extends Resolveable<infer R, any> ? R : never;
+type DataFromResolveable<T extends Resolveable<any, any>> = T extends Resolveable<any, infer R> ? R : never;
+
+export function resolveData<T extends Resolveable<any, any>>(
+  source: T,
+  data?: Maybe<DataFromResolveable<T>>,
+): ValueFromResolveable<T> {
   return isFunction(source) ? source(data || {}) : source;
 }

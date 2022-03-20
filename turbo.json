@@ -1,0 +1,20 @@
+{
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".melodist/**", "tsconfig.tsbuildinfo"]
+    },
+    "test": {
+      "cache": false
+    },
+    "dev": {
+      "cache": false
+    },
+    "lint": {
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

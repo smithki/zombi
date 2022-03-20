@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "name": "config",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "files": [
+    "eslint-preset.js",
+    "tsconfig.json"
+  ],
+  "devDependencies": {
+    "@ikscodes/eslint-config": "~7.0.2",
+    "@ikscodes/prettier-config": "~2.0.2",
+    "@typescript-eslint/eslint-plugin": "~4.33.0",
+    "eslint": "~7.32.0",
+    "eslint-import-resolver-typescript": "~2.5.0",
+    "eslint-plugin-import": "~2.25.4",
+    "eslint-plugin-jsx-a11y": "~6.5.1",
+    "eslint-plugin-prettier": "~3.4.1",
+    "eslint-plugin-react": "~7.29.4",
+    "eslint-plugin-react-hooks": "~4.3.0",
+    "eslint-config-prettier": "~8.5.0",
+    "prettier": "~2.6.0"
+  }
+}

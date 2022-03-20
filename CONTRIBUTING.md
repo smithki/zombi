@@ -14,7 +14,7 @@ Please note we have a **code of conduct**, please follow it in all your interact
 - For features: `feature/[package_name]/[issue_number]/[descriptive_feature_name]`
 - For chores/the rest: `chore/[package_name]/[descriptive_chore_name]`
 
-4. Install & hoist dependencies with Yarn + Lerna: `yarn bootstrap`
+4. Install & hoist dependencies with NPM + Lerna: `npm install`
 5. Add `./node_modules/.bin` to your system's [`PATH`](https://en.wikipedia.org/wiki/PATH_(variable)), if it's not already listed.
 6. Start building for development: `yarn dev`
 
@@ -22,14 +22,20 @@ Please note we have a **code of conduct**, please follow it in all your interact
 
 | NPM Script | Usage | Description |
 | ---------- | ----- | ----------- |
-| `bootstrap` | `yarn bootstrap` | Install dependencies/set up a local development environment. |
-| `wsrun` | `PKG=$PACKAGE_TARGET yarn wsrun` | Execute arbitrary scripts via `wsrun` for the specified package. |
-| `dev` | `PKG=$PACKAGE_TARGET yarn dev` | Start the specified package in development mode. |
-| `build` | `PKG=$PACKAGE_TARGET yarn build` | Build the specified package for production, or all packages if `$PKG` is omitted. |
-| `clean` | `PKG=$PACKAGE_TARGET yarn clean` | Run cleaning scripts for the specified package, or all packages if `$PKG` is omitted. Available flags: (`--cache`, `--test-artifacts`, `--deps`) |
-| `lint` | `PKG=$PACKAGE_TARGET yarn lint` | Run the linter for the specified package, or all packages if `$PKG` is omitted. |
-| `test` | `PKG=$PACKAGE_TARGET yarn test` | Run tests for the specified package, or all packages if `$PKG` is omitted. |
-| `paths` | `PKG=$PACKAGE_TARGET yarn paths` | Print the relative paths to each project based on the value of `$PKG`. |
+| `dev` | `npm run dev` | Start a development server for all packages, or scoped packages only if `--scope` is defined.  |
+| `build` | `npm run build` | Build all packages for production, or scoped packages only if `--scope` is defined. |
+| `test` | `npm run test` | Run unit-tests for all packages, or scoped packages only if `--scope` is defined. |
+| `lint` | `npm run lint` | Run the linter all packages, or scoped packages only if `--scope` is defined. |
+| `clean` | `npm run clean` | Run cleaning scripts for all packages, or scoped packages only if `--scope` is defined. |
+| `clean:node_modules` | `npm run clean:node_modules` | Remove all `node_modules`, recursively. |
+
+#### Passing arguments to scripts
+
+CLI Arguments (like those for [`turbo`](https://turborepo.org/)), can be passed to `npm run *` using the dash-dash delimiter (`--`). For example:
+
+```zsh
+npm run build -- --scope=@zombi/generators
+```
 
 ## Opening a Pull Request
 

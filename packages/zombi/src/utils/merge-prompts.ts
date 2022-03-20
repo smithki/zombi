@@ -26,7 +26,7 @@ export function mergePrompts<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(...
 export function mergePrompts(...questions: Questions<any>[]): Questions<any> {
   const result: Questions<any> = [];
 
-  questions.forEach(q => {
+  questions.forEach((q) => {
     if (Array.isArray(q)) {
       result.push(...q);
     } else {
