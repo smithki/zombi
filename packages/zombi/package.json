@@ -1,6 +1,6 @@
 {
   "name": "zombi",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Easy-to-use, declarative scaffolding tools.",
   "repository": "smithki/zombi",
   "license": "MIT",
@@ -32,12 +32,12 @@
   },
   "devDependencies": {
     "@types/ejs": "^3.0.5",
-    "@types/react": "^17.0.0",
-    "@types/lodash": "^4.14.157",
-    "@types/pretty-time": "^1.1.0",
-    "@types/node": "^9.4.6",
     "@types/fs-extra": "^5.0.1",
-    "config": "*",
+    "@types/lodash": "^4.14.157",
+    "@types/node": "^9.4.6",
+    "@types/pretty-time": "^1.1.0",
+    "@types/react": "^17.0.0",
+    "config": "^4.1.0",
     "react": "^17.0.1",
     "react-is": "^17.0.1"
   },
