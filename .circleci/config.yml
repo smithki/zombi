@@ -7,14 +7,14 @@ aliases: [
   # CircleCI workspace.
   &dependency-paths [
     "node_modules",
-    "packages/@zombi/*/node_modules",
+    "packages/@zombi/generators/node_modules",
     "packages/zombi/node_modules",
   ],
 
   # List of build output paths that should be persisted to the
   # CircleCI workspace.
   &build-output-paths [
-    "packages/@zombi/*/.melodist",
+    "packages/@zombi/generators/.melodist",
     "packages/zombi/.melodist",
   ],
 
