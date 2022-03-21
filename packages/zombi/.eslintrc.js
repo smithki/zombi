@@ -1,1 +1,1 @@
-module.exports = require('config/eslint/base')(__dirname);
+module.exports = require('@zombi/config/eslint/base')(__dirname);
