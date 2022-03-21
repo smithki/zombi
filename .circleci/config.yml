@@ -72,7 +72,7 @@ jobs:
           key: *dependency-cache-key
       - run:
           name: Install Module Dependencies
-          command: npx lerna bootstrap
+          command: npm install
       - save_cache:
           paths: *dependency-paths
           key: *dependency-cache-key
