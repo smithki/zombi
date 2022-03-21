@@ -1,3 +1,23 @@
+# v4.1.1 (Mon Mar 21 2022)
+
+#### 🐛 Bug Fix
+
+- `@zombi/generators`, `zombi`
+  - Move 'packages/config' to 'packages/@zombi/config' [#53](https://github.com/smithki/zombi/pull/53) ([@smithki](https://github.com/smithki))
+
+#### ⚠️ Pushed to `master`
+
+- Revert: Use lerna bootstrap in CI ([@smithki](https://github.com/smithki))
+- Use lerna bootstrap in CI ([@smithki](https://github.com/smithki))
+- Revert "Remove unnecessary package-lock.json" ([@smithki](https://github.com/smithki))
+- Remove unnecessary package-lock.json ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v4.1.0 (Sun Mar 20 2022)
 
 #### 🚀 Enhancement

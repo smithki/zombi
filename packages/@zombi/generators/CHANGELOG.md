@@ -1,3 +1,17 @@
+# v4.1.1 (Mon Mar 21 2022)
+
+#### 🐛 Bug Fix
+
+- Move 'packages/config' to 'packages/@zombi/config' [#53](https://github.com/smithki/zombi/pull/53) ([@smithki](https://github.com/smithki))
+- Fix linter ([@smithki](https://github.com/smithki))
+- Move 'packages/config' to 'packages/@zombi/config' ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v4.1.0 (Sun Mar 20 2022)
 
 #### 🚀 Enhancement
