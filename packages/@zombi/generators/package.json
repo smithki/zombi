@@ -1,6 +1,6 @@
 {
   "name": "@zombi/generators",
-  "version": "4.1.2",
+  "version": "4.1.3",
   "description": "Core generator scaffolds built using Zombi.",
   "repository": "smithki/zombi",
   "license": "MIT",
@@ -19,11 +19,11 @@
   },
   "dependencies": {
     "ini": "^2.0.0",
-    "zombi": "^4.1.2"
+    "zombi": "^4.1.3"
   },
   "devDependencies": {
     "@types/ini": "^1.3.30",
-    "@zombi/config": "^4.1.2",
+    "@zombi/config": "^4.1.3",
     "react": "^17.0.1"
   },
   "peerDependencies": {
