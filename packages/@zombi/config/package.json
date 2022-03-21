@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@zombi/config",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "main": "index.js",
   "license": "MIT",
   "files": [
