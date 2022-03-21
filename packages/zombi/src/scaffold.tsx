@@ -227,11 +227,11 @@ function createPromptWrapper(timer: Timer, spinner: Ora, options?: ScaffoldOptio
       const doPrompt = async (theQuestions: any[]) => {
         await promptLock.acquire();
 
-        if (wrappedPrompt.count === 0) console.log(); // Aesthetics!
-        wrappedPrompt.count++;
-
         if (spinner.isSpinning && !options?.quiet) spinner.stop();
         timer.pause();
+
+        if (wrappedPrompt.count === 0 && !options?.quiet) console.log(); // Aesthetics!
+        wrappedPrompt.count++;
 
         return enquirer(theQuestions)
           .then((answers: any) => {
