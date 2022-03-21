@@ -1,3 +1,15 @@
+# v4.1.2 (Mon Mar 21 2022)
+
+#### 🐛 Bug Fix
+
+- Remove obsolete package directory (`package/config`) [#54](https://github.com/smithki/zombi/pull/54) ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v4.1.1 (Mon Mar 21 2022)
 
 #### 🐛 Bug Fix
