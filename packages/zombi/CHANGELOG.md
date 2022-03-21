@@ -1,3 +1,15 @@
+# v4.1.3 (Mon Mar 21 2022)
+
+#### ⚠️ Pushed to `master`
+
+- Fix some logging quirks ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v4.1.1 (Mon Mar 21 2022)
 
 #### 🐛 Bug Fix
