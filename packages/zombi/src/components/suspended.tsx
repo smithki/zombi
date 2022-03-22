@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { isBoolean, assign, isFunction } from 'lodash';
-import { Data as EjsData } from 'ejs';
+import type { Data as EjsData } from 'ejs';
 import { useZombiContext, ZombiContext } from './zombi';
 
 /**

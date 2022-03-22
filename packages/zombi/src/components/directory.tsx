@@ -1,7 +1,7 @@
 import React, { createContext, ReactElement, ReactNode, useContext } from 'react';
-import { Data as EjsData } from 'ejs';
+import type { Data as EjsData } from 'ejs';
 import { assign } from 'lodash';
-import { Resolveable } from '../types';
+import type { Resolveable } from '../types';
 import { resolveData } from '../utils/resolve-data';
 import { useZombiContext } from './zombi';
 

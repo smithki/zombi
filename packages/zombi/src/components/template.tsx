@@ -3,7 +3,7 @@
 import React, { ReactElement } from 'react';
 import path from 'path';
 import fs from 'fs';
-import { assign, isBoolean } from 'lodash';
+import { assign } from 'lodash';
 import { Data as EjsData } from 'ejs';
 import { usePathContext } from './directory';
 import { useZombiContext, ZombiFsOptions } from './zombi';
@@ -20,7 +20,7 @@ export interface TemplateComponent {
 export interface Template<T extends EjsData = EjsData> extends ZombiFsOptions<T> {
   name?: Resolveable<string, T>;
   source: Resolveable<string, T>;
-  permission?:
+  permission?: Resolveable<
     | 'r'
     | 'rs'
     | 'sr'
@@ -38,7 +38,9 @@ export interface Template<T extends EjsData = EjsData> extends ZombiFsOptions<T>
     | 'xa'
     | 'a+'
     | 'ax+'
-    | 'xa+';
+    | 'xa+',
+    T
+  >;
 }
 
 const TemplateImpl: TemplateComponent = (props) => {
@@ -46,14 +48,15 @@ const TemplateImpl: TemplateComponent = (props) => {
 
   const ctx = useZombiContext();
 
+  const dataCopy = assign({}, ctx?.data, data);
   const optionsWithOverrides: Effect<any>['options'] = {
     ...ctx,
+    data: dataCopy,
     clobber: clobber ?? ctx?.clobber,
-    data: assign({}, ctx?.data, data),
     ejs: data !== false,
     symlink: false,
     modifier: children ?? ((filepath) => filepath),
-    permission: getPermissionsConstant(permission),
+    permission: getPermissionsConstant(resolveData(permission, dataCopy)),
   };
 
   const { from, to } = useFromToValues(source, name, optionsWithOverrides);
@@ -74,14 +77,15 @@ const TemplateSymlink: TemplateSymlinkComponent = (props) => {
 
   const ctx = useZombiContext();
 
+  const data = assign({}, ctx?.data);
   const optionsWithOverrides: Effect<any>['options'] = {
     ...ctx,
+    data,
     clobber: clobber ?? ctx?.clobber,
-    data: assign({}, ctx?.data),
     ejs: false,
     symlink: true,
     modifier: children ?? ((filepath) => filepath),
-    permission: getPermissionsConstant(permission),
+    permission: getPermissionsConstant(resolveData(permission, data)),
   };
 
   const { from, to } = useFromToValues(source, name, optionsWithOverrides);

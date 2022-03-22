@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode, ReactElement } from 'react';
-import { Data as EjsData } from 'ejs';
+import type { Data as EjsData } from 'ejs';
 import { isBoolean, assign } from 'lodash';
-import { Questions, Maybe } from '../types';
+import type { Questions, Maybe } from '../types';
 import { Suspended } from './suspended';
 
 export type ZombiContext<T extends EjsData = EjsData> = Zombi<T> & {

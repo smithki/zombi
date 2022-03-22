@@ -7,8 +7,8 @@ import { renderFile } from 'ejs';
 import { isNil, isEmpty, isString } from 'lodash';
 import { isBinary } from './utils/is-binary';
 import { createPromise } from './utils/create-promise';
-import { PromptWrapper } from './types';
-import { Effect } from './components/effect';
+import type { PromptWrapper } from './types';
+import type { Effect } from './components/effect';
 import { ensureArray } from './utils/array-helpers';
 
 type EffectOptions = Effect['options'];

@@ -1,5 +1,5 @@
-import { Data as EjsData } from 'ejs';
-import EnquirerWrapper from './enquirer';
+import type { Data as EjsData } from 'ejs';
+import type EnquirerWrapper from './enquirer';
 
 export type Maybe<T> = T | false | null | undefined;
 export type Definitely<T> = Exclude<T, false | null | undefined>;

@@ -1,7 +1,7 @@
-import React, { ReactElement } from 'react';
-import { Data as EjsData } from 'ejs';
-import { ZombiContext } from './zombi';
-import { Maybe } from '../types';
+import type { ReactElement } from 'react';
+import type { Data as EjsData } from 'ejs';
+import type { ZombiContext } from './zombi';
+import type { Maybe } from '../types';
 
 export interface EffectComponent {
   <T extends EjsData>(props: Effect<T>): ReactElement | null;
