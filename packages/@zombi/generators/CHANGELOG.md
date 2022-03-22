@@ -1,3 +1,15 @@
+# v4.1.4 (Tue Mar 22 2022)
+
+#### 🏠 Internal
+
+- Add GitHub templates [#55](https://github.com/smithki/zombi/pull/55) ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v4.1.1 (Mon Mar 21 2022)
 
 #### 🐛 Bug Fix
