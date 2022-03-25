@@ -1,3 +1,18 @@
+# v4.1.5 (Fri Mar 25 2022)
+
+#### ⚠️ Pushed to `master`
+
+- Fix CI/CD ([@smithki](https://github.com/smithki))
+- Update auto ([@smithki](https://github.com/smithki))
+- NPM audit fix ([@smithki](https://github.com/smithki))
+- Update melodist ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v4.1.4 (Tue Mar 22 2022)
 
 #### ⚠️ Pushed to `master`
