@@ -1,4 +1,9 @@
 {
   "version": "4.1.4",
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "command": {
+    "publish": {
+      "verifyAccess": false
+    }
+  }
 }
