@@ -11,6 +11,7 @@
       "cache": false
     },
     "lint": {
+      "dependsOn": ["^build"],
       "cache": false
     },
     "clean": {
