@@ -42,7 +42,7 @@
     "react-is": "^17.0.1"
   },
   "peerDependencies": {
-    "react": "^17.0.1",
-    "react-is": "^17.0.1"
+    "react": ">=17",
+    "react-is": ">=17"
   }
 }
