@@ -1,3 +1,31 @@
+# v5.0.0 (Wed Aug 31 2022)
+
+#### 💥 Breaking Change
+
+- `@zombi/generators`, `zombi`
+  - Fix security errors reported by NPM audit [#60](https://github.com/smithki/zombi/pull/60) ([@smithki](https://github.com/smithki))
+
+#### ⚠️ Pushed to `master`
+
+- Add .env to git ignores ([@smithki](https://github.com/smithki))
+- Re-generate package-lock.json ([@smithki](https://github.com/smithki))
+- Update auto ([@smithki](https://github.com/smithki))
+- Revert: remove lerna ([@smithki](https://github.com/smithki))
+- `@zombi/generators`, `zombi`
+  - Revert version bump ([@smithki](https://github.com/smithki))
+  - CI fixes: remove lerna ([@smithki](https://github.com/smithki))
+
+#### 🏠 Internal
+
+- `@zombi/generators`
+  - Revert: change to package.json versioning [#61](https://github.com/smithki/zombi/pull/61) ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v4.1.5 (Fri Mar 25 2022)
 
 #### ⚠️ Pushed to `master`

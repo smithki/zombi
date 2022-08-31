@@ -1,3 +1,25 @@
+# v5.0.0 (Wed Aug 31 2022)
+
+#### 💥 Breaking Change
+
+- Fix security errors reported by NPM audit [#60](https://github.com/smithki/zombi/pull/60) ([@smithki](https://github.com/smithki))
+
+#### 🐛 Bug Fix
+
+- Bump version to: v5.0.0 \[skip ci\] ([@smithki](https://github.com/smithki))
+- Fix security errors reported by NPM audit ([@smithki](https://github.com/smithki))
+
+#### ⚠️ Pushed to `master`
+
+- Revert version bump ([@smithki](https://github.com/smithki))
+- CI fixes: remove lerna ([@smithki](https://github.com/smithki))
+
+#### Authors: 1
+
+- Ian K Smith ([@smithki](https://github.com/smithki))
+
+---
+
 # v4.1.4 (Tue Mar 22 2022)
 
 #### ⚠️ Pushed to `master`
