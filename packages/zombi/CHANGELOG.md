@@ -1,3 +1,15 @@
+# v6.0.1 (Wed Aug 31 2022)
+
+#### ⚠️ Pushed to `master`
+
+- React 18 support (smithki707@gmail.com)
+
+#### Authors: 1
+
+- Ian K Smith (smithki707@gmail.com)
+
+---
+
 # v6.0.0 (Wed Aug 31 2022)
 
 #### 💥 Breaking Change
