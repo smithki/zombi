@@ -1,3 +1,17 @@
+# v6.0.2 (Wed Aug 31 2022)
+
+#### ⚠️ Pushed to `master`
+
+- Update package-lock.json (smithki707@gmail.com)
+- `@zombi/generators`
+  - Support React 18 (smithki707@gmail.com)
+
+#### Authors: 1
+
+- Ian K Smith (smithki707@gmail.com)
+
+---
+
 # v6.0.1 (Wed Aug 31 2022)
 
 #### ⚠️ Pushed to `master`
