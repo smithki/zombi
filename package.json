@@ -18,7 +18,7 @@
     "clean:node_modules": "rimraf node_modules **/node_modules"
   },
   "devDependencies": {
-    "auto": "^10.36.5",
+    "auto": "^10.37.4",
     "lerna": "~5.5.0",
     "melodist": "0.7.5",
     "rimraf": "3.0.2",
