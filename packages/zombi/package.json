@@ -1,6 +1,6 @@
 {
   "name": "zombi",
-  "version": "4.1.5",
+  "version": "5.0.0",
   "description": "Easy-to-use, declarative scaffolding tools.",
   "repository": "smithki/zombi",
   "license": "MIT",
@@ -37,7 +37,7 @@
     "@types/node": "^9.4.6",
     "@types/pretty-time": "^1.1.0",
     "@types/react": "^17.0.0",
-    "@zombi/config": "*",
+    "@zombi/config": "^5.0.0",
     "react": "^17.0.1",
     "react-is": "^17.0.1"
   },
